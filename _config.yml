@@ -13,7 +13,7 @@ timezone: Asia/Taipei
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: http://yoursite.com
+url: https://annsonic.github.io/
 root: /
 permalink: :year/:month/:day/:title/
 permalink_defaults:
@@ -107,5 +107,5 @@ theme: next
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:
   type: git
-  repository: https://github.com/annsonic/blog.git
+  repository: https://github.com/annsonic/annsonic.github.io.git
   branch: master
