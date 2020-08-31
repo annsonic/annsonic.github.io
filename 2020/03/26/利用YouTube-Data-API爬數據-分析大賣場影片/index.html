@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"annsonic.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta property="og:type" content="article">
+<meta property="og:title" content="利用YouTube Data API爬數據-分析大賣場影片">
+<meta property="og:url" content="https://annsonic.github.io/2020/03/26/%E5%88%A9%E7%94%A8YouTube-Data-API%E7%88%AC%E6%95%B8%E6%93%9A-%E5%88%86%E6%9E%90%E5%A4%A7%E8%B3%A3%E5%A0%B4%E5%BD%B1%E7%89%87/index.html">
+<meta property="og:site_name" content="Ann&#39;s Note">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://annsonic.github.io/2020/03/26/%E5%88%A9%E7%94%A8YouTube-Data-API%E7%88%AC%E6%95%B8%E6%93%9A-%E5%88%86%E6%9E%90%E5%A4%A7%E8%B3%A3%E5%A0%B4%E5%BD%B1%E7%89%87/bar.png">
+<meta property="og:image" content="https://annsonic.github.io/2020/03/26/%E5%88%A9%E7%94%A8YouTube-Data-API%E7%88%AC%E6%95%B8%E6%93%9A-%E5%88%86%E6%9E%90%E5%A4%A7%E8%B3%A3%E5%A0%B4%E5%BD%B1%E7%89%87/bar.png">
+<meta property="og:image" content="https://annsonic.github.io/2020/03/26/%E5%88%A9%E7%94%A8YouTube-Data-API%E7%88%AC%E6%95%B8%E6%93%9A-%E5%88%86%E6%9E%90%E5%A4%A7%E8%B3%A3%E5%A0%B4%E5%BD%B1%E7%89%87/pxmart_other_title.png">
+<meta property="og:image" content="https://annsonic.github.io/2020/03/26/%E5%88%A9%E7%94%A8YouTube-Data-API%E7%88%AC%E6%95%B8%E6%93%9A-%E5%88%86%E6%9E%90%E5%A4%A7%E8%B3%A3%E5%A0%B4%E5%BD%B1%E7%89%87/pxmart_promote_title.png">
+<meta property="og:image" content="https://annsonic.github.io/2020/03/26/%E5%88%A9%E7%94%A8YouTube-Data-API%E7%88%AC%E6%95%B8%E6%93%9A-%E5%88%86%E6%9E%90%E5%A4%A7%E8%B3%A3%E5%A0%B4%E5%BD%B1%E7%89%87/carrefour_promote_title.png">
+<meta property="article:published_time" content="2020-03-26T13:05:15.000Z">
+<meta property="article:modified_time" content="2020-08-31T09:59:44.562Z">
+<meta property="article:author" content="Ann">
+<meta property="article:tag" content="YouTube Data API">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://annsonic.github.io/2020/03/26/%E5%88%A9%E7%94%A8YouTube-Data-API%E7%88%AC%E6%95%B8%E6%93%9A-%E5%88%86%E6%9E%90%E5%A4%A7%E8%B3%A3%E5%A0%B4%E5%BD%B1%E7%89%87/bar.png">
+
+<link rel="canonical" href="https://annsonic.github.io/2020/03/26/%E5%88%A9%E7%94%A8YouTube-Data-API%E7%88%AC%E6%95%B8%E6%93%9A-%E5%88%86%E6%9E%90%E5%A4%A7%E8%B3%A3%E5%A0%B4%E5%BD%B1%E7%89%87/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-TW'
+  };
+</script>
+
+  <title>利用YouTube Data API爬數據-分析大賣場影片 | Ann's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Ann's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://annsonic.github.io/2020/03/26/%E5%88%A9%E7%94%A8YouTube-Data-API%E7%88%AC%E6%95%B8%E6%93%9A-%E5%88%86%E6%9E%90%E5%A4%A7%E8%B3%A3%E5%A0%B4%E5%BD%B1%E7%89%87/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Ann">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ann's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          利用YouTube Data API爬數據-分析大賣場影片
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2020-03-26 21:05:15" itemprop="dateCreated datePublished" datetime="2020-03-26T21:05:15+08:00">2020-03-26</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2020-08-31 17:59:44" itemprop="dateModified" datetime="2020-08-31T17:59:44+08:00">2020-08-31</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Project/" itemprop="url" rel="index"><span itemprop="name">Project</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><img src="/2020/03/26/%E5%88%A9%E7%94%A8YouTube-Data-API%E7%88%AC%E6%95%B8%E6%93%9A-%E5%88%86%E6%9E%90%E5%A4%A7%E8%B3%A3%E5%A0%B4%E5%BD%B1%E7%89%87/bar.png" alt="Average number of comments by mart band" title="avg comments"></p>
+<a id="more"></a>
+
+<h2 id="主題："><a href="#主題：" class="headerlink" title="主題："></a>主題：</h2><p>針對大賣場相關的商品體驗影片，驗證台灣觀眾會因為賣場品牌而有不同的關注點，關注點分為3類：好物推薦、新品開箱、其他消費體驗</p>
+<h2 id="假設："><a href="#假設：" class="headerlink" title="假設："></a>假設：</h2><p>(1)影片的留言者皆非大賣場員工，留言數正比於觀眾的共鳴強度</p>
+<p>(2)關鍵字可以反映商業的意圖，故可將影片的意圖屬性簡單分類為好物推薦、新品開箱、其他消費體驗，假設我選定的關鍵字具有代表性</p>
+<p>(3)YouTube回傳的搜尋結果(前50部片)具有取樣代表性</p>
+<h2 id="方法："><a href="#方法：" class="headerlink" title="方法："></a>方法：</h2><p>(1)搜尋標題帶有大賣場名稱的影片，亦即：全聯、家樂福、好市多 (排除大潤發、愛買與頂好，因為影片數量過少)</p>
+<p>(2)將影片標題依關鍵字分為3大類：好物推薦(Promoted)、新品開箱(Trial)、其他消費體驗(Other)，對應關鍵字為</p>
+<ul>
+<li>好物推薦 - 必買、CP值、推薦、評比</li>
+<li>新品開箱 - 開箱、介紹、試<br>而標題不帶上述關鍵字者歸入其他消費體驗類</li>
+</ul>
+<p>(3)以文字雲分別檢視各類的影片標題、影片留言的熱門字</p>
+<p>(4)統計三類影片的留言數</p>
+<h2 id="實驗限制："><a href="#實驗限制：" class="headerlink" title="實驗限制："></a>實驗限制：</h2><p>受限個人不熟悉自然語言處理，所以能對文字雲做的語意分析程度有限</p>
+<h2 id="結果"><a href="#結果" class="headerlink" title="結果:"></a>結果:</h2><p><img src="/2020/03/26/%E5%88%A9%E7%94%A8YouTube-Data-API%E7%88%AC%E6%95%B8%E6%93%9A-%E5%88%86%E6%9E%90%E5%A4%A7%E8%B3%A3%E5%A0%B4%E5%BD%B1%E7%89%87/bar.png" alt="Average number of comments by mart band" title="avg comments"></p>
+<p>(1)條狀圖顯示台灣觀眾會因為賣場品牌而有不同的關注點，關注點分為3類：好物推薦(blue column)、新品開箱(orange column)、其他消費體驗(green column)。</p>
+<p>(2)好市多的開箱類影片最吸引觀眾留言，一部開箱影片的平均留言人數達419人次、遠高於好物推薦類(128人次)與其他消費體驗類(79人次)，顯著不同於全聯和家樂福的情況，推測因為好市多的商品是大份量販售、平均單價低廉但總價高，故消費者在購買前會比較謹慎，會參考別人的開箱心得再決定購買，已購買者也會樂意分享個人心得於留言。合計平均留言人數也是勝過其他兩個賣場。</p>
+<p>(3)文字雲顯示，我的關鍵字分類還是不夠精確，新品開箱類影片被歸類為其他消費體驗類，例如全聯的抹茶；收集的留言數量也隨著不同時間點搜尋影片而得到不同的數字。不過普遍來說，開箱類影片比起推薦類影片有更高的留言量，推測是因為開箱類傾向於介紹新檔期美食，觀眾好奇美食的口味、也易引起已嘗鮮者的共鳴。</p>
+<ul>
+<li>全聯其他消費體驗類標題<br><img src="/2020/03/26/%E5%88%A9%E7%94%A8YouTube-Data-API%E7%88%AC%E6%95%B8%E6%93%9A-%E5%88%86%E6%9E%90%E5%A4%A7%E8%B3%A3%E5%A0%B4%E5%BD%B1%E7%89%87/pxmart_other_title.png" alt="Word_cloud_pxmart_other_title" title="word cloud"></li>
+</ul>
+<p>(4)全聯影片的標題文字雲集中在強打甜點活動的品項上，感覺跟全聯注重社群行銷有關，業配影片的嫌疑性高。</p>
+<ul>
+<li>好物標題文字雲(全聯 vs 家樂福)<br><img src="/2020/03/26/%E5%88%A9%E7%94%A8YouTube-Data-API%E7%88%AC%E6%95%B8%E6%93%9A-%E5%88%86%E6%9E%90%E5%A4%A7%E8%B3%A3%E5%A0%B4%E5%BD%B1%E7%89%87/pxmart_promote_title.png" alt="Word_cloud_pxmart_promote_title" title="word cloud"><br><img src="/2020/03/26/%E5%88%A9%E7%94%A8YouTube-Data-API%E7%88%AC%E6%95%B8%E6%93%9A-%E5%88%86%E6%9E%90%E5%A4%A7%E8%B3%A3%E5%A0%B4%E5%BD%B1%E7%89%87/carrefour_promote_title.png" alt="Word_cloud_carrefour_promote_title" title="word cloud"></li>
+</ul>
+<hr>
+<h2 id="後記"><a href="#後記" class="headerlink" title="後記"></a>後記</h2><p>(非教學文)這學期的作業。<br>老師出題的用意只是讓學生練習使用YouTube Data API爬影片的數據，<br>不過因為要分析的主題是自己決定，<br>反而花了很多時間想研究題目，<br>分析結果不是很專業，<br>但被選為當次模範作業，<br>頗有成就感所以紀錄一下以茲紀念。</p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>作者： </strong>Ann
+  </li>
+  <li class="post-copyright-link">
+    <strong>文章連結：</strong>
+    <a href="https://annsonic.github.io/2020/03/26/%E5%88%A9%E7%94%A8YouTube-Data-API%E7%88%AC%E6%95%B8%E6%93%9A-%E5%88%86%E6%9E%90%E5%A4%A7%E8%B3%A3%E5%A0%B4%E5%BD%B1%E7%89%87/" title="利用YouTube Data API爬數據-分析大賣場影片">https://annsonic.github.io/2020/03/26/利用YouTube-Data-API爬數據-分析大賣場影片/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版權聲明： </strong>本網誌所有文章除特別聲明外，均採用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 許可協議。轉載請註明出處！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/YouTube-Data-API/" rel="tag"># YouTube Data API</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/03/11/%E9%80%A0%E5%9E%8B%E6%B0%A3%E7%90%83%E2%80%94%E5%8C%97%E6%A5%B5%E7%86%8A/" rel="prev" title="造型氣球—北極熊">
+      <i class="fa fa-chevron-left"></i> 造型氣球—北極熊
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/03/28/%E9%80%A0%E5%9E%8B%E6%B0%A3%E7%90%83-%E5%B0%8F%E7%B4%85%E5%B8%BD/" rel="next" title="造型氣球-小紅帽">
+      造型氣球-小紅帽 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BB%E9%A1%8C%EF%BC%9A"><span class="nav-number">1.</span> <span class="nav-text">主題：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%81%87%E8%A8%AD%EF%BC%9A"><span class="nav-number">2.</span> <span class="nav-text">假設：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%B3%95%EF%BC%9A"><span class="nav-number">3.</span> <span class="nav-text">方法：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%A6%E9%A9%97%E9%99%90%E5%88%B6%EF%BC%9A"><span class="nav-number">4.</span> <span class="nav-text">實驗限制：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B5%90%E6%9E%9C"><span class="nav-number">5.</span> <span class="nav-text">結果:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BE%8C%E8%A8%98"><span class="nav-number">6.</span> <span class="nav-text">後記</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Ann</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ann</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 強力驅動
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
