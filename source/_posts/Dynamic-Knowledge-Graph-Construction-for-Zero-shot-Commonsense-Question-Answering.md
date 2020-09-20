@@ -67,8 +67,7 @@ COMeT有提供source code: https://github.com/atcbosselut/comet-commonsense
   ![story_commonsense_exp](9.png "story exp.")
 
 ## 個人感想
-* 我使用COMeT、發現它的推論有點久，
-  GPU要等上9秒才算完一筆推論
+* COMeT能接受的句型有限，應該是受限於ATOMIC資料集句子、偏向簡短的SVO句型
 * 實驗中如何得到情緒分類的標籤...關於這點作者沒有交待清楚，
   COMeT產生的xReact不是完全照情緒分類的標籤名稱，
   像是這樣
