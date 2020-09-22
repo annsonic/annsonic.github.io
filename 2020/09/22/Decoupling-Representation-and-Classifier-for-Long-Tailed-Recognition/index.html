@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"annsonic.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="2020年發表於ICLR，作者來自於Facebook AI，有提供source codehttps:&#x2F;&#x2F;github.com&#x2F;facebookresearch&#x2F;classifier-balancing我讀這一篇是因為碰到長尾分佈下的分類問題，試過給loss加權重、但沒幫助，而這篇建議的re-sampling技巧我試過覺得有用，在此紀錄一下自己從中學習到的。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Decoupling Representation and Classifier for Long-Tailed Recognition">
+<meta property="og:url" content="https://annsonic.github.io/2020/09/22/Decoupling-Representation-and-Classifier-for-Long-Tailed-Recognition/index.html">
+<meta property="og:site_name" content="Ann&#39;s Note">
+<meta property="og:description" content="2020年發表於ICLR，作者來自於Facebook AI，有提供source codehttps:&#x2F;&#x2F;github.com&#x2F;facebookresearch&#x2F;classifier-balancing我讀這一篇是因為碰到長尾分佈下的分類問題，試過給loss加權重、但沒幫助，而這篇建議的re-sampling技巧我試過覺得有用，在此紀錄一下自己從中學習到的。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://annsonic.github.io/2020/09/22/Decoupling-Representation-and-Classifier-for-Long-Tailed-Recognition/0.png">
+<meta property="og:image" content="https://annsonic.github.io/2020/09/22/Decoupling-Representation-and-Classifier-for-Long-Tailed-Recognition/1.png">
+<meta property="og:image" content="https://annsonic.github.io/2020/09/22/Decoupling-Representation-and-Classifier-for-Long-Tailed-Recognition/3.png">
+<meta property="og:image" content="https://annsonic.github.io/2020/09/22/Decoupling-Representation-and-Classifier-for-Long-Tailed-Recognition/4.png">
+<meta property="og:image" content="https://annsonic.github.io/2020/09/22/Decoupling-Representation-and-Classifier-for-Long-Tailed-Recognition/2.png">
+<meta property="og:image" content="https://annsonic.github.io/2020/09/22/Decoupling-Representation-and-Classifier-for-Long-Tailed-Recognition/5.png">
+<meta property="og:image" content="https://annsonic.github.io/2020/09/22/Decoupling-Representation-and-Classifier-for-Long-Tailed-Recognition/6.png">
+<meta property="og:image" content="https://annsonic.github.io/2020/09/22/Decoupling-Representation-and-Classifier-for-Long-Tailed-Recognition/7.png">
+<meta property="og:image" content="https://annsonic.github.io/2020/09/22/Decoupling-Representation-and-Classifier-for-Long-Tailed-Recognition/8.png">
+<meta property="article:published_time" content="2020-09-22T10:34:39.000Z">
+<meta property="article:modified_time" content="2020-09-22T10:45:02.826Z">
+<meta property="article:author" content="Ann">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://annsonic.github.io/2020/09/22/Decoupling-Representation-and-Classifier-for-Long-Tailed-Recognition/0.png">
+
+<link rel="canonical" href="https://annsonic.github.io/2020/09/22/Decoupling-Representation-and-Classifier-for-Long-Tailed-Recognition/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-TW'
+  };
+</script>
+
+  <title>Decoupling Representation and Classifier for Long-Tailed Recognition | Ann's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Ann's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://annsonic.github.io/2020/09/22/Decoupling-Representation-and-Classifier-for-Long-Tailed-Recognition/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Ann">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ann's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Decoupling Representation and Classifier for Long-Tailed Recognition
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+              
+
+              <time title="創建時間：2020-09-22 18:34:39 / 修改時間：18:45:02" itemprop="dateCreated datePublished" datetime="2020-09-22T18:34:39+08:00">2020-09-22</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Interested-Paper/" itemprop="url" rel="index"><span itemprop="name">Interested Paper</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>2020年發表於ICLR，<br>作者來自於Facebook AI，<br>有提供source code<br><a target="_blank" rel="noopener" href="https://github.com/facebookresearch/classifier-balancing">https://github.com/facebookresearch/classifier-balancing</a><br>我讀這一篇是因為碰到長尾分佈下的分類問題，<br>試過給loss加權重、但沒幫助，<br>而這篇建議的re-sampling技巧我試過覺得有用，<br>在此紀錄一下自己從中學習到的。</p>
+<a id="more"></a>
+
+<h2 id="觀點與事實"><a href="#觀點與事實" class="headerlink" title="觀點與事實"></a>觀點與事實</h2><ul>
+<li>此文獻建議以2階段的取樣方式來處理長尾分佈下的分類問題<br><img src="/2020/09/22/Decoupling-Representation-and-Classifier-for-Long-Tailed-Recognition/0.png" alt="method" title="2 stage learning"></li>
+<li>(第一階段)學習好的圖片特徵，<br>以 instance-balanced sampling 方式採樣，<br>一起訓練捲積層和分類器。</li>
+<li>(第二階段)學習分類，<br>固定捲積層不動，<br>以 class-balanced sampling 方式採樣、重新訓練分類器，<br>或是 τ-normalized 將分類器的權重做正規化、τ是超參數，<br>或是 Learnable weight scaling。</li>
+<li>在ImageNet-LT資料集上得到的top-1準確度53.3%(SOTA)，<br>Places-LT上得到top-1準確度37.9%<br>iNaturalist上得到top-1準確度72.5%。</li>
+</ul>
+<h2 id="背景簡介"><a href="#背景簡介" class="headerlink" title="背景簡介"></a>背景簡介</h2><ul>
+<li>長尾分佈如下圖，<br>現實中往往有稀有的類別，<br>難以採集到均衡的資料<br><img src="/2020/09/22/Decoupling-Representation-and-Classifier-for-Long-Tailed-Recognition/1.png" alt="long tailed" title="Imbalanced dataset"></li>
+<li>當數據的分佈極不平衡時，<br>會造成分類器學習到的是”數據的分佈機率”、偏好佔多數的種類。</li>
+<li>資料平衡的可能方法:<ul>
+<li>Oversample the minority class.</li>
+<li>Undersample the majority class.</li>
+<li>Synthesize new minority classes.<br>但是有過擬合、欠擬合的副作用。<br>[1] <a target="_blank" rel="noopener" href="https://www.svds.com/learning-imbalanced-classes/">Oversampling and undersampling, Synthesizing new examples: SMOTE</a></li>
+</ul>
+</li>
+<li>可以依類別給予不同的loss權重<br>[1] <a target="_blank" rel="noopener" href="https://www.svds.com/learning-imbalanced-classes/">Adjusting class weights</a></li>
+</ul>
+<h2 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h2><ul>
+<li>取樣方式，比較重要的<ul>
+<li>Instance-balanced sampling<br>每個資料點都一樣的機率被選中</li>
+<li>Class-balanced sampling<br>先公平地選擇類別，然後在該類別再公平地選擇資料點<br><img src="/2020/09/22/Decoupling-Representation-and-Classifier-for-Long-Tailed-Recognition/3.png" alt="sampling" title="Sampling strategies"></li>
+</ul>
+</li>
+<li>第二階段的分類器訓練方式<ul>
+<li>Classifier Re-training (cRT)<br>以 class-balanced sampling 方式採樣重新訓練分類器</li>
+<li>τ-normalized<br>將第一階段的分類器的權重做正規化，<br>τ是超參數，作者經由cross validation做選擇</li>
+<li>Learnable weight scaling (LWS)<br>將正規化的係數也透過模型學習，<br>但我不清楚作者用什麼模型來學習<br><img src="/2020/09/22/Decoupling-Representation-and-Classifier-for-Long-Tailed-Recognition/4.png" alt="classifier type" title="Classifier strategies"></li>
+</ul>
+</li>
+</ul>
+<h2 id="實驗結果節錄"><a href="#實驗結果節錄" class="headerlink" title="實驗結果節錄"></a>實驗結果節錄</h2><p>  下圖是作者繪出分類器的權值L2範數對於各類資料的分佈，<br>  橫軸由左至右，是多數類別至少數類別，<br>  黑色虛線表示資料筆數，<br>  藍色線是normal training分類器的權值L2，<br>  可以看到稀有類別的權值比較小，<br>  影響其logit也小，<br>  softmax結果便會偏向佔多數的類別勝出。</p>
+<p>  而綠色線是cRT得到分類器的權值L2，<br>  它犧牲多數類別的權值，<br>  稀有類別的權值比較高。</p>
+<p>  τ-norm(黃線) 和 LWS(棕線)表現差不多，<br>  他們對權重的平衡比較折衷。</p>
+<p>  <img src="/2020/09/22/Decoupling-Representation-and-Classifier-for-Long-Tailed-Recognition/2.png" alt="long tailed issue" title="Imbalanced dataset issue"></p>
+<ul>
+<li>與前作的分類準確度比較<br><img src="/2020/09/22/Decoupling-Representation-and-Classifier-for-Long-Tailed-Recognition/5.png" alt="imagenet-lt" title="imagenet-lt exp."><br><img src="/2020/09/22/Decoupling-Representation-and-Classifier-for-Long-Tailed-Recognition/6.png" alt="iNaturalist" title="iNaturalist exp."></li>
+</ul>
+<h2 id="個人感想"><a href="#個人感想" class="headerlink" title="個人感想"></a>個人感想</h2><ul>
+<li>容易搭配，<br>因為只須改變sampling方式和調整fully connect layer，<br>可以與不同的backbone架構搭配。</li>
+<li>Class-balanced sampling是最簡便的，<br>只是應該會影響batch size的選擇…<br>例如batch size會是類別數目的倍數，<br>又，等效訓練batch數變多(拉長訓練時間)</li>
+<li>我用在我的文字情緒分類問題上，有效，<br>獻醜了，<br>我的資料筆數：230, 210, 150, 60, 60, 50 … 12，<br>是長尾分佈，<br>feature extrator是拿別人pre-trained好，<br>我只訓練fully connect layer。<br>這是Instance-balanced sampling得到的混搖矩陣<br><img src="/2020/09/22/Decoupling-Representation-and-Classifier-for-Long-Tailed-Recognition/7.png" alt="ib" title="ib exp."><br>這是Class-balanced sampling得到的混搖矩陣<br><img src="/2020/09/22/Decoupling-Representation-and-Classifier-for-Long-Tailed-Recognition/8.png" alt="cb" title="ib exp."><br>兩者準確率沒差，<br>但Class-balanced sampling的precision較均衡、f1-score高了10%。</li>
+</ul>
+<h2 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h2><p>[1] 資料不平衡時的訓練技巧 <a target="_blank" rel="noopener" href="https://www.svds.com/learning-imbalanced-classes/">https://www.svds.com/learning-imbalanced-classes/</a><br>[2] 論文心得 <a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/158638078">https://zhuanlan.zhihu.com/p/158638078</a><br>[3] 論文心得 <a target="_blank" rel="noopener" href="https://blog.csdn.net/shanglianlm/article/details/105973699">https://blog.csdn.net/shanglianlm/article/details/105973699</a></p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>作者： </strong>Ann
+  </li>
+  <li class="post-copyright-link">
+    <strong>文章連結：</strong>
+    <a href="https://annsonic.github.io/2020/09/22/Decoupling-Representation-and-Classifier-for-Long-Tailed-Recognition/" title="Decoupling Representation and Classifier for Long-Tailed Recognition">https://annsonic.github.io/2020/09/22/Decoupling-Representation-and-Classifier-for-Long-Tailed-Recognition/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版權聲明： </strong>本網誌所有文章除特別聲明外，均採用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 許可協議。轉載請註明出處！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/09/20/%E9%80%A0%E5%9E%8B%E6%B0%A3%E7%90%83-%E6%A3%92%E6%A3%92%E7%B3%96/" rel="prev" title="造型氣球-棒棒糖">
+      <i class="fa fa-chevron-left"></i> 造型氣球-棒棒糖
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%80%E9%BB%9E%E8%88%87%E4%BA%8B%E5%AF%A6"><span class="nav-number">1.</span> <span class="nav-text">觀點與事實</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%83%8C%E6%99%AF%E7%B0%A1%E4%BB%8B"><span class="nav-number">2.</span> <span class="nav-text">背景簡介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%A6%E9%A9%97%E7%B5%90%E6%9E%9C%E7%AF%80%E9%8C%84"><span class="nav-number">4.</span> <span class="nav-text">實驗結果節錄</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%80%8B%E4%BA%BA%E6%84%9F%E6%83%B3"><span class="nav-number">5.</span> <span class="nav-text">個人感想</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%83%E8%80%83%E8%B3%87%E6%96%99"><span class="nav-number">6.</span> <span class="nav-text">參考資料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Ann</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ann</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 強力驅動
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
