@@ -40,7 +40,10 @@ categories: Project
    其image normalozation的mean和std設定值是由COCO資料集算出來的，
    我比較用Blood Cells資料集算出來的mean和std，
    雖然圖片的色調明暗差異大，
-   但模型準確度是差異不大，
+   但模型準確度是差異不大。
+
+   我的計算程式源自[這裡]，
+   [參考：NVidia的影像正規化效果說明](https://docs.nvidia.com/deeplearning/dali/master-user-guide/docs/examples/general/normalize.html)
    見下圖，是重複實驗3次、取平均的結果，
    虛線是使用COCO資料集圖片的mean、var，
    實線是使用Blood Cells資料集的mean、var，
