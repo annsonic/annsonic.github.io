@@ -20,21 +20,23 @@
     var CONFIG = {"hostname":"annsonic.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta property="og:type" content="article">
-<meta property="og:title" content="造型氣球—北極熊">
-<meta property="og:url" content="https://annsonic.github.io/2020/03/11/%E9%80%A0%E5%9E%8B%E6%B0%A3%E7%90%83%E2%80%94%E5%8C%97%E6%A5%B5%E7%86%8A/index.html">
+  <meta name="description" content="未完個人練習，以RetinaNet數血液細胞的個數。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="計數血液細胞-使用RetinaNet">
+<meta property="og:url" content="https://annsonic.github.io/2020/11/08/%E8%A8%88%E6%95%B8%E8%A1%80%E6%B6%B2%E7%B4%B0%E8%83%9E-%E4%BD%BF%E7%94%A8RetinaNet/index.html">
 <meta property="og:site_name" content="Ann&#39;s Note">
+<meta property="og:description" content="未完個人練習，以RetinaNet數血液細胞的個數。">
 <meta property="og:locale" content="zh_TW">
-<meta property="og:image" content="https://annsonic.github.io/2020/03/11/%E9%80%A0%E5%9E%8B%E6%B0%A3%E7%90%83%E2%80%94%E5%8C%97%E6%A5%B5%E7%86%8A/polar_bear.jpg">
-<meta property="og:image" content="https://annsonic.github.io/2020/03/11/%E9%80%A0%E5%9E%8B%E6%B0%A3%E7%90%83%E2%80%94%E5%8C%97%E6%A5%B5%E7%86%8A/g.jpg">
-<meta property="article:published_time" content="2020-03-11T11:33:39.000Z">
-<meta property="article:modified_time" content="2020-08-31T04:49:38.703Z">
+<meta property="og:image" content="https://annsonic.github.io/2020/11/08/%E8%A8%88%E6%95%B8%E8%A1%80%E6%B6%B2%E7%B4%B0%E8%83%9E-%E4%BD%BF%E7%94%A8RetinaNet/compare.png">
+<meta property="article:published_time" content="2020-11-08T13:35:39.000Z">
+<meta property="article:modified_time" content="2020-11-08T14:58:24.215Z">
 <meta property="article:author" content="Ann">
-<meta property="article:tag" content="polar bear">
+<meta property="article:tag" content="Object detection">
+<meta property="article:tag" content="RetinaNet">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://annsonic.github.io/2020/03/11/%E9%80%A0%E5%9E%8B%E6%B0%A3%E7%90%83%E2%80%94%E5%8C%97%E6%A5%B5%E7%86%8A/polar_bear.jpg">
+<meta name="twitter:image" content="https://annsonic.github.io/2020/11/08/%E8%A8%88%E6%95%B8%E8%A1%80%E6%B6%B2%E7%B4%B0%E8%83%9E-%E4%BD%BF%E7%94%A8RetinaNet/compare.png">
 
-<link rel="canonical" href="https://annsonic.github.io/2020/03/11/%E9%80%A0%E5%9E%8B%E6%B0%A3%E7%90%83%E2%80%94%E5%8C%97%E6%A5%B5%E7%86%8A/">
+<link rel="canonical" href="https://annsonic.github.io/2020/11/08/%E8%A8%88%E6%95%B8%E8%A1%80%E6%B6%B2%E7%B4%B0%E8%83%9E-%E4%BD%BF%E7%94%A8RetinaNet/">
 
 
 <script id="page-configurations">
@@ -47,7 +49,7 @@
   };
 </script>
 
-  <title>造型氣球—北極熊 | Ann's Note</title>
+  <title>計數血液細胞-使用RetinaNet | Ann's Note</title>
   
 
 
@@ -162,7 +164,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
-    <link itemprop="mainEntityOfPage" href="https://annsonic.github.io/2020/03/11/%E9%80%A0%E5%9E%8B%E6%B0%A3%E7%90%83%E2%80%94%E5%8C%97%E6%A5%B5%E7%86%8A/">
+    <link itemprop="mainEntityOfPage" href="https://annsonic.github.io/2020/11/08/%E8%A8%88%E6%95%B8%E8%A1%80%E6%B6%B2%E7%B4%B0%E8%83%9E-%E4%BD%BF%E7%94%A8RetinaNet/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -175,7 +177,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          造型氣球—北極熊
+          計數血液細胞-使用RetinaNet
         </h1>
 
         <div class="post-meta">
@@ -184,23 +186,17 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">發表於</span>
+              
 
-              <time title="創建時間：2020-03-11 19:33:39" itemprop="dateCreated datePublished" datetime="2020-03-11T19:33:39+08:00">2020-03-11</time>
+              <time title="創建時間：2020-11-08 21:35:39 / 修改時間：22:58:24" itemprop="dateCreated datePublished" datetime="2020-11-08T21:35:39+08:00">2020-11-08</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新於</span>
-                <time title="修改時間：2020-08-31 12:49:38" itemprop="dateModified" datetime="2020-08-31T12:49:38+08:00">2020-08-31</time>
-              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
               </span>
               <span class="post-meta-item-text">分類於</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Balloon-Twisting/" itemprop="url" rel="index"><span itemprop="name">Balloon Twisting</span></a>
+                  <a href="/categories/Project/" itemprop="url" rel="index"><span itemprop="name">Project</span></a>
                 </span>
             </span>
 
@@ -215,18 +211,64 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p><img src="/2020/03/11/%E9%80%A0%E5%9E%8B%E6%B0%A3%E7%90%83%E2%80%94%E5%8C%97%E6%A5%B5%E7%86%8A/polar_bear.jpg" alt="polar bear" title="balloon twisting polar bear"></p>
+        <p>未完<br>個人練習，以RetinaNet數血液細胞的個數。</p>
 <a id="more"></a>
 
-<p>參考Smile for Kids先生的教學做的~ <a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=1_ihCOLohHE">教學影片傳送門</a><br>材料:</p>
+<h2 id="主題："><a href="#主題：" class="headerlink" title="主題："></a>主題：</h2><p>計算一張血塗片影像中出現的血小板(Platelet)、紅血球(RBC)和白血球(WBC)的個數。<br>並運用一些訓練技巧: </p>
 <ul>
-<li>熊:白色260氣球，充氣至尾端留8指</li>
-<li>圍巾:紅色260氣球，充氣至30cm長(或是用半條氣球即可)，用160氣球可能更好</li>
-<li>剪刀</li>
-<li>黑色奇異筆</li>
+<li>資料增量： GridMask, Mosaic</li>
+<li>正規化：DropBlock</li>
 </ul>
-<p>個人覺得不是很簡單，<br>我沒做到熊熊飽滿的臉…因為要將鼻子穿過臉上的洞時我穿不過，<br>不過我朋友說可以不必畫眼睛，<br>直接利用臉上的兩個空洞當眼睛，哈~</p>
-<p>因為我自己容易倒帶之後反而忘記我目前做到哪一個步驟,<br>所以參考台大氣球社一位學長提出的記譜方式製作這張流程圖<br><img src="/2020/03/11/%E9%80%A0%E5%9E%8B%E6%B0%A3%E7%90%83%E2%80%94%E5%8C%97%E6%A5%B5%E7%86%8A/g.jpg" alt="flow" title="balloon twisting flow"><br>氣球譜 <a target="_blank" rel="noopener" href="https://mropengate.blogspot.com/2016/03/blog-post_87.html">原文</a><br>邊上的文字是表示 – 第幾個步驟:氣泡長度(單位是自己的手指頭寬度）</p>
+<h2 id="資料集："><a href="#資料集：" class="headerlink" title="資料集："></a>資料集：</h2><p>與 baseline (HOG+SVM) <a href="https://annsonic.github.io/2020/10/30/%E8%A8%88%E6%95%B8%E8%A1%80%E6%B6%B2%E7%B4%B0%E8%83%9E-%E4%BD%BF%E7%94%A8HOG%E5%92%8CSVM/#%E8%B3%87%E6%96%99%E9%9B%86">link</a> 相同</p>
+<h2 id="方法："><a href="#方法：" class="headerlink" title="方法："></a>方法：</h2><ul>
+<li>backbone選用ResNet-18，確認其物件偵測表現遜於backbone為ResNet-50，然後測試一些訓練技巧，能否提昇backbone為ResNet-18的表現。</li>
+<li>每個方法重複實驗3次，數據取平均。</li>
+</ul>
+<h2 id="結果"><a href="#結果" class="headerlink" title="結果:"></a>結果:</h2><p>   使用 VOC-style Average Precision算法[6]。</p>
+   <table>
+    <tr>
+      <td></td>
+      <td colspan="3">Average Precision (IoU threshold)</td>
+    </tr>
+    <tr>
+      <td>Method</td>
+      <td>Platelet</td>
+      <td>RBC</td>
+      <td>WBC</td>
+    </tr>
+    <tr>
+      <td>HOG+SVM</td>
+      <td>34.32% (0.1)</td>
+      <td>58.64% (0.1)</td>
+      <td>91.43% (0.5)</td>
+    </tr>
+    <tr>
+      <td>RetinaNet(ResNet-50)</td>
+      <td>85.76% (0.5)</td>
+      <td>88.16% (0.5)</td>
+      <td>100% (0.5)</td>
+    </tr>
+    <tr>
+      <td>RetinaNet(ResNet-18)</td>
+      <td>% (0.5)</td>
+      <td>% (0.5)</td>
+      <td>% (0.5)</td>
+    </tr>
+   </table>
+
+<h2 id="溫故知新"><a href="#溫故知新" class="headerlink" title="溫故知新"></a>溫故知新</h2><ol>
+<li><p>image normalozation的mean和std設定值是否很重要？</p>
+<p>需要做image normalozation的原因跟做batch normalization的原因相似，batch normalization：將輸入資料調整為高斯分佈、降低Internal Covariate Shift問題，增進模型的學習效率。image normalozation的常見算法是對training dataset的每個channel獨立計算mean和variance，用BN取代image normalozation不是個有效率的作法，因為BN的mean和variance是模型逐次學習出來的。</p>
+<p>我使用的RetinaNet其image normalozation的mean和std設定值是由COCO資料集算出來的，比較用Blood Cells資料集算出來的mean和std，雖然肉眼看到的色調明暗差異大，但兩者模型準確度是差異不大。</p>
+<img src="compare.png" style="width: 50%; height: 50%" title="Compare different image mean and std"/>
+</li>
+<li><p>為何凍結BN層參數？</p>
+<p>作者說雖然因為pretrained資料集是Imagenet，與我們的dataset統計分佈有差異，可是訓練物件偵測模型的batch size很小(例如8)，又，有人實驗過，若藉由finetuning來學習新的BN，模型表現反而會像從頭訓練那般，難怪作者會選擇凍結Resnet的BN層參數。</p>
+</li>
+<li><p>使用Focal loss時，model新增的層的初始值要選用zero-weight、constant-bias。</p>
+</li>
+</ol>
+<h2 id="參考資料："><a href="#參考資料：" class="headerlink" title="參考資料："></a>參考資料：</h2><p>[] RetinaNet source project [link]<br>[] Internal Covariate Shift <a target="_blank" rel="noopener" href="https://machinelearning.wtf/terms/internal-covariate-shift/">link</a><br>[] NVidia的影像正規化介紹 <a target="_blank" rel="noopener" href="https://docs.nvidia.com/deeplearning/dali/master-user-guide/docs/examples/general/normalize.html">link</a><br>[] 凍結BN層參數 <a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/63016740/why-its-necessary-to-frozen-all-inner-state-of-a-batch-normalization-layer-when">link</a></p>
 
     </div>
 
@@ -242,7 +284,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>文章連結：</strong>
-    <a href="https://annsonic.github.io/2020/03/11/%E9%80%A0%E5%9E%8B%E6%B0%A3%E7%90%83%E2%80%94%E5%8C%97%E6%A5%B5%E7%86%8A/" title="造型氣球—北極熊">https://annsonic.github.io/2020/03/11/造型氣球—北極熊/</a>
+    <a href="https://annsonic.github.io/2020/11/08/%E8%A8%88%E6%95%B8%E8%A1%80%E6%B6%B2%E7%B4%B0%E8%83%9E-%E4%BD%BF%E7%94%A8RetinaNet/" title="計數血液細胞-使用RetinaNet">https://annsonic.github.io/2020/11/08/計數血液細胞-使用RetinaNet/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版權聲明： </strong>本網誌所有文章除特別聲明外，均採用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 許可協議。轉載請註明出處！
@@ -253,7 +295,8 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/polar-bear/" rel="tag"># polar bear</a>
+              <a href="/tags/Object-detection/" rel="tag"># Object detection</a>
+              <a href="/tags/RetinaNet/" rel="tag"># RetinaNet</a>
           </div>
 
         
@@ -262,13 +305,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2020/02/23/%E9%80%A0%E5%9E%8B%E6%B0%A3%E7%90%83%E2%80%94%E5%85%94%E5%AD%90/" rel="prev" title="造型氣球—兔子">
-      <i class="fa fa-chevron-left"></i> 造型氣球—兔子
+    <a href="/2020/10/30/%E8%A8%88%E6%95%B8%E8%A1%80%E6%B6%B2%E7%B4%B0%E8%83%9E-%E4%BD%BF%E7%94%A8HOG%E5%92%8CSVM/" rel="prev" title="計數血液細胞-使用HOG和SVM">
+      <i class="fa fa-chevron-left"></i> 計數血液細胞-使用HOG和SVM
     </a></div>
-      <div class="post-nav-item">
-    <a href="/2020/03/26/%E5%88%A9%E7%94%A8YouTube-Data-API%E7%88%AC%E6%95%B8%E6%93%9A-%E5%88%86%E6%9E%90%E5%A4%A7%E8%B3%A3%E5%A0%B4%E5%BD%B1%E7%89%87/" rel="next" title="利用YouTube Data API爬數據-分析大賣場影片">
-      利用YouTube Data API爬數據-分析大賣場影片 <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -327,6 +367,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BB%E9%A1%8C%EF%BC%9A"><span class="nav-number">1.</span> <span class="nav-text">主題：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B3%87%E6%96%99%E9%9B%86%EF%BC%9A"><span class="nav-number">2.</span> <span class="nav-text">資料集：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%B3%95%EF%BC%9A"><span class="nav-number">3.</span> <span class="nav-text">方法：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B5%90%E6%9E%9C"><span class="nav-number">4.</span> <span class="nav-text">結果:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%BA%AB%E6%95%85%E7%9F%A5%E6%96%B0"><span class="nav-number">5.</span> <span class="nav-text">溫故知新</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%83%E8%80%83%E8%B3%87%E6%96%99%EF%BC%9A"><span class="nav-number">6.</span> <span class="nav-text">參考資料：</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
