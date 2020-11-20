@@ -27,14 +27,15 @@
 <meta property="og:site_name" content="Ann&#39;s Note">
 <meta property="og:description" content="未完個人練習，以RetinaNet數血液細胞的個數。">
 <meta property="og:locale" content="zh_TW">
-<meta property="og:image" content="https://annsonic.github.io/2020/11/08/%E8%A8%88%E6%95%B8%E8%A1%80%E6%B6%B2%E7%B4%B0%E8%83%9E-%E4%BD%BF%E7%94%A8RetinaNet/compare.png">
+<meta property="og:image" content="https://annsonic.github.io/2020/11/08/%E8%A8%88%E6%95%B8%E8%A1%80%E6%B6%B2%E7%B4%B0%E8%83%9E-%E4%BD%BF%E7%94%A8RetinaNet/test_SGDR_Mosaic_GridMask.png">
+<meta property="og:image" content="https://annsonic.github.io/2020/11/08/%E8%A8%88%E6%95%B8%E8%A1%80%E6%B6%B2%E7%B4%B0%E8%83%9E-%E4%BD%BF%E7%94%A8RetinaNet/test_DropBlock.png">
 <meta property="article:published_time" content="2020-11-08T13:35:39.000Z">
-<meta property="article:modified_time" content="2020-11-08T14:58:24.215Z">
+<meta property="article:modified_time" content="2020-11-20T14:44:09.415Z">
 <meta property="article:author" content="Ann">
 <meta property="article:tag" content="Object detection">
 <meta property="article:tag" content="RetinaNet">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://annsonic.github.io/2020/11/08/%E8%A8%88%E6%95%B8%E8%A1%80%E6%B6%B2%E7%B4%B0%E8%83%9E-%E4%BD%BF%E7%94%A8RetinaNet/compare.png">
+<meta name="twitter:image" content="https://annsonic.github.io/2020/11/08/%E8%A8%88%E6%95%B8%E8%A1%80%E6%B6%B2%E7%B4%B0%E8%83%9E-%E4%BD%BF%E7%94%A8RetinaNet/test_SGDR_Mosaic_GridMask.png">
 
 <link rel="canonical" href="https://annsonic.github.io/2020/11/08/%E8%A8%88%E6%95%B8%E8%A1%80%E6%B6%B2%E7%B4%B0%E8%83%9E-%E4%BD%BF%E7%94%A8RetinaNet/">
 
@@ -186,10 +187,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">發表於</span>
-              
 
-              <time title="創建時間：2020-11-08 21:35:39 / 修改時間：22:58:24" itemprop="dateCreated datePublished" datetime="2020-11-08T21:35:39+08:00">2020-11-08</time>
+              <time title="創建時間：2020-11-08 21:35:39" itemprop="dateCreated datePublished" datetime="2020-11-08T21:35:39+08:00">2020-11-08</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2020-11-20 22:44:09" itemprop="dateModified" datetime="2020-11-20T22:44:09+08:00">2020-11-20</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -216,59 +223,182 @@
 
 <h2 id="主題："><a href="#主題：" class="headerlink" title="主題："></a>主題：</h2><p>計算一張血塗片影像中出現的血小板(Platelet)、紅血球(RBC)和白血球(WBC)的個數。<br>並運用一些訓練技巧: </p>
 <ul>
+<li>增加一個 anchor scale，全部scale為[0.79, 1.0, 1.26, 1.59]</li>
+<li>Stochastic Gradient Descent with Warm Restarts 來調整學習率</li>
 <li>資料增量： GridMask, Mosaic</li>
 <li>正規化：DropBlock</li>
 </ul>
 <h2 id="資料集："><a href="#資料集：" class="headerlink" title="資料集："></a>資料集：</h2><p>與 baseline (HOG+SVM) <a href="https://annsonic.github.io/2020/10/30/%E8%A8%88%E6%95%B8%E8%A1%80%E6%B6%B2%E7%B4%B0%E8%83%9E-%E4%BD%BF%E7%94%A8HOG%E5%92%8CSVM/#%E8%B3%87%E6%96%99%E9%9B%86">link</a> 相同</p>
 <h2 id="方法："><a href="#方法：" class="headerlink" title="方法："></a>方法：</h2><ul>
-<li>backbone選用ResNet-18，確認其物件偵測表現遜於backbone為ResNet-50，然後測試一些訓練技巧，能否提昇backbone為ResNet-18的表現。</li>
+<li>backbone選用ResNet-18，確認其物件偵測表現遜於backbone為ResNet-50(以確認模型表現還有成長的空間)，然後測試一些訓練技巧，能否提昇backbone為ResNet-18的表現。</li>
 <li>每個方法重複實驗3次，數據取平均。</li>
 </ul>
 <h2 id="結果"><a href="#結果" class="headerlink" title="結果:"></a>結果:</h2><p>   使用 VOC-style Average Precision算法[6]。</p>
-   <table>
-    <tr>
-      <td></td>
-      <td colspan="3">Average Precision (IoU threshold)</td>
-    </tr>
-    <tr>
-      <td>Method</td>
-      <td>Platelet</td>
-      <td>RBC</td>
-      <td>WBC</td>
-    </tr>
-    <tr>
-      <td>HOG+SVM</td>
-      <td>34.32% (0.1)</td>
-      <td>58.64% (0.1)</td>
-      <td>91.43% (0.5)</td>
-    </tr>
-    <tr>
-      <td>RetinaNet(ResNet-50)</td>
-      <td>85.76% (0.5)</td>
-      <td>88.16% (0.5)</td>
-      <td>100% (0.5)</td>
-    </tr>
-    <tr>
-      <td>RetinaNet(ResNet-18)</td>
-      <td>% (0.5)</td>
-      <td>% (0.5)</td>
-      <td>% (0.5)</td>
-    </tr>
-   </table>
+<ul>
+<li><p>在我的Validation資料上測試的表現：</p>
+<font size="2">
+<table>
+<tr>
+ <td></td>
+ <td></td>
+ <td colspan="3">Average Precision (IoU threshold)</td>
+ <td></td>
+</tr>
+<tr>
+ <td></td>
+ <td>Method</td>
+ <td>Platelet</td>
+ <td>RBC</td>
+ <td>WBC</td>
+ <td>mAP</td>
+</tr>
+ <td>(1)</td>
+ <td>RetinaNet(ResNet-50)</td>
+ <td>93.20% (0.05)</td>
+ <td>90.40% (0.05)</td>
+ <td>100% (0.5)</td>
+ <td>94.53% (0.05)</td>
+</tr>
+<tr>
+ <td>(2)</td>
+ <td>RetinaNet(ResNet-18)</td>
+ <td>88.90% (0.05)</td>
+ <td>89.27% (0.05)</td>
+ <td>100% (0.5)</td>
+ <td>92.70% (0.05)</td>
+</tr>
+<tr>
+ <td>(3)</td>
+ <td>RetinaNet(ResNet-18) + anchor scale</td>
+ <td>89.03% (0.05)</td>
+ <td>89.27% (0.05)</td>
+ <td>100% (0.5)</td>
+ <td>92.77% (0.05)</td>
+</tr>
+<tr>
+ <td>(4)</td>
+ <td>RetinaNet(ResNet-18) + anchor scale + SGD</td>
+ <td>92.19% (0.05)</td>
+ <td>88.89% (0.05)</td>
+ <td>100% (0.5)</td>
+ <td>93.69% (0.05)</td>
+</tr>
+<tr>
+ <td>(5)</td>
+ <td>RetinaNet(ResNet-18) + anchor scale + SGD<br> + DropBlock</td>
+ <td>92.37% (0.05) <br>85.68% (0.5)</td>
+ <td>88.18% (0.05) <br>79.6% (0.5)</td>
+ <td>100% (0.5)</td>
+ <td>93.51% (0.05)<br>88.43% (0.5)</td>
+</tr>
+<tr>
+ <td>(6)</td>
+ <td>RetinaNet(ResNet-18) + anchor scale + SGDR</td>
+ <td>92.73% (0.05)</td>
+ <td>88.69% (0.05)</td>
+ <td>100% (0.5)</td>
+ <td>93.81%</td>
+</tr>
+<tr>
+ <td>(7)</td>
+ <td>RetinaNet(ResNet-18) + anchor scale + SGDR<br> + GridMask + Mosaic</td>
+ <td>93.13% (0.05)<br>92.18% (0.5)</td>
+ <td>89.6% (0.05)<br>69.9% (0.5)</td>
+ <td>100% (0.5)</td>
+ <td>94.24% (0.05)<br>87.36% (0.5)</td>
+</tr>
+</table>
+</font>
+</li>
+<li><p>參數設定值：</p>
+</li>
+<li><p>最好的模型在我的testing資料上測試的表現：</p>
+<font size="2">
+<table>
+<tr>
+ <td></td>
+ <td></td>
+ <td colspan="3">Average Precision (IoU threshold)</td>
+ <td></td>
+</tr>
+<tr>
+ <td></td>
+ <td>Method</td>
+ <td>Platelet</td>
+ <td>RBC</td>
+ <td>WBC</td>
+ <td>mAP</td>
+</tr>
+<tr>
+ <td>(1)</td>
+ <td>HOG+SVM</td>
+ <td>34.32% (0.1)</td>
+ <td>58.64% (0.1)</td>
+ <td>91.43% (0.5)</td>
+ <td>61.46% (0.1)</td>
+</tr>
+<tr>
+ <td>(2)</td>
+ <td>RetinaNet(ResNet-18) + anchor scale + SGD<br> + DropBlock</td>
+ <td>93.71% (0.5)</td>
+ <td>84.56% (0.5)</td>
+ <td>100% (0.5)</td>
+ <td>92.76% (0.5)</td>
+</tr>
+<tr>
+ <td>(3)</td>
+ <td>RetinaNet(ResNet-18) + anchor scale + SGDR<br> + GridMask + Mosaic</td>
+ <td>94.27% (0.5)</td>
+ <td>77.96% (0.5)</td>
+ <td>100% (0.5)</td>
+ <td>90.74% (0.5)</td>
+</tr>
+</table>
+</font>
 
+<p>precision-recall curve</p>
+<ul>
+<li><p>RetinaNet(ResNet-18) + anchor scale + SGDR<br> + GridMask + Mosaic</p>
+<img src="test_SGDR_Mosaic_GridMask.png" style="width: 100%; height: 100%" title="PR of Platelets trained by SGDR Mosaic GridMask"/>
+</li>
+<li><p>RetinaNet(ResNet-18) + anchor scale + SGD + DropBlock</p>
+<img src="test_DropBlock.png" style="width: 100%; height: 100%" title="PR of Platelets trained by DropBlock"/>
+
+</li>
+</ul>
+</li>
+</ul>
 <h2 id="溫故知新"><a href="#溫故知新" class="headerlink" title="溫故知新"></a>溫故知新</h2><ol>
 <li><p>image normalozation的mean和std設定值是否很重要？</p>
 <p>需要做image normalozation的原因跟做batch normalization的原因相似，batch normalization：將輸入資料調整為高斯分佈、降低Internal Covariate Shift問題，增進模型的學習效率。image normalozation的常見算法是對training dataset的每個channel獨立計算mean和variance，用BN取代image normalozation不是個有效率的作法，因為BN的mean和variance是模型逐次學習出來的。</p>
 <p>我使用的RetinaNet其image normalozation的mean和std設定值是由COCO資料集算出來的，比較用Blood Cells資料集算出來的mean和std，雖然肉眼看到的色調明暗差異大，但兩者模型準確度是差異不大。</p>
-<img src="compare.png" style="width: 50%; height: 50%" title="Compare different image mean and std"/>
 </li>
 <li><p>為何凍結BN層參數？</p>
 <p>作者說雖然因為pretrained資料集是Imagenet，與我們的dataset統計分佈有差異，可是訓練物件偵測模型的batch size很小(例如8)，又，有人實驗過，若藉由finetuning來學習新的BN，模型表現反而會像從頭訓練那般，難怪作者會選擇凍結Resnet的BN層參數。</p>
 </li>
 <li><p>使用Focal loss時，model新增的層的初始值要選用zero-weight、constant-bias。</p>
+<p>我實驗如果改用Kaming initialization，訓練初期的的loss會非常大(如下)，我覺得若訓練在別的資料集有可能導致訓練不收斂。</p>
+<font style="font-size:10px;">
+   Epoch: 0 | Iteration: 0 | Classification loss: 3037.13330 | Regression loss: 9.85530 | Running loss: 3046.98853 <br>
+   Epoch: 0 | Iteration: 30 | Classification loss: 84.43515 | Regression loss: 1.49457 | Running loss: 764.80437 <br>
+   Epoch: 0 | Iteration: 60 | Classification loss: 1.43819 | Regression loss: 0.88586 | Running loss: 397.02907 <br>
+   Epoch: 0 | Iteration: 90 | Classification loss: 0.68479 | Regression loss: 0.87473 | Running loss: 266.69952 <br>
+   Epoch: 0 | Iteration: 120 | Classification loss: 0.47948 | Regression loss: 0.77096 | Running loss: 200.89332 <br>
+</font>
+</li>
+<li><p>增加小尺寸的anchor在此效果不大，因為RetinaNet最小的anchor是32x32px，偵測物件的條件是IOU &gt; 0.5，sqrt(0.5<em>32</em>32) = 22.6 pixels，等效上大小22.6x22.6px 的物件即可被偵測到，而小型血小板的尺寸也約莫20x20px、數量很少；但在使用Mosaic資料增量時，因為4張圖組成一張新圖，物件被縮小為1/4倍，便需要更小尺寸的anchor。</p>
+<p>雖然FPN使用C2應該能幫助偵測小物件，但付出的代價是更多anchor、更難訓練好模型[]</p>
+</li>
+<li><p>SGDR<br>Adam演算法的缺點是容易收斂在局部最佳點，訓練物件偵測模型的話建議使用SGD演算法，而SGDR據說可以更能找到全局最佳點，我實驗感覺它還是靠運氣，3次訓練中最好的mAP為94.18，而最差的mAP為93.44、跟SGD差不多；學習率的變化週期是0.5 epoch、1 epoch的表現差不多，2 epoch則略遜。</p>
+</li>
+<li><p>觀察訓練過程中的precision數值，感覺血小板和紅血球的precision有互相消長的傾向，我初期以為是因為血小板的形狀簡單、算是eazy sample，所以實驗加重Focal loss的參數alpha和gamma，但實驗得到血小板的precision數值在訓練的早期有提昇，最終數值卻沒有突破，紅血球表現持平。</p>
+<p>從影像檢視血小板的錯誤情形，推測血小板和紅血球的AP互相消長的原因可能是紅血球的陰影、出現在紅血球附近類似氣泡的東西干擾模型的判斷。Mosaic和GridMask資料增量有助於提昇血小板的AP。</p>
+</li>
+<li><p>紅血球細胞相連的問題造成模型誤判，我單純從AP數據看會以為DropBlock沒有效果，後來才發現我疏忽、程式中預設的IoU threshold為0.05，改為0.5之後便得到顯著差別了，另外從影像檢視，DropBlock訓練的模型還辨認出漏標的紅血球細胞。</p>
+<p>但是DropBlock得到的血小板AP較差，極可能因為我設定的block size太大，遮蔽了血小板，但現在我還不知道如何視覺化看到DropBlock在activation上的樣子；要在哪裡加上DropBlock也是需要嘗試的。</p>
 </li>
 </ol>
-<h2 id="參考資料："><a href="#參考資料：" class="headerlink" title="參考資料："></a>參考資料：</h2><p>[] RetinaNet source project [link]<br>[] Internal Covariate Shift <a target="_blank" rel="noopener" href="https://machinelearning.wtf/terms/internal-covariate-shift/">link</a><br>[] NVidia的影像正規化介紹 <a target="_blank" rel="noopener" href="https://docs.nvidia.com/deeplearning/dali/master-user-guide/docs/examples/general/normalize.html">link</a><br>[] 凍結BN層參數 <a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/63016740/why-its-necessary-to-frozen-all-inner-state-of-a-batch-normalization-layer-when">link</a></p>
+<h2 id="參考資料："><a href="#參考資料：" class="headerlink" title="參考資料："></a>參考資料：</h2><p>[] RetinaNet source project <a target="_blank" rel="noopener" href="https://github.com/yhenon/pytorch-retinanet">link</a><br>[] Internal Covariate Shift <a target="_blank" rel="noopener" href="https://machinelearning.wtf/terms/internal-covariate-shift/">link</a><br>[] NVidia的影像正規化介紹 <a target="_blank" rel="noopener" href="https://docs.nvidia.com/deeplearning/dali/master-user-guide/docs/examples/general/normalize.html">link</a><br>[] 凍結BN層參數 <a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/63016740/why-its-necessary-to-frozen-all-inner-state-of-a-batch-normalization-layer-when">link</a><br>[] 不建議FPN使用C2 <a target="_blank" rel="noopener" href="https://github.com/fizyr/keras-retinanet/issues/202">link</a><br>[] 訓練物件偵測模型的話建議使用SGD演算法 <a target="_blank" rel="noopener" href="https://github.com/fizyr/keras-retinanet/issues/540">link</a><br>[] Focal loss的alpha、gamma意義<a target="_blank" rel="noopener" href="https://github.com/fizyr/keras-retinanet/issues/710">link</a></p>
 
     </div>
 
