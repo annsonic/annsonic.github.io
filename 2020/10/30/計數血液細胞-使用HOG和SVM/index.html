@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 5.1.1">
+<meta name="generator" content="Hexo 6.0.0">
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
@@ -17,7 +17,7 @@
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"annsonic.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+    var CONFIG = {"hostname":"annsonic.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
   <meta name="description" content="個人練習，以SVM作為這個題目（數血液細胞個數）的baseline。">
@@ -89,6 +89,7 @@
   </style>
 </noscript>
 
+<link rel="alternate" href="/atom.xml" title="Ann's Note" type="application/atom+xml">
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage">
@@ -128,16 +129,6 @@
         <li class="menu-item menu-item-home">
 
     <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
-
-  </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a>
-
-  </li>
-        <li class="menu-item menu-item-categories">
-
-    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a>
 
   </li>
         <li class="menu-item menu-item-archives">
@@ -227,7 +218,7 @@
 
       
         <p>個人練習，以SVM作為這個題目（數血液細胞個數）的baseline。</p>
-<a id="more"></a>
+<span id="more"></span>
 
 <h2 id="主題："><a href="#主題：" class="headerlink" title="主題："></a>主題：</h2><p>計算一張血塗片影像中出現的血小板(Platelet)、紅血球(RBC)和白血球(WBC)的個數。</p>
 <h2 id="假設："><a href="#假設：" class="headerlink" title="假設："></a>假設：</h2><p>玻片的製作、細胞染色和資料標註都符合標準：</p>
@@ -308,12 +299,10 @@ b. 未能將擠在一起的紅血球分辨清楚，
    <img src="fail_RBC_00013.jpg" width=320 height=240 title="rbc_misclassication" alt="error case" />
 c. 未帶有核分裂特徵的白血球，不容易被分類器辨識，
    猜測是因為其訓練資料少才導致
-   <img src="fail_WBC_00270.jpg" width=320 height=240 title="wbc_misclassication" alt="error case" />
-
-</li>
+   <img src="fail_WBC_00270.jpg" width=320 height=240 title="wbc_misclassication" alt="error case" /></li>
 </ol>
 <h2 id="除錯心得："><a href="#除錯心得：" class="headerlink" title="除錯心得："></a>除錯心得：</h2><ol>
-<li><p>skimage/feature/_hog.py, Line 272: ValueError: negative dimensions are not allowed<br>原來我誤會參數的定義了，<br>HOG為了能對光照變化和陰影獲得更好的效果，<br>圖片會切區間(block)，區間內再細分格子細胞(cell)，<br>輸入影像需要配合作resize，或是動態設定pixel_per_cell [7]，<br>為了避免出錯，簡單設定：單一側的image_size = 單一側的pixels_per_cell * 單一側的cells_per_block<br><img src="/2020/10/30/%E8%A8%88%E6%95%B8%E8%A1%80%E6%B6%B2%E7%B4%B0%E8%83%9E-%E4%BD%BF%E7%94%A8HOG%E5%92%8CSVM/hog_viz.png" alt="HOG descriptor and parameters" title="visualize the HOG descriptor"></p>
+<li><p>skimage&#x2F;feature&#x2F;_hog.py, Line 272: ValueError: negative dimensions are not allowed<br>原來我誤會參數的定義了，<br>HOG為了能對光照變化和陰影獲得更好的效果，<br>圖片會切區間(block)，區間內再細分格子細胞(cell)，<br>輸入影像需要配合作resize，或是動態設定pixel_per_cell [7]，<br>為了避免出錯，簡單設定：單一側的image_size &#x3D; 單一側的pixels_per_cell * 單一側的cells_per_block<br><img src="/2020/10/30/%E8%A8%88%E6%95%B8%E8%A1%80%E6%B6%B2%E7%B4%B0%E8%83%9E-%E4%BD%BF%E7%94%A8HOG%E5%92%8CSVM/hog_viz.png" alt="HOG descriptor and parameters" title="visualize the HOG descriptor"></p>
 </li>
 <li><p>這樣訓練的SVM分類器果然很弱，<br>畢竟它只看過截圖截得好好的訓練資料；<br>故意幾張餵細胞的部份截圖，還真的分類錯了。<br>我花費比較多心力在第一階段的畫面選準一點。</p>
 </li>
@@ -331,23 +320,6 @@ c. 未帶有核分裂特徵的白血球，不容易被分類器辨識，
     
     
     
-        
-
-<div>
-<ul class="post-copyright">
-  <li class="post-copyright-author">
-    <strong>作者： </strong>Ann
-  </li>
-  <li class="post-copyright-link">
-    <strong>文章連結：</strong>
-    <a href="https://annsonic.github.io/2020/10/30/%E8%A8%88%E6%95%B8%E8%A1%80%E6%B6%B2%E7%B4%B0%E8%83%9E-%E4%BD%BF%E7%94%A8HOG%E5%92%8CSVM/" title="計數血液細胞-使用HOG和SVM">https://annsonic.github.io/2020/10/30/計數血液細胞-使用HOG和SVM/</a>
-  </li>
-  <li class="post-copyright-license">
-    <strong>版權聲明： </strong>本網誌所有文章除特別聲明外，均採用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 許可協議。轉載請註明出處！
-  </li>
-</ul>
-</div>
-
 
       <footer class="post-footer">
           <div class="post-tags">
@@ -441,20 +413,18 @@ c. 未帶有核分裂特徵的白血球，不容易被分類器辨識，
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">21</span>
+          <span class="site-state-item-count">23</span>
           <span class="site-state-item-name">文章</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
-          
         <span class="site-state-item-count">4</span>
         <span class="site-state-item-name">分類</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
-          
-        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-count">19</span>
         <span class="site-state-item-name">標籤</span></a>
       </div>
   </nav>
@@ -481,13 +451,13 @@ c. 未帶有核分裂特徵的白血球，不容易被分類器辨識，
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
   <span class="author" itemprop="copyrightHolder">Ann</span>
 </div>
-  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 強力驅動
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 強力驅動
   </div>
 
         
@@ -513,7 +483,7 @@ c. 未帶有核分裂特徵的白血球，不容易被分類器辨識，
 <script src="/js/motion.js"></script>
 
 
-<script src="/js/schemes/pisces.js"></script>
+<script src="/js/schemes/muse.js"></script>
 
 
 <script src="/js/next-boot.js"></script>

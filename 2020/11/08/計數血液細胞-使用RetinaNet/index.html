@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 5.1.1">
+<meta name="generator" content="Hexo 6.0.0">
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
@@ -17,7 +17,7 @@
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"annsonic.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+    var CONFIG = {"hostname":"annsonic.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
   <meta name="description" content="個人練習，以RetinaNet[1]數血液細胞的個數。">
@@ -84,6 +84,7 @@
   </style>
 </noscript>
 
+<link rel="alternate" href="/atom.xml" title="Ann's Note" type="application/atom+xml">
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage">
@@ -123,16 +124,6 @@
         <li class="menu-item menu-item-home">
 
     <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
-
-  </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a>
-
-  </li>
-        <li class="menu-item menu-item-categories">
-
-    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a>
 
   </li>
         <li class="menu-item menu-item-archives">
@@ -222,17 +213,15 @@
 
       
         <p>個人練習，以RetinaNet[1]數血液細胞的個數。</p>
-<a id="more"></a>
+<span id="more"></span>
 
 <h2 id="主題："><a href="#主題：" class="headerlink" title="主題："></a>主題：</h2><p>計算一張血塗片影像中出現的血小板(Platelet)、紅血球(RBC)和白血球(WBC)的個數。<br>並運用一些訓練技巧: </p>
 <ul>
 <li>增加一個 anchor scale，全部scale為[0.79, 1.0, 1.26, 1.59]</li>
-<li>Stochastic Gradient Descent with Warm Restarts 來調整學習率，參數T_0=139(因為資料筆數278), T_mult=1, eta_min=1e-6<img src="cosine_lr.png" style="width: 50%; height: 50%" title="learning rate schedule"/></li>
-<li>資料增量： Mosaic[2]，參數probability of utilizing Mosaic = 50%<img src="mosaic_sample_3.png" style="width: 50%; height: 50%" title="Sample of Mosaic data augmentation"/></li>
-<li>正規化：GridMask[3], DropBlock[4]<br>GridMask，參數 rotation=45, mask ratio = 80%, probability of utilizing GridMask = 50%，程序在做了Mosaic資料增量之後<img src="gridmask_sample.png" style="width: 50%; height: 50%" title="Sample of GridMask regularization"/>
-DropBlock，實驗顯示套用在PyramidFeatures的P5_1層效果比P3_1層來得好，參數block_size=2, start prob=0, stop probe=0.1, nr_steps=4e3, start_step=0
-
-</li>
+<li>Stochastic Gradient Descent with Warm Restarts 來調整學習率，參數T_0&#x3D;139(因為資料筆數278), T_mult&#x3D;1, eta_min&#x3D;1e-6<img src="cosine_lr.png" style="width: 50%; height: 50%" title="learning rate schedule"/></li>
+<li>資料增量： Mosaic[2]，參數probability of utilizing Mosaic &#x3D; 50%<img src="mosaic_sample_3.png" style="width: 50%; height: 50%" title="Sample of Mosaic data augmentation"/></li>
+<li>正規化：GridMask[3], DropBlock[4]<br>GridMask，參數 rotation&#x3D;45, mask ratio &#x3D; 80%, probability of utilizing GridMask &#x3D; 50%，程序在做了Mosaic資料增量之後<img src="gridmask_sample.png" style="width: 50%; height: 50%" title="Sample of GridMask regularization"/>
+DropBlock，實驗顯示套用在PyramidFeatures的P5_1層效果比P3_1層來得好，參數block_size=2, start prob=0, stop probe=0.1, nr_steps=4e3, start_step=0</li>
 </ul>
 <h2 id="資料集："><a href="#資料集：" class="headerlink" title="資料集："></a>資料集：</h2><p>與 baseline (HOG+SVM) <a href="https://annsonic.github.io/2020/10/30/%E8%A8%88%E6%95%B8%E8%A1%80%E6%B6%B2%E7%B4%B0%E8%83%9E-%E4%BD%BF%E7%94%A8HOG%E5%92%8CSVM/#%E8%B3%87%E6%96%99%E9%9B%86">link</a> 相同</p>
 <h2 id="方法："><a href="#方法：" class="headerlink" title="方法："></a>方法：</h2><ul>
@@ -242,97 +231,98 @@ DropBlock，實驗顯示套用在PyramidFeatures的P5_1層效果比P3_1層來得
 </ul>
 <h2 id="結果"><a href="#結果" class="headerlink" title="結果:"></a>結果:</h2><p>   使用 VOC-style Average Precision算法[6]。</p>
 <ul>
-<li><p>最好的模型的表現：：</p>
-<font size="2">
-<table>
-<tr>
- <td></td>
- <td></td>
- <td colspan="3">Average Precision (avg val/test)(IoU threshold=0.5)</td>
- <td></td>
-</tr>
-<tr>
- <td></td>
- <td>Method</td>
- <td>Platelet</td>
- <td>RBC</td>
- <td>WBC</td>
- <td>mAP (avg val/test)</td>
-</tr>
- <td>(1)</td>
- <td>RetinaNet(ResNet-50)</td>
- <td>85.54%±6.40% / 90.59%</td>
- <td>81.18%±3.21% / 86.29%</td>
- <td>100% / 100%</td>
- <td>88.91%±1.25% / 92.29%</td>
-</tr>
-<tr>
- <td>(2)</td>
- <td>RetinaNet(ResNet-18)</td>
- <td>79.09%±3.28% / 87.00%</td>
- <td>77.67%±2.69% / 86.22%</td>
- <td>100% / 100%</td>
- <td>85.59%±0.73% / 91.07%</td>
-</tr>
-<tr>
- <td>(3)</td>
- <td>RetinaNet(ResNet-18)<br> + anchor scale + SGDR</td>
- <td>80.18%±2.23% / 98.10%</td>
- <td>82.78%±1.76% / 86.63%</td>
- <td>100% / 100%</td>
- <td>87.65%±0.22% / 94.91%</td>
-</tr>
-<tr>
- <td>(4)</td>
- <td>RetinaNet(ResNet-18)<br> + anchor scale + SGDR<br> + GridMask</td>
- <td>83.10%±2.06% / 94.33%</td>
- <td>80.18%±0.8% / 85.64%</td>
- <td>100% / 100%</td>
- <td>87.76%±0.58% / 93.32%</td>
-</tr>
-<tr>
- <td>(5)</td>
- <td>RetinaNet(ResNet-18)<br> + anchor scale + SGDR<br> + GridMask + Mosaic</td>
- <td>85.46%±0.35% / 95.80%</td>
- <td>81.22%±1.34% / 87.57%</td>
- <td>100% / 100%</td>
- <td>88.89%±0.34% / 94.46%</td>
-</tr>
-<tr>
- <td>(6)</td>
- <td>RetinaNet(ResNet-18)<br> + anchor scale + SGDR<br> + DropBlock(P3_1)</td>
- <td>80.78%±0.49% / NA</td>
- <td>81.80%±0.80% / NA</td>
- <td>100% / NA</td>
- <td>87.53%±0.20% / NA</td>
-</tr>
-<tr>
- <td>(7)</td>
- <td>RetinaNet(ResNet-18)<br> + anchor scale + SGDR<br> + DropBlock(P5_1)</td>
- <td>83.95%±1.94% / 97.30%</td>
- <td>82.17%±1.81% / 85.77%</td>
- <td>100% / 100%</td>
- <td>88.71%±0.19% / 94.36%</td>
-</tr>
-<tr>
- <td>(8)</td>
- <td>RetinaNet(ResNet-18)<br> + anchor scale + SGDR<br> + GridMask + Mosaic<br> + DropBlock(P5_1)</td>
- <td>87.05%±6.33% / 98.97%</td>
- <td>81.88%±4.48% / 90.59%</td>
- <td>100% / 100%</td>
- <td>89.64%±1.22% / 96.52%</td>
-</tr>
-</table>
-</font>
-</li>
+<li>最好的模型的表現：：</li>
+</ul>
+   <font size="2">
+   <table>
+    <tr>
+      <td></td>
+      <td></td>
+      <td colspan="3">Average Precision (avg val/test)(IoU threshold=0.5)</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>Method</td>
+      <td>Platelet</td>
+      <td>RBC</td>
+      <td>WBC</td>
+      <td>mAP (avg val/test)</td>
+    </tr>
+      <td>(1)</td>
+      <td>RetinaNet(ResNet-50)</td>
+      <td>85.54%±6.40% / 90.59%</td>
+      <td>81.18%±3.21% / 86.29%</td>
+      <td>100% / 100%</td>
+      <td>88.91%±1.25% / 92.29%</td>
+    </tr>
+    <tr>
+      <td>(2)</td>
+      <td>RetinaNet(ResNet-18)</td>
+      <td>79.09%±3.28% / 87.00%</td>
+      <td>77.67%±2.69% / 86.22%</td>
+      <td>100% / 100%</td>
+      <td>85.59%±0.73% / 91.07%</td>
+    </tr>
+    <tr>
+      <td>(3)</td>
+      <td>RetinaNet(ResNet-18)<br> + anchor scale + SGDR</td>
+      <td>80.18%±2.23% / 98.10%</td>
+      <td>82.78%±1.76% / 86.63%</td>
+      <td>100% / 100%</td>
+      <td>87.65%±0.22% / 94.91%</td>
+    </tr>
+    <tr>
+      <td>(4)</td>
+      <td>RetinaNet(ResNet-18)<br> + anchor scale + SGDR<br> + GridMask</td>
+      <td>83.10%±2.06% / 94.33%</td>
+      <td>80.18%±0.8% / 85.64%</td>
+      <td>100% / 100%</td>
+      <td>87.76%±0.58% / 93.32%</td>
+    </tr>
+    <tr>
+      <td>(5)</td>
+      <td>RetinaNet(ResNet-18)<br> + anchor scale + SGDR<br> + GridMask + Mosaic</td>
+      <td>85.46%±0.35% / 95.80%</td>
+      <td>81.22%±1.34% / 87.57%</td>
+      <td>100% / 100%</td>
+      <td>88.89%±0.34% / 94.46%</td>
+    </tr>
+    <tr>
+      <td>(6)</td>
+      <td>RetinaNet(ResNet-18)<br> + anchor scale + SGDR<br> + DropBlock(P3_1)</td>
+      <td>80.78%±0.49% / NA</td>
+      <td>81.80%±0.80% / NA</td>
+      <td>100% / NA</td>
+      <td>87.53%±0.20% / NA</td>
+    </tr>
+    <tr>
+      <td>(7)</td>
+      <td>RetinaNet(ResNet-18)<br> + anchor scale + SGDR<br> + DropBlock(P5_1)</td>
+      <td>83.95%±1.94% / 97.30%</td>
+      <td>82.17%±1.81% / 85.77%</td>
+      <td>100% / 100%</td>
+      <td>88.71%±0.19% / 94.36%</td>
+    </tr>
+    <tr>
+      <td>(8)</td>
+      <td>RetinaNet(ResNet-18)<br> + anchor scale + SGDR<br> + GridMask + Mosaic<br> + DropBlock(P5_1)</td>
+      <td>87.05%±6.33% / 98.97%</td>
+      <td>81.88%±4.48% / 90.59%</td>
+      <td>100% / 100%</td>
+      <td>89.64%±1.22% / 96.52%</td>
+    </tr>
+   </table>
+   </font>
+
+<ul>
 <li><p>precision-recall curve on testing dataset:</p>
 <ul>
-<li><p>RetinaNet(ResNet-18) + anchor scale + SGDR + GridMask + Mosaic + DropBlock(P5_1)</p>
-<img src="mAP.png" style="width: 100%; height: 100%" title="Testing mAP trained by SGDR Mosaic GridMask DropBlock"/>
-
-<p>得到的數據接近這個部落格(<a target="_blank" rel="noopener" href="https://medium.com/@sadeghm/performance-analysis-of-a-cnn-object-detector-for-blood-cell-detection-and-counting-908f9b038f2b">link</a>)的結果。</p>
-</li>
+<li>RetinaNet(ResNet-18) + anchor scale + SGDR + GridMask + Mosaic + DropBlock(P5_1)</li>
 </ul>
+ <img src="mAP.png" style="width: 100%; height: 100%" title="Testing mAP trained by SGDR Mosaic GridMask DropBlock"/>
+
+<p> 得到的數據接近這個部落格(<a target="_blank" rel="noopener" href="https://medium.com/@sadeghm/performance-analysis-of-a-cnn-object-detector-for-blood-cell-detection-and-counting-908f9b038f2b">link</a>)的結果。</p>
 </li>
 <li><p>分析bounding box</p>
  <img src="viz_prediction.png" style="width: 100%; height: 100%" title="Prediction trained by SGDR Mosaic GridMask DropBlock"/>
@@ -361,7 +351,7 @@ DropBlock，實驗顯示套用在PyramidFeatures的P5_1層效果比P3_1層來得
    Epoch: 0 | Iteration: 120 | Classification loss: 0.47948 | Regression loss: 0.77096 | Running loss: 200.89332 <br>
 </font>
 </li>
-<li><p>增加小尺寸的anchor在此效果不大，因為RetinaNet最小的anchor是32x32px，偵測物件的條件是IOU &gt; 0.5，sqrt(0.5<em>32</em>32) = 22.6 pixels，等效上大小22.6x22.6px 的物件即可被偵測到，而小型血小板的尺寸也約莫20x20px、數量很少；但在使用Mosaic資料增量時，因為4張圖組成一張新圖，物件被縮小為1/4倍，便需要更小尺寸的anchor。</p>
+<li><p>增加小尺寸的anchor在此效果不大，因為RetinaNet最小的anchor是32x32px，偵測物件的條件是IOU &gt; 0.5，sqrt(0.5<em>32</em>32) &#x3D; 22.6 pixels，等效上大小22.6x22.6px 的物件即可被偵測到，而小型血小板的尺寸也約莫20x20px、數量很少；但在使用Mosaic資料增量時，因為4張圖組成一張新圖，物件被縮小為1&#x2F;4倍，便需要更小尺寸的anchor。</p>
 <p>雖然FPN使用C2應該能幫助偵測小物件，但付出的代價是更多anchor、更難訓練好模型[8]</p>
 </li>
 <li><p>SGDR<br>Adam演算法的缺點是容易收斂在局部最佳點，訓練物件偵測模型的話建議使用SGD演算法[9]，而SGDR據說可以更能找到全局最佳點，我實驗學習率的變化週期是0.5 epoch、1 epoch的表現差不多，2 epoch則略遜，感覺它還是靠運氣，找到的血小板AP、紅血球AP最佳點差異不小，也影響從數據比較GridMask、Mosaic、DropBlock的效果。RetinaNet(ResNet-18) + anchor scale + SGDR的3次訓練表現如下表</p>
@@ -415,23 +405,6 @@ DropBlock，實驗顯示套用在PyramidFeatures的P5_1層效果比P3_1層來得
     
     
     
-        
-
-<div>
-<ul class="post-copyright">
-  <li class="post-copyright-author">
-    <strong>作者： </strong>Ann
-  </li>
-  <li class="post-copyright-link">
-    <strong>文章連結：</strong>
-    <a href="https://annsonic.github.io/2020/11/08/%E8%A8%88%E6%95%B8%E8%A1%80%E6%B6%B2%E7%B4%B0%E8%83%9E-%E4%BD%BF%E7%94%A8RetinaNet/" title="計數血液細胞-使用RetinaNet">https://annsonic.github.io/2020/11/08/計數血液細胞-使用RetinaNet/</a>
-  </li>
-  <li class="post-copyright-license">
-    <strong>版權聲明： </strong>本網誌所有文章除特別聲明外，均採用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 許可協議。轉載請註明出處！
-  </li>
-</ul>
-</div>
-
 
       <footer class="post-footer">
           <div class="post-tags">
@@ -524,20 +497,18 @@ DropBlock，實驗顯示套用在PyramidFeatures的P5_1層效果比P3_1層來得
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">21</span>
+          <span class="site-state-item-count">23</span>
           <span class="site-state-item-name">文章</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
-          
         <span class="site-state-item-count">4</span>
         <span class="site-state-item-name">分類</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
-          
-        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-count">19</span>
         <span class="site-state-item-name">標籤</span></a>
       </div>
   </nav>
@@ -564,13 +535,13 @@ DropBlock，實驗顯示套用在PyramidFeatures的P5_1層效果比P3_1層來得
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
   <span class="author" itemprop="copyrightHolder">Ann</span>
 </div>
-  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 強力驅動
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 強力驅動
   </div>
 
         
@@ -596,7 +567,7 @@ DropBlock，實驗顯示套用在PyramidFeatures的P5_1層效果比P3_1層來得
 <script src="/js/motion.js"></script>
 
 
-<script src="/js/schemes/pisces.js"></script>
+<script src="/js/schemes/muse.js"></script>
 
 
 <script src="/js/next-boot.js"></script>

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 5.1.1">
+<meta name="generator" content="Hexo 6.0.0">
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
@@ -17,7 +17,7 @@
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"annsonic.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+    var CONFIG = {"hostname":"annsonic.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
   <meta name="description" content="2019年發表於NLP四大頂會之一的NAACL-HLT，作者來自於微軟，有提供source code:https:&#x2F;&#x2F;github.com&#x2F;golsun&#x2F;SpaceFusion">
@@ -89,6 +89,7 @@
   </style>
 </noscript>
 
+<link rel="alternate" href="/atom.xml" title="Ann's Note" type="application/atom+xml">
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage">
@@ -128,16 +129,6 @@
         <li class="menu-item menu-item-home">
 
     <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
-
-  </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a>
-
-  </li>
-        <li class="menu-item menu-item-categories">
-
-    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a>
 
   </li>
         <li class="menu-item menu-item-archives">
@@ -227,7 +218,7 @@
 
       
         <p>2019年發表於NLP四大頂會之一的NAACL-HLT，<br>作者來自於微軟，<br>有提供source code:<a target="_blank" rel="noopener" href="https://github.com/golsun/SpaceFusion">https://github.com/golsun/SpaceFusion</a></p>
-<a id="more"></a>
+<span id="more"></span>
 
 <h2 id="觀點與事實"><a href="#觀點與事實" class="headerlink" title="觀點與事實"></a>觀點與事實</h2><ul>
 <li>此文獻提出一個控制Seq2seq模型生成語意的方法</li>
@@ -242,11 +233,12 @@
 </ul>
 <h2 id="資料集"><a href="#資料集" class="headerlink" title="資料集"></a>資料集</h2><ul>
 <li>作者使用Switchboard資料集和Reddit資料集，我針對Reddit資料集做介紹。<br>從Reddit網站爬了2011年份的發文以及其留言，<br>以發文作為context、留言作為references句子（和hypothesis句子），<br>平均一句context有24句reference。<br><img src="/2020/05/09/Jointly-Optimizing-Diversity-and-Relevance-in-Neural-Response-Generation/3.jpg" alt="dataset" title="reddit"><h2 id="模型與方法"><a href="#模型與方法" class="headerlink" title="模型與方法"></a>模型與方法</h2><ol>
-<li>為了消弭空間中的空白區域，<br>將Seq2Seq的encoder潛在空間與AE的encoder潛在空間拉近，<br>因為句子配對有n種組合、所以距離除以n，n是batch size;<br><img src="/2020/05/09/Jointly-Optimizing-Diversity-and-Relevance-in-Neural-Response-Generation/4.jpg" alt="method 1" title="regularization "></li>
-<li>為求句子均勻佔據在空間中，<br>不同的context彼此在Seq2seq encoder潛在空間中的距離要拉遠，<br>同樣地，references句子彼此在AE encoder潛在空間中的距離要拉遠，<br>而句子佔據空間中有 n*(n-1)種組合，<br>所以距離除以n^2-n<br><img src="/2020/05/09/Jointly-Optimizing-Diversity-and-Relevance-in-Neural-Response-Generation/5.jpg" alt="method 2" title="regularization "></li>
-<li>希望能以內插的方式，控制生成的句子的語氣或意見，<br>所以加入新的內插encoder潛在空間Zinterp，<br>Zinterp的計算公式如下，<br>decoder實際為3個不同的decoder所組成。<br>發現一個疑點，<br>Zinterp生成的句子yinterp_hat是需要標準答案，<br>才能計算出categorical cross entropy，<br>這…看code還是不清楚作者怎麼解決此問題的，<br>不過看作者實驗中的u值，<br>u超過0.3即取reference句子做輸出，<br>可能就是這般訓練出模型的。</li>
-<li>整體的loss函數，於是Seq2seq和AE變成同時做訓練。<br><img src="/2020/05/09/Jointly-Optimizing-Diversity-and-Relevance-in-Neural-Response-Generation/6.jpg" alt="method 3" title="regularization "><br><img src="/2020/05/09/Jointly-Optimizing-Diversity-and-Relevance-in-Neural-Response-Generation/7.jpg" alt="model" title="model "><h2 id="實驗結果節錄"><a href="#實驗結果節錄" class="headerlink" title="實驗結果節錄"></a>實驗結果節錄</h2><img src="/2020/05/09/Jointly-Optimizing-Diversity-and-Relevance-in-Neural-Response-Generation/8.jpg" alt="result" title="result "><br><img src="/2020/05/09/Jointly-Optimizing-Diversity-and-Relevance-in-Neural-Response-Generation/9.jpg" alt="result" title="result "><br><img src="/2020/05/09/Jointly-Optimizing-Diversity-and-Relevance-in-Neural-Response-Generation/10.jpg" alt="result" title="result "><br><img src="/2020/05/09/Jointly-Optimizing-Diversity-and-Relevance-in-Neural-Response-Generation/11.jpg" alt="result" title="result "><br><img src="/2020/05/09/Jointly-Optimizing-Diversity-and-Relevance-in-Neural-Response-Generation/12.jpg" alt="result" title="result "></li>
+<li>為了消弭空間中的空白區域，<br>  將Seq2Seq的encoder潛在空間與AE的encoder潛在空間拉近，<br>  因為句子配對有n種組合、所以距離除以n，n是batch size;<br>  <img src="/2020/05/09/Jointly-Optimizing-Diversity-and-Relevance-in-Neural-Response-Generation/4.jpg" alt="method 1" title="regularization "></li>
+<li>為求句子均勻佔據在空間中，<br>  不同的context彼此在Seq2seq encoder潛在空間中的距離要拉遠，<br>  同樣地，references句子彼此在AE encoder潛在空間中的距離要拉遠，<br>  而句子佔據空間中有 n*(n-1)種組合，<br>  所以距離除以n^2-n<br>  <img src="/2020/05/09/Jointly-Optimizing-Diversity-and-Relevance-in-Neural-Response-Generation/5.jpg" alt="method 2" title="regularization "></li>
+<li>希望能以內插的方式，控制生成的句子的語氣或意見，<br>  所以加入新的內插encoder潛在空間Zinterp，<br>  Zinterp的計算公式如下，<br>  decoder實際為3個不同的decoder所組成。<br>  發現一個疑點，<br>  Zinterp生成的句子yinterp_hat是需要標準答案，<br>  才能計算出categorical cross entropy，<br>  這…看code還是不清楚作者怎麼解決此問題的，<br>  不過看作者實驗中的u值，<br>  u超過0.3即取reference句子做輸出，<br>  可能就是這般訓練出模型的。</li>
 </ol>
+<p>4.整體的loss函數，於是Seq2seq和AE變成同時做訓練。<br>  <img src="/2020/05/09/Jointly-Optimizing-Diversity-and-Relevance-in-Neural-Response-Generation/6.jpg" alt="method 3" title="regularization "><br>  <img src="/2020/05/09/Jointly-Optimizing-Diversity-and-Relevance-in-Neural-Response-Generation/7.jpg" alt="model" title="model "></p>
+<h2 id="實驗結果節錄"><a href="#實驗結果節錄" class="headerlink" title="實驗結果節錄"></a>實驗結果節錄</h2><p><img src="/2020/05/09/Jointly-Optimizing-Diversity-and-Relevance-in-Neural-Response-Generation/8.jpg" alt="result" title="result "><br><img src="/2020/05/09/Jointly-Optimizing-Diversity-and-Relevance-in-Neural-Response-Generation/9.jpg" alt="result" title="result "><br><img src="/2020/05/09/Jointly-Optimizing-Diversity-and-Relevance-in-Neural-Response-Generation/10.jpg" alt="result" title="result "><br><img src="/2020/05/09/Jointly-Optimizing-Diversity-and-Relevance-in-Neural-Response-Generation/11.jpg" alt="result" title="result "><br><img src="/2020/05/09/Jointly-Optimizing-Diversity-and-Relevance-in-Neural-Response-Generation/12.jpg" alt="result" title="result "></p>
 </li>
 </ul>
 <h2 id="個人感想"><a href="#個人感想" class="headerlink" title="個人感想"></a>個人感想</h2><ul>
@@ -261,23 +253,6 @@
     
     
     
-        
-
-<div>
-<ul class="post-copyright">
-  <li class="post-copyright-author">
-    <strong>作者： </strong>Ann
-  </li>
-  <li class="post-copyright-link">
-    <strong>文章連結：</strong>
-    <a href="https://annsonic.github.io/2020/05/09/Jointly-Optimizing-Diversity-and-Relevance-in-Neural-Response-Generation/" title="Jointly Optimizing Diversity and Relevance in Neural Response Generation">https://annsonic.github.io/2020/05/09/Jointly-Optimizing-Diversity-and-Relevance-in-Neural-Response-Generation/</a>
-  </li>
-  <li class="post-copyright-license">
-    <strong>版權聲明： </strong>本網誌所有文章除特別聲明外，均採用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 許可協議。轉載請註明出處！
-  </li>
-</ul>
-</div>
-
 
       <footer class="post-footer">
 
@@ -366,20 +341,18 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">21</span>
+          <span class="site-state-item-count">23</span>
           <span class="site-state-item-name">文章</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
-          
         <span class="site-state-item-count">4</span>
         <span class="site-state-item-name">分類</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
-          
-        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-count">19</span>
         <span class="site-state-item-name">標籤</span></a>
       </div>
   </nav>
@@ -406,13 +379,13 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
   <span class="author" itemprop="copyrightHolder">Ann</span>
 </div>
-  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 強力驅動
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 強力驅動
   </div>
 
         
@@ -438,7 +411,7 @@
 <script src="/js/motion.js"></script>
 
 
-<script src="/js/schemes/pisces.js"></script>
+<script src="/js/schemes/muse.js"></script>
 
 
 <script src="/js/next-boot.js"></script>

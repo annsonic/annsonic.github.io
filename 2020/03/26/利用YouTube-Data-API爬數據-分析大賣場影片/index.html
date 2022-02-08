@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 5.1.1">
+<meta name="generator" content="Hexo 6.0.0">
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
@@ -17,7 +17,7 @@
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"annsonic.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+    var CONFIG = {"hostname":"annsonic.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
   <meta property="og:type" content="article">
@@ -81,6 +81,7 @@
   </style>
 </noscript>
 
+<link rel="alternate" href="/atom.xml" title="Ann's Note" type="application/atom+xml">
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage">
@@ -120,16 +121,6 @@
         <li class="menu-item menu-item-home">
 
     <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
-
-  </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a>
-
-  </li>
-        <li class="menu-item menu-item-categories">
-
-    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a>
 
   </li>
         <li class="menu-item menu-item-archives">
@@ -219,7 +210,7 @@
 
       
         <p><img src="/2020/03/26/%E5%88%A9%E7%94%A8YouTube-Data-API%E7%88%AC%E6%95%B8%E6%93%9A-%E5%88%86%E6%9E%90%E5%A4%A7%E8%B3%A3%E5%A0%B4%E5%BD%B1%E7%89%87/bar.png" alt="Average number of comments by mart band" title="avg comments"></p>
-<a id="more"></a>
+<span id="more"></span>
 
 <h2 id="主題："><a href="#主題：" class="headerlink" title="主題："></a>主題：</h2><p>針對大賣場相關的商品體驗影片，驗證台灣觀眾會因為賣場品牌而有不同的關注點，關注點分為3類：好物推薦、新品開箱、其他消費體驗</p>
 <h2 id="假設："><a href="#假設：" class="headerlink" title="假設："></a>假設：</h2><p>(1)影片的留言者皆非大賣場員工，留言數正比於觀眾的共鳴強度</p>
@@ -239,11 +230,11 @@
 <p>(2)好市多的開箱類影片最吸引觀眾留言，一部開箱影片的平均留言人數達419人次、遠高於好物推薦類(128人次)與其他消費體驗類(79人次)，顯著不同於全聯和家樂福的情況，推測因為好市多的商品是大份量販售、平均單價低廉但總價高，故消費者在購買前會比較謹慎，會參考別人的開箱心得再決定購買，已購買者也會樂意分享個人心得於留言。合計平均留言人數也是勝過其他兩個賣場。</p>
 <p>(3)文字雲顯示，我的關鍵字分類還是不夠精確，新品開箱類影片被歸類為其他消費體驗類，例如全聯的抹茶；收集的留言數量也隨著不同時間點搜尋影片而得到不同的數字。不過普遍來說，開箱類影片比起推薦類影片有更高的留言量，推測是因為開箱類傾向於介紹新檔期美食，觀眾好奇美食的口味、也易引起已嘗鮮者的共鳴。</p>
 <ul>
-<li>全聯其他消費體驗類標題<br><img src="/2020/03/26/%E5%88%A9%E7%94%A8YouTube-Data-API%E7%88%AC%E6%95%B8%E6%93%9A-%E5%88%86%E6%9E%90%E5%A4%A7%E8%B3%A3%E5%A0%B4%E5%BD%B1%E7%89%87/pxmart_other_title.png" alt="Word_cloud_pxmart_other_title" title="word cloud"></li>
+<li>全聯其他消費體驗類標題<br>  <img src="/2020/03/26/%E5%88%A9%E7%94%A8YouTube-Data-API%E7%88%AC%E6%95%B8%E6%93%9A-%E5%88%86%E6%9E%90%E5%A4%A7%E8%B3%A3%E5%A0%B4%E5%BD%B1%E7%89%87/pxmart_other_title.png" alt="Word_cloud_pxmart_other_title" title="word cloud"></li>
 </ul>
 <p>(4)全聯影片的標題文字雲集中在強打甜點活動的品項上，感覺跟全聯注重社群行銷有關，業配影片的嫌疑性高。</p>
 <ul>
-<li>好物標題文字雲(全聯 vs 家樂福)<br><img src="/2020/03/26/%E5%88%A9%E7%94%A8YouTube-Data-API%E7%88%AC%E6%95%B8%E6%93%9A-%E5%88%86%E6%9E%90%E5%A4%A7%E8%B3%A3%E5%A0%B4%E5%BD%B1%E7%89%87/pxmart_promote_title.png" alt="Word_cloud_pxmart_promote_title" title="word cloud"><br><img src="/2020/03/26/%E5%88%A9%E7%94%A8YouTube-Data-API%E7%88%AC%E6%95%B8%E6%93%9A-%E5%88%86%E6%9E%90%E5%A4%A7%E8%B3%A3%E5%A0%B4%E5%BD%B1%E7%89%87/carrefour_promote_title.png" alt="Word_cloud_carrefour_promote_title" title="word cloud"></li>
+<li>好物標題文字雲(全聯 vs 家樂福)<br>  <img src="/2020/03/26/%E5%88%A9%E7%94%A8YouTube-Data-API%E7%88%AC%E6%95%B8%E6%93%9A-%E5%88%86%E6%9E%90%E5%A4%A7%E8%B3%A3%E5%A0%B4%E5%BD%B1%E7%89%87/pxmart_promote_title.png" alt="Word_cloud_pxmart_promote_title" title="word cloud"><br>  <img src="/2020/03/26/%E5%88%A9%E7%94%A8YouTube-Data-API%E7%88%AC%E6%95%B8%E6%93%9A-%E5%88%86%E6%9E%90%E5%A4%A7%E8%B3%A3%E5%A0%B4%E5%BD%B1%E7%89%87/carrefour_promote_title.png" alt="Word_cloud_carrefour_promote_title" title="word cloud"></li>
 </ul>
 <hr>
 <h2 id="後記"><a href="#後記" class="headerlink" title="後記"></a>後記</h2><p>(非教學文)這學期的作業。<br>老師出題的用意只是讓學生練習使用YouTube Data API爬影片的數據，<br>不過因為要分析的主題是自己決定，<br>反而花了很多時間想研究題目，<br>分析結果不是很專業，<br>但被選為當次模範作業，<br>頗有成就感所以紀錄一下以茲紀念。</p>
@@ -253,23 +244,6 @@
     
     
     
-        
-
-<div>
-<ul class="post-copyright">
-  <li class="post-copyright-author">
-    <strong>作者： </strong>Ann
-  </li>
-  <li class="post-copyright-link">
-    <strong>文章連結：</strong>
-    <a href="https://annsonic.github.io/2020/03/26/%E5%88%A9%E7%94%A8YouTube-Data-API%E7%88%AC%E6%95%B8%E6%93%9A-%E5%88%86%E6%9E%90%E5%A4%A7%E8%B3%A3%E5%A0%B4%E5%BD%B1%E7%89%87/" title="利用YouTube Data API爬數據-分析大賣場影片">https://annsonic.github.io/2020/03/26/利用YouTube-Data-API爬數據-分析大賣場影片/</a>
-  </li>
-  <li class="post-copyright-license">
-    <strong>版權聲明： </strong>本網誌所有文章除特別聲明外，均採用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 許可協議。轉載請註明出處！
-  </li>
-</ul>
-</div>
-
 
       <footer class="post-footer">
           <div class="post-tags">
@@ -361,20 +335,18 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">21</span>
+          <span class="site-state-item-count">23</span>
           <span class="site-state-item-name">文章</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
-          
         <span class="site-state-item-count">4</span>
         <span class="site-state-item-name">分類</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
-          
-        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-count">19</span>
         <span class="site-state-item-name">標籤</span></a>
       </div>
   </nav>
@@ -401,13 +373,13 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
   <span class="author" itemprop="copyrightHolder">Ann</span>
 </div>
-  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 強力驅動
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 強力驅動
   </div>
 
         
@@ -433,7 +405,7 @@
 <script src="/js/motion.js"></script>
 
 
-<script src="/js/schemes/pisces.js"></script>
+<script src="/js/schemes/muse.js"></script>
 
 
 <script src="/js/next-boot.js"></script>
