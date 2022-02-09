@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"annsonic.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="觀點與事實Elastic transform 對於手寫文字和醫學影像是很有用的增量技巧，2003年論文[1]首度提出時應用於MNIST資料集，簡單的CNN模型驗證10,000張影像達到分類準確率99.6%，2015年的Unet[2]時應用於細胞的影像切割，Unet模型驗證ISBI cell tracking challenge的PhC-U373資料集達到平均IoU為0.92。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Elastic transform">
+<meta property="og:url" content="https://annsonic.github.io/2022/07/09/Elastic-transform/index.html">
+<meta property="og:site_name" content="Ann&#39;s Note">
+<meta property="og:description" content="觀點與事實Elastic transform 對於手寫文字和醫學影像是很有用的增量技巧，2003年論文[1]首度提出時應用於MNIST資料集，簡單的CNN模型驗證10,000張影像達到分類準確率99.6%，2015年的Unet[2]時應用於細胞的影像切割，Unet模型驗證ISBI cell tracking challenge的PhC-U373資料集達到平均IoU為0.92。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://annsonic.github.io/2022/07/09/Elastic-transform/affine.png">
+<meta property="og:image" content="https://annsonic.github.io/2022/07/09/Elastic-transform/1.png">
+<meta property="og:image" content="https://annsonic.github.io/2022/07/09/Elastic-transform/2.png">
+<meta property="og:image" content="https://annsonic.github.io/2022/07/09/Elastic-transform/3.png">
+<meta property="og:image" content="https://annsonic.github.io/2022/07/09/Elastic-transform/4.png">
+<meta property="article:published_time" content="2022-07-09T07:01:51.000Z">
+<meta property="article:modified_time" content="2022-02-09T10:48:06.264Z">
+<meta property="article:author" content="Ann">
+<meta property="article:tag" content="Interested Paper">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://annsonic.github.io/2022/07/09/Elastic-transform/affine.png">
+
+<link rel="canonical" href="https://annsonic.github.io/2022/07/09/Elastic-transform/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-TW'
+  };
+</script>
+
+  <title>Elastic transform | Ann's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Ann's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Ann's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://annsonic.github.io/2022/07/09/Elastic-transform/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Ann">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ann's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Elastic transform
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2022-07-09 15:01:51" itemprop="dateCreated datePublished" datetime="2022-07-09T15:01:51+08:00">2022-07-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2022-02-09 18:48:06" itemprop="dateModified" datetime="2022-02-09T18:48:06+08:00">2022-02-09</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="觀點與事實"><a href="#觀點與事實" class="headerlink" title="觀點與事實"></a>觀點與事實</h2><p>Elastic transform 對於手寫文字和醫學影像是很有用的增量技巧，<br>2003年論文[1]首度提出時應用於MNIST資料集，<br>簡單的CNN模型驗證10,000張影像達到分類準確率99.6%，<br>2015年的Unet[2]時應用於細胞的影像切割，<br>Unet模型驗證ISBI cell tracking challenge的PhC-U373資料集達到平均IoU為0.92。</p>
+<span id="more"></span>
+
+<h2 id="背景簡介"><a href="#背景簡介" class="headerlink" title="背景簡介"></a>背景簡介</h2><p>隨機地移動像素造成形變，又結合線性轉換來增加變化：<br>(1)<br>線性轉換使用 Affine transformation，<br>它涵蓋 translation 位移、rotation 旋轉、scaling 放大縮小（包含鏡射）、shear 推移這些轉換，<br>線性轉換的特性是會保持兩點之間的比例，<br>所以原先的中心點仍然是中心點。<br>可以參考 [3][4]。<br>(2)<br>像素的移動量是隨機決定，<br>移動量再經過捲積來增加相鄰像素彼此空間上的相關性，<br>隨機移動的像素在畫面上看起來像雜訊，<br>因此需要降低隨機雜訊的平滑化濾波器，<br>在此捲積 kernel 採 Gaussian filter[5]。</p>
+<h2 id="方法與實驗結果"><a href="#方法與實驗結果" class="headerlink" title="方法與實驗結果"></a>方法與實驗結果</h2><p>我讀的是 albumentations 的程式碼[6]。</p>
+<p>它先進行 Affine transformation，<br>選定的座標點是圖片左上角、左下角和右下角，<br>距離邊界 1&#x2F;6 邊長的3個點，<br>所以變數 <code>alpha_affine</code> 值應該要小於圖片尺寸的 1&#x2F;6，<br>超過的話影像會發生鏡射。<br><img src="/2022/07/09/Elastic-transform/affine.png" alt="reflection" title="Reflection by affine"></p>
+<p>移動像素的部份，<br>移動量初始時值域為 [-1, 1]，<br>與 Gaussian filter 做捲積，<br>如果啟用變數 <code>approximate</code> 的話，<br>捲積的 kernel 大小固定為 17*17，<br>套用 OpenCV 的 <code>GaussianBlur</code> 函式，<br>計算速度快，<br>反之則計算 kernel 大小，<br>套用 scipy 的 <code>gaussian_filter</code> 函式，<br>kernel 大小 w 的計算公式<br><code>w = 2 * int(truncate * sigma + 0.5) + 1</code>，<br>truncate 預設為 4。</p>
+<p>我們可以調整變數 <code>sigma</code>，<br>即分佈的標準差，<br>若標準差小（例如sigma &#x3D; 0.01），<br>捲積後位移向量仍然呈現隨機狀，<br>所以形變的影像彷彿加上很多雜訊，<br>看起來很粗糙；<br>若標準差適當（例如sigma &#x3D; 4），<br>捲積後相鄰的位移向量會呈現方向上的漸變，<br>這樣可以得到彈性形變的效果，<br>若標準差太大（例如sigma &#x3D; 16），<br>位移向量的變化變得平均，<br>彈性形變的扭曲效果便不明顯。<br>又，因為高斯分佈的峰值會隨標準差變大而下降，<br>需要搭配倍率來增幅，<br>倍率變數 <code>alpha</code>。 </p>
+<p><img src="/2022/07/09/Elastic-transform/1.png" alt="Small sigma" title="Elastic without affine, with sigma = 0.01 and alpha = 5, 34"><br><img src="/2022/07/09/Elastic-transform/2.png" alt="Small sigma 2" title="Elastic without affine, with sigma = 1 and alpha = 34"><br><img src="/2022/07/09/Elastic-transform/3.png" alt="Medium sigma" title="Elastic without affine, with sigma = 4 and alpha = 34"><br><img src="/2022/07/09/Elastic-transform/4.png" alt="Large sigma" title="Elastic without affine, with sigma = 16 and alpha = 34"></p>
+<h2 id="程式碼"><a href="#程式碼" class="headerlink" title="程式碼"></a>程式碼</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br></pre></td><td class="code"><pre><span class="line">import numpy as np</span><br><span class="line">import random</span><br><span class="line">import cv2</span><br><span class="line">import matplotlib.pyplot as plt</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># Magic numbers</span><br><span class="line">alpha_affine = 112 // 6 # Unit: pixels</span><br><span class="line">sigma = 4 # Unit: pixels</span><br><span class="line">alpha = 34</span><br><span class="line">border_mode = cv2.BORDER_REFLECT_101</span><br><span class="line"></span><br><span class="line"># Read the source image</span><br><span class="line">src = cv2.imread(&#x27;6.png&#x27;)</span><br><span class="line">colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255)]</span><br><span class="line"></span><br><span class="line"># Select 3 points (array pts1) for transformation</span><br><span class="line">height, width = src.shape[:2]</span><br><span class="line">center_square = np.float32((height, width)) // 2</span><br><span class="line">square_size = min((height, width)) // 3</span><br><span class="line">pts1 = np.float32(</span><br><span class="line">        [</span><br><span class="line">            center_square + square_size,</span><br><span class="line">            [center_square[0] + square_size, center_square[1] - square_size],</span><br><span class="line">            center_square - square_size,</span><br><span class="line">        ]</span><br><span class="line">    )</span><br><span class="line"># Visualize and save image</span><br><span class="line">src_pts1 = src.copy()</span><br><span class="line">for i,pt in enumerate(pts1):</span><br><span class="line">    cy, cx = int(pt[0]), int(pt[1])</span><br><span class="line">    cv2.circle(src_pts1, (cx,cy), radius=1, color=colors[i], thickness=-1)</span><br><span class="line">cv2.imwrite(&#x27;pts1.png&#x27;, src_pts1)</span><br><span class="line"></span><br><span class="line"># Perturb 3 points to random positions</span><br><span class="line">random_state = np.random.RandomState(random.randint(0, (1 &lt;&lt; 32) - 1))</span><br><span class="line">pts2 = pts1 + random_state.uniform(low=-alpha_affine, high=alpha_affine, size=pts1.shape).astype(</span><br><span class="line">        np.float32)</span><br><span class="line"># Visualize and save image</span><br><span class="line">src_pts2 = src.copy()</span><br><span class="line">for i,pt in enumerate(pts2):</span><br><span class="line">    cy, cx = int(pt[0]), int(pt[1])</span><br><span class="line">    cv2.circle(src_pts2, (cx,cy), radius=1, color=colors[i], thickness=-1)</span><br><span class="line">cv2.imwrite(&#x27;pts2.png&#x27;, src_pts2)</span><br><span class="line"></span><br><span class="line"># Compute the affine transform matrix</span><br><span class="line">matrix = cv2.getAffineTransform(pts1, pts2)</span><br><span class="line"></span><br><span class="line"># Apply transformation</span><br><span class="line">dst_affine = cv2.warpAffine(src_pts2, matrix, (height,width))</span><br><span class="line"># Visualize and save image</span><br><span class="line">cv2.imwrite(&#x27;affine.png&#x27;, dst_affine)</span><br><span class="line"></span><br><span class="line"># Generate random displacement field in x-direction, range [-1, 1]</span><br><span class="line">dx = random_state.rand(height, width).astype(np.float32) * 2 - 1</span><br><span class="line"># Apply smoothing</span><br><span class="line">cv2.GaussianBlur(dx, (17, 17), sigma, dst=dx, borderType=border_mode)</span><br><span class="line">dx *= alpha</span><br><span class="line"># Duplicate random vector field in y-direction</span><br><span class="line">dy = dx</span><br><span class="line"># Position indices x, y</span><br><span class="line">x, y = np.meshgrid(np.arange(width), np.arange(height))</span><br><span class="line"># Purturbed position indices</span><br><span class="line">map_x = np.float32(x + dx)</span><br><span class="line">map_y = np.float32(y + dy)</span><br><span class="line"># Remap the pixels</span><br><span class="line">dst_mapped = cv2.remap(dst_affine, map_x, map_y, cv2.INTER_LINEAR)</span><br><span class="line"></span><br><span class="line"># Visualize the elastic transformation</span><br><span class="line">fig,ax = plt.subplots(1,1)</span><br><span class="line">ax.imshow(dst_mapped)</span><br><span class="line"># Prune the index array to reduce the arrow density</span><br><span class="line">skip=(slice(None,None,4),slice(None,None,4))</span><br><span class="line">ax.quiver(x[skip], y[skip], dx[skip], dy[skip], </span><br><span class="line">          color=&#x27;orange&#x27;, linewidths=(5,), headaxislength=10)</span><br><span class="line">ax.set_axis_off()</span><br><span class="line">plt.savefig(&#x27;dst.png&#x27;)</span><br><span class="line">plt.clf()</span><br><span class="line"></span><br><span class="line"># Initiate the array as the discrete Dirac delta function</span><br><span class="line">gaussian_kernel = np.zeros((17, 17))</span><br><span class="line">gaussian_kernel[8, 8] = 1</span><br><span class="line"># Apply smoothing</span><br><span class="line">cv2.GaussianBlur(gaussian_kernel, (17, 17), sigma, dst=gaussian_kernel, borderType=border_mode)</span><br><span class="line">gaussian_kernel = gaussian_kernel / gaussian_kernel.sum()</span><br><span class="line"># Visualize the kernel and save image</span><br><span class="line">plt.imshow(gaussian_kernel, cmap=plt.get_cmap(&#x27;jet&#x27;), interpolation=&#x27;nearest&#x27;)</span><br><span class="line">plt.colorbar()</span><br><span class="line">plt.savefig(&#x27;kernel.png&#x27;)</span><br></pre></td></tr></table></figure>
+
+<h2 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h2><p>[1] Simard, Steinkraus and Platt, “Best Practices for Convolutional Neural Networks applied to Visual Document Analysis”, in Proc. of the International Conference on Document Analysis and Recognition, 2003.<br>[2] Ronneberger, Olaf et al. “U-Net: Convolutional Networks for Biomedical Image Segmentation.” MICCAI (2015).<br>[3] Affine transform 矩陣 <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Affine_transformation">Wiki</a><br>[4] Affine Transformation 三點轉換 <a target="_blank" rel="noopener" href="https://theailearner.com/tag/cv2-warpaffine/">解釋</a><br>[5] Gaussian filter <a target="_blank" rel="noopener" href="https://medium.com/@bob800530/python-gaussian-filter-%E6%A6%82%E5%BF%B5%E8%88%87%E5%AF%A6%E4%BD%9C-676aac52ea17">解釋</a><br>[6] albumentations 的<a target="_blank" rel="noopener" href="https://albumentations.ai/docs/api_reference/augmentations/geometric/transforms/#albumentations.augmentations.geometric.transforms.ElasticTransform">程式碼</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Interested-Paper/" rel="tag"># Interested Paper</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/05/16/%E9%80%A0%E5%9E%8B%E6%B0%A3%E7%90%83%E2%80%94%E6%96%B0%E5%A8%98%E6%8D%A7%E8%8A%B1/" rel="prev" title="造型氣球—新娘捧花">
+      <i class="fa fa-chevron-left"></i> 造型氣球—新娘捧花
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%80%E9%BB%9E%E8%88%87%E4%BA%8B%E5%AF%A6"><span class="nav-number">1.</span> <span class="nav-text">觀點與事實</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%83%8C%E6%99%AF%E7%B0%A1%E4%BB%8B"><span class="nav-number">2.</span> <span class="nav-text">背景簡介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%B3%95%E8%88%87%E5%AF%A6%E9%A9%97%E7%B5%90%E6%9E%9C"><span class="nav-number">3.</span> <span class="nav-text">方法與實驗結果</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A8%8B%E5%BC%8F%E7%A2%BC"><span class="nav-number">4.</span> <span class="nav-text">程式碼</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%83%E8%80%83%E8%B3%87%E6%96%99"><span class="nav-number">5.</span> <span class="nav-text">參考資料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Ann</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">24</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ann</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 強力驅動
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
