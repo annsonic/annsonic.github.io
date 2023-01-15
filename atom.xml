@@ -6,7 +6,7 @@
   <link href="https://annsonic.github.io/atom.xml" rel="self"/>
   
   <link href="https://annsonic.github.io/"/>
-  <updated>2022-02-09T10:48:06.264Z</updated>
+  <updated>2023-01-15T14:30:01.176Z</updated>
   <id>https://annsonic.github.io/</id>
   
   <author>
@@ -15,6 +15,27 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>造型氣球—柴郡貓</title>
+    <link href="https://annsonic.github.io/2023/01/15/%E9%80%A0%E5%9E%8B%E6%B0%A3%E7%90%83%E2%80%94%E6%9F%B4%E9%83%A1%E8%B2%93/"/>
+    <id>https://annsonic.github.io/2023/01/15/%E9%80%A0%E5%9E%8B%E6%B0%A3%E7%90%83%E2%80%94%E6%9F%B4%E9%83%A1%E8%B2%93/</id>
+    <published>2023-01-15T14:14:31.000Z</published>
+    <updated>2023-01-15T14:30:01.176Z</updated>
+    
+    <content type="html"><![CDATA[<p><img src="/2023/01/15/%E9%80%A0%E5%9E%8B%E6%B0%A3%E7%90%83%E2%80%94%E6%9F%B4%E9%83%A1%E8%B2%93/cheshire.jpg" alt="The Cheshire Cat" title="balloon twisting Cheshire Cat"></p><span id="more"></span><p>參考Alex先生的教學做的~ <a href="https://www.youtube.com/watch?v=bor1j4QOpM8">教學影片傳送門</a><br>材料:</p><ul><li>牙齒：白色260 , 1&#x2F;3條即可, 留2指</li><li>眼：黃色260  1&#x2F;3條即可, 留2指 </li><li>身體1：紫色260, 2條, 留4指</li><li>身體2：粉紅色260, 2條，留4指</li><li>剪刀</li><li>黑色奇異筆</li></ul><p>沒看過卡通版的愛麗絲夢遊仙境，<br>但這陣子聽 童話透中島 podcast 演繹的愛麗絲，<br>覺得這真是很有哲理的故事，<br>在 YT 找到的 Alex 先生的柴郡貓照型也很有意思，<br>抽象的身體意味著柴郡貓隱身，<br>在空氣中留下一抹露齒的笑容。<br>給未來的自己注意：<br>步驟 9 的貓下巴要比上唇長度長一些，<br>讓平視時可以看到下巴。</p><p>因為我自己容易倒帶之後反而忘記我目前做到哪一個步驟,<br>所以參考台大氣球社一位學長提出的記譜方式製作這張流程圖<br><img src="/2023/01/15/%E9%80%A0%E5%9E%8B%E6%B0%A3%E7%90%83%E2%80%94%E6%9F%B4%E9%83%A1%E8%B2%93/g.jpg" alt="flow" title="balloon twisting flow"><br>氣球譜 <a href="https://mropengate.blogspot.com/2016/03/blog-post_87.html">原文</a><br>邊上的文字是表示 – 第幾個步驟:氣泡長度(單位是自己的手指頭寬度）</p>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;&lt;img src=&quot;/2023/01/15/%E9%80%A0%E5%9E%8B%E6%B0%A3%E7%90%83%E2%80%94%E6%9F%B4%E9%83%A1%E8%B2%93/cheshire.jpg&quot; alt=&quot;The Cheshire Cat&quot; title=&quot;balloon twisting Cheshire Cat&quot;&gt;&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="Balloon Twisting" scheme="https://annsonic.github.io/categories/Balloon-Twisting/"/>
+    
+    
+    <category term="Cheshire Cat" scheme="https://annsonic.github.io/tags/Cheshire-Cat/"/>
+    
+  </entry>
   
   <entry>
     <title>Elastic transform</title>
@@ -406,27 +427,6 @@
     
     
     <category term="Little Red Riding Hood" scheme="https://annsonic.github.io/tags/Little-Red-Riding-Hood/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>利用YouTube Data API爬數據-分析大賣場影片</title>
-    <link href="https://annsonic.github.io/2020/03/26/%E5%88%A9%E7%94%A8YouTube-Data-API%E7%88%AC%E6%95%B8%E6%93%9A-%E5%88%86%E6%9E%90%E5%A4%A7%E8%B3%A3%E5%A0%B4%E5%BD%B1%E7%89%87/"/>
-    <id>https://annsonic.github.io/2020/03/26/%E5%88%A9%E7%94%A8YouTube-Data-API%E7%88%AC%E6%95%B8%E6%93%9A-%E5%88%86%E6%9E%90%E5%A4%A7%E8%B3%A3%E5%A0%B4%E5%BD%B1%E7%89%87/</id>
-    <published>2020-03-26T13:05:15.000Z</published>
-    <updated>2020-08-31T09:59:44.562Z</updated>
-    
-    <content type="html"><![CDATA[<p><img src="/2020/03/26/%E5%88%A9%E7%94%A8YouTube-Data-API%E7%88%AC%E6%95%B8%E6%93%9A-%E5%88%86%E6%9E%90%E5%A4%A7%E8%B3%A3%E5%A0%B4%E5%BD%B1%E7%89%87/bar.png" alt="Average number of comments by mart band" title="avg comments"></p><span id="more"></span><h2 id="主題："><a href="#主題：" class="headerlink" title="主題："></a>主題：</h2><p>針對大賣場相關的商品體驗影片，驗證台灣觀眾會因為賣場品牌而有不同的關注點，關注點分為3類：好物推薦、新品開箱、其他消費體驗</p><h2 id="假設："><a href="#假設：" class="headerlink" title="假設："></a>假設：</h2><p>(1)影片的留言者皆非大賣場員工，留言數正比於觀眾的共鳴強度</p><p>(2)關鍵字可以反映商業的意圖，故可將影片的意圖屬性簡單分類為好物推薦、新品開箱、其他消費體驗，假設我選定的關鍵字具有代表性</p><p>(3)YouTube回傳的搜尋結果(前50部片)具有取樣代表性</p><h2 id="方法："><a href="#方法：" class="headerlink" title="方法："></a>方法：</h2><p>(1)搜尋標題帶有大賣場名稱的影片，亦即：全聯、家樂福、好市多 (排除大潤發、愛買與頂好，因為影片數量過少)</p><p>(2)將影片標題依關鍵字分為3大類：好物推薦(Promoted)、新品開箱(Trial)、其他消費體驗(Other)，對應關鍵字為</p><ul><li>好物推薦 - 必買、CP值、推薦、評比</li><li>新品開箱 - 開箱、介紹、試<br>而標題不帶上述關鍵字者歸入其他消費體驗類</li></ul><p>(3)以文字雲分別檢視各類的影片標題、影片留言的熱門字</p><p>(4)統計三類影片的留言數</p><h2 id="實驗限制："><a href="#實驗限制：" class="headerlink" title="實驗限制："></a>實驗限制：</h2><p>受限個人不熟悉自然語言處理，所以能對文字雲做的語意分析程度有限</p><h2 id="結果"><a href="#結果" class="headerlink" title="結果:"></a>結果:</h2><p><img src="/2020/03/26/%E5%88%A9%E7%94%A8YouTube-Data-API%E7%88%AC%E6%95%B8%E6%93%9A-%E5%88%86%E6%9E%90%E5%A4%A7%E8%B3%A3%E5%A0%B4%E5%BD%B1%E7%89%87/bar.png" alt="Average number of comments by mart band" title="avg comments"></p><p>(1)條狀圖顯示台灣觀眾會因為賣場品牌而有不同的關注點，關注點分為3類：好物推薦(blue column)、新品開箱(orange column)、其他消費體驗(green column)。</p><p>(2)好市多的開箱類影片最吸引觀眾留言，一部開箱影片的平均留言人數達419人次、遠高於好物推薦類(128人次)與其他消費體驗類(79人次)，顯著不同於全聯和家樂福的情況，推測因為好市多的商品是大份量販售、平均單價低廉但總價高，故消費者在購買前會比較謹慎，會參考別人的開箱心得再決定購買，已購買者也會樂意分享個人心得於留言。合計平均留言人數也是勝過其他兩個賣場。</p><p>(3)文字雲顯示，我的關鍵字分類還是不夠精確，新品開箱類影片被歸類為其他消費體驗類，例如全聯的抹茶；收集的留言數量也隨著不同時間點搜尋影片而得到不同的數字。不過普遍來說，開箱類影片比起推薦類影片有更高的留言量，推測是因為開箱類傾向於介紹新檔期美食，觀眾好奇美食的口味、也易引起已嘗鮮者的共鳴。</p><ul><li>全聯其他消費體驗類標題<br>  <img src="/2020/03/26/%E5%88%A9%E7%94%A8YouTube-Data-API%E7%88%AC%E6%95%B8%E6%93%9A-%E5%88%86%E6%9E%90%E5%A4%A7%E8%B3%A3%E5%A0%B4%E5%BD%B1%E7%89%87/pxmart_other_title.png" alt="Word_cloud_pxmart_other_title" title="word cloud"></li></ul><p>(4)全聯影片的標題文字雲集中在強打甜點活動的品項上，感覺跟全聯注重社群行銷有關，業配影片的嫌疑性高。</p><ul><li>好物標題文字雲(全聯 vs 家樂福)<br>  <img src="/2020/03/26/%E5%88%A9%E7%94%A8YouTube-Data-API%E7%88%AC%E6%95%B8%E6%93%9A-%E5%88%86%E6%9E%90%E5%A4%A7%E8%B3%A3%E5%A0%B4%E5%BD%B1%E7%89%87/pxmart_promote_title.png" alt="Word_cloud_pxmart_promote_title" title="word cloud"><br>  <img src="/2020/03/26/%E5%88%A9%E7%94%A8YouTube-Data-API%E7%88%AC%E6%95%B8%E6%93%9A-%E5%88%86%E6%9E%90%E5%A4%A7%E8%B3%A3%E5%A0%B4%E5%BD%B1%E7%89%87/carrefour_promote_title.png" alt="Word_cloud_carrefour_promote_title" title="word cloud"></li></ul><hr><h2 id="後記"><a href="#後記" class="headerlink" title="後記"></a>後記</h2><p>(非教學文)這學期的作業。<br>老師出題的用意只是讓學生練習使用YouTube Data API爬影片的數據，<br>不過因為要分析的主題是自己決定，<br>反而花了很多時間想研究題目，<br>分析結果不是很專業，<br>但被選為當次模範作業，<br>頗有成就感所以紀錄一下以茲紀念。</p>]]></content>
-    
-    
-    <summary type="html">&lt;p&gt;&lt;img src=&quot;/2020/03/26/%E5%88%A9%E7%94%A8YouTube-Data-API%E7%88%AC%E6%95%B8%E6%93%9A-%E5%88%86%E6%9E%90%E5%A4%A7%E8%B3%A3%E5%A0%B4%E5%BD%B1%E7%89%87/bar.png&quot; alt=&quot;Average number of comments by mart band&quot; title=&quot;avg comments&quot;&gt;&lt;/p&gt;</summary>
-    
-    
-    
-    <category term="Project" scheme="https://annsonic.github.io/categories/Project/"/>
-    
-    
-    <category term="YouTube Data API" scheme="https://annsonic.github.io/tags/YouTube-Data-API/"/>
     
   </entry>
   

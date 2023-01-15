@@ -2,6 +2,15 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://annsonic.github.io/2023/01/15/%E9%80%A0%E5%9E%8B%E6%B0%A3%E7%90%83%E2%80%94%E6%9F%B4%E9%83%A1%E8%B2%93/</loc>
+    
+    <lastmod>2023-01-15</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://annsonic.github.io/2022/07/09/Elastic-transform/</loc>
     
     <lastmod>2022-02-09</lastmod>
@@ -238,148 +247,155 @@
 
   <url>
     <loc>https://annsonic.github.io/</loc>
-    <lastmod>2022-02-09</lastmod>
+    <lastmod>2023-01-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
 
   
   <url>
+    <loc>https://annsonic.github.io/tags/Interested-Paper/</loc>
+    <lastmod>2023-01-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
     <loc>https://annsonic.github.io/tags/YouTube-Data-API/</loc>
-    <lastmod>2022-02-09</lastmod>
+    <lastmod>2023-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://annsonic.github.io/tags/Object-detection/</loc>
-    <lastmod>2022-02-09</lastmod>
+    <lastmod>2023-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://annsonic.github.io/tags/histogram-oriented-gradients-HOG/</loc>
-    <lastmod>2022-02-09</lastmod>
+    <lastmod>2023-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://annsonic.github.io/tags/SVM/</loc>
-    <lastmod>2022-02-09</lastmod>
+    <lastmod>2023-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://annsonic.github.io/tags/RetinaNet/</loc>
-    <lastmod>2022-02-09</lastmod>
+    <lastmod>2023-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://annsonic.github.io/tags/Peppa-Pig/</loc>
-    <lastmod>2022-02-09</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://annsonic.github.io/tags/rooster/</loc>
-    <lastmod>2022-02-09</lastmod>
+    <lastmod>2023-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://annsonic.github.io/tags/Chang-E/</loc>
-    <lastmod>2022-02-09</lastmod>
+    <lastmod>2023-01-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://annsonic.github.io/tags/rooster/</loc>
+    <lastmod>2023-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://annsonic.github.io/tags/Little-Red-Riding-Hood/</loc>
-    <lastmod>2022-02-09</lastmod>
+    <lastmod>2023-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://annsonic.github.io/tags/Chinese-character-Spring/</loc>
-    <lastmod>2022-02-09</lastmod>
+    <lastmod>2023-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://annsonic.github.io/tags/lollipop/</loc>
-    <lastmod>2022-02-09</lastmod>
+    <lastmod>2023-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://annsonic.github.io/tags/monkey/</loc>
-    <lastmod>2022-02-09</lastmod>
+    <lastmod>2023-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://annsonic.github.io/tags/sheep/</loc>
-    <lastmod>2022-02-09</lastmod>
+    <lastmod>2023-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://annsonic.github.io/tags/Melody/</loc>
-    <lastmod>2022-02-09</lastmod>
+    <lastmod>2023-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://annsonic.github.io/tags/frog/</loc>
-    <lastmod>2022-02-09</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://annsonic.github.io/tags/rabbit/</loc>
-    <lastmod>2022-02-09</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://annsonic.github.io/tags/polar-bear/</loc>
-    <lastmod>2022-02-09</lastmod>
+    <lastmod>2023-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://annsonic.github.io/tags/Elmo/</loc>
-    <lastmod>2022-02-09</lastmod>
+    <lastmod>2023-01-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://annsonic.github.io/tags/rabbit/</loc>
+    <lastmod>2023-01-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://annsonic.github.io/tags/polar-bear/</loc>
+    <lastmod>2023-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://annsonic.github.io/tags/wedding-bouquet/</loc>
-    <lastmod>2022-02-09</lastmod>
+    <lastmod>2023-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>https://annsonic.github.io/tags/Interested-Paper/</loc>
-    <lastmod>2022-02-09</lastmod>
+    <loc>https://annsonic.github.io/tags/Cheshire-Cat/</loc>
+    <lastmod>2023-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
@@ -388,28 +404,28 @@
   
   <url>
     <loc>https://annsonic.github.io/categories/Interested-Paper/</loc>
-    <lastmod>2022-02-09</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://annsonic.github.io/categories/Geriatric-Welfare/</loc>
-    <lastmod>2022-02-09</lastmod>
+    <lastmod>2023-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://annsonic.github.io/categories/Project/</loc>
-    <lastmod>2022-02-09</lastmod>
+    <lastmod>2023-01-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://annsonic.github.io/categories/Geriatric-Welfare/</loc>
+    <lastmod>2023-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://annsonic.github.io/categories/Balloon-Twisting/</loc>
-    <lastmod>2022-02-09</lastmod>
+    <lastmod>2023-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
