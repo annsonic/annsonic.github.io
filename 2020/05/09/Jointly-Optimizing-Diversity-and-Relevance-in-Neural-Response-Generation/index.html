@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 6.0.0">
+<meta name="generator" content="Hexo 6.3.0">
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
@@ -89,7 +89,6 @@
   </style>
 </noscript>
 
-<link rel="alternate" href="/atom.xml" title="Ann's Note" type="application/atom+xml">
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage">
@@ -232,15 +231,14 @@
 <li>前作[2]使用AE輔助Seq2Seq，<br>兩者共用同一個decoder，<br><img src="/2020/05/09/Jointly-Optimizing-Diversity-and-Relevance-in-Neural-Response-Generation/1.jpg" alt="previous work" title="AE multitask"><br>Seq2Seq輸入context句子，<br>學習輸出對應的hypothesis句子，<br>AE負責學習其他可以配上此context的reference句子、學習出這些句子的空間分佈，<br>兩者交替學習；<br><img src="/2020/05/09/Jointly-Optimizing-Diversity-and-Relevance-in-Neural-Response-Generation/2.jpg" alt="latent space" title="latent space"><br>但是將Seq2seq和AE的encoder潛在空間一起視覺化後，<br>發現兩者沒有交集，<br>空間中存在一個大空白區域。</li>
 </ul>
 <h2 id="資料集"><a href="#資料集" class="headerlink" title="資料集"></a>資料集</h2><ul>
-<li>作者使用Switchboard資料集和Reddit資料集，我針對Reddit資料集做介紹。<br>從Reddit網站爬了2011年份的發文以及其留言，<br>以發文作為context、留言作為references句子（和hypothesis句子），<br>平均一句context有24句reference。<br><img src="/2020/05/09/Jointly-Optimizing-Diversity-and-Relevance-in-Neural-Response-Generation/3.jpg" alt="dataset" title="reddit"><h2 id="模型與方法"><a href="#模型與方法" class="headerlink" title="模型與方法"></a>模型與方法</h2><ol>
-<li>為了消弭空間中的空白區域，<br>  將Seq2Seq的encoder潛在空間與AE的encoder潛在空間拉近，<br>  因為句子配對有n種組合、所以距離除以n，n是batch size;<br>  <img src="/2020/05/09/Jointly-Optimizing-Diversity-and-Relevance-in-Neural-Response-Generation/4.jpg" alt="method 1" title="regularization "></li>
-<li>為求句子均勻佔據在空間中，<br>  不同的context彼此在Seq2seq encoder潛在空間中的距離要拉遠，<br>  同樣地，references句子彼此在AE encoder潛在空間中的距離要拉遠，<br>  而句子佔據空間中有 n*(n-1)種組合，<br>  所以距離除以n^2-n<br>  <img src="/2020/05/09/Jointly-Optimizing-Diversity-and-Relevance-in-Neural-Response-Generation/5.jpg" alt="method 2" title="regularization "></li>
-<li>希望能以內插的方式，控制生成的句子的語氣或意見，<br>  所以加入新的內插encoder潛在空間Zinterp，<br>  Zinterp的計算公式如下，<br>  decoder實際為3個不同的decoder所組成。<br>  發現一個疑點，<br>  Zinterp生成的句子yinterp_hat是需要標準答案，<br>  才能計算出categorical cross entropy，<br>  這…看code還是不清楚作者怎麼解決此問題的，<br>  不過看作者實驗中的u值，<br>  u超過0.3即取reference句子做輸出，<br>  可能就是這般訓練出模型的。</li>
-</ol>
-<p>4.整體的loss函數，於是Seq2seq和AE變成同時做訓練。<br>  <img src="/2020/05/09/Jointly-Optimizing-Diversity-and-Relevance-in-Neural-Response-Generation/6.jpg" alt="method 3" title="regularization "><br>  <img src="/2020/05/09/Jointly-Optimizing-Diversity-and-Relevance-in-Neural-Response-Generation/7.jpg" alt="model" title="model "></p>
-<h2 id="實驗結果節錄"><a href="#實驗結果節錄" class="headerlink" title="實驗結果節錄"></a>實驗結果節錄</h2><p><img src="/2020/05/09/Jointly-Optimizing-Diversity-and-Relevance-in-Neural-Response-Generation/8.jpg" alt="result" title="result "><br><img src="/2020/05/09/Jointly-Optimizing-Diversity-and-Relevance-in-Neural-Response-Generation/9.jpg" alt="result" title="result "><br><img src="/2020/05/09/Jointly-Optimizing-Diversity-and-Relevance-in-Neural-Response-Generation/10.jpg" alt="result" title="result "><br><img src="/2020/05/09/Jointly-Optimizing-Diversity-and-Relevance-in-Neural-Response-Generation/11.jpg" alt="result" title="result "><br><img src="/2020/05/09/Jointly-Optimizing-Diversity-and-Relevance-in-Neural-Response-Generation/12.jpg" alt="result" title="result "></p>
-</li>
+<li>作者使用Switchboard資料集和Reddit資料集，我針對Reddit資料集做介紹。<br>從Reddit網站爬了2011年份的發文以及其留言，<br>以發文作為context、留言作為references句子（和hypothesis句子），<br>平均一句context有24句reference。<br><img src="/2020/05/09/Jointly-Optimizing-Diversity-and-Relevance-in-Neural-Response-Generation/3.jpg" alt="dataset" title="reddit"></li>
 </ul>
+<h2 id="模型與方法"><a href="#模型與方法" class="headerlink" title="模型與方法"></a>模型與方法</h2><ol>
+<li>為了消弭空間中的空白區域，<br>將Seq2Seq的encoder潛在空間與AE的encoder潛在空間拉近，<br>因為句子配對有n種組合、所以距離除以n，n是batch size;<br><img src="/2020/05/09/Jointly-Optimizing-Diversity-and-Relevance-in-Neural-Response-Generation/4.jpg" alt="method 1" title="regularization "></li>
+<li>為求句子均勻佔據在空間中，<br>不同的context彼此在Seq2seq encoder潛在空間中的距離要拉遠，<br>同樣地，references句子彼此在AE encoder潛在空間中的距離要拉遠，<br>而句子佔據空間中有 n*(n-1)種組合，<br>所以距離除以n^2-n<br><img src="/2020/05/09/Jointly-Optimizing-Diversity-and-Relevance-in-Neural-Response-Generation/5.jpg" alt="method 2" title="regularization "></li>
+<li>希望能以內插的方式，控制生成的句子的語氣或意見，<br>所以加入新的內插encoder潛在空間Zinterp，<br>Zinterp的計算公式如下，<br>decoder實際為3個不同的decoder所組成。<br>發現一個疑點，<br>Zinterp生成的句子yinterp_hat是需要標準答案，<br>才能計算出categorical cross entropy，<br>這…看code還是不清楚作者怎麼解決此問題的，<br>不過看作者實驗中的u值，<br>u超過0.3即取reference句子做輸出，<br>可能就是這般訓練出模型的。<br>  4.整體的loss函數，於是Seq2seq和AE變成同時做訓練。<br><img src="/2020/05/09/Jointly-Optimizing-Diversity-and-Relevance-in-Neural-Response-Generation/6.jpg" alt="method 3" title="regularization "><br><img src="/2020/05/09/Jointly-Optimizing-Diversity-and-Relevance-in-Neural-Response-Generation/7.jpg" alt="model" title="model "></li>
+</ol>
+<h2 id="實驗結果節錄"><a href="#實驗結果節錄" class="headerlink" title="實驗結果節錄"></a>實驗結果節錄</h2><p>  <img src="/2020/05/09/Jointly-Optimizing-Diversity-and-Relevance-in-Neural-Response-Generation/8.jpg" alt="result" title="result "><br>  <img src="/2020/05/09/Jointly-Optimizing-Diversity-and-Relevance-in-Neural-Response-Generation/9.jpg" alt="result" title="result "><br>  <img src="/2020/05/09/Jointly-Optimizing-Diversity-and-Relevance-in-Neural-Response-Generation/10.jpg" alt="result" title="result "><br>  <img src="/2020/05/09/Jointly-Optimizing-Diversity-and-Relevance-in-Neural-Response-Generation/11.jpg" alt="result" title="result "><br>  <img src="/2020/05/09/Jointly-Optimizing-Diversity-and-Relevance-in-Neural-Response-Generation/12.jpg" alt="result" title="result "></p>
 <h2 id="個人感想"><a href="#個人感想" class="headerlink" title="個人感想"></a>個人感想</h2><ul>
 <li>作者擅長視覺化說故事</li>
 <li>將encoder潛在空間混合後，用內插法來控制生成句子的語氣或意見，<br>感覺比起其他方法來得溫和，句子品質應該有比較好</li>
