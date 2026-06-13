@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"annsonic.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="個人練習，以SVM作為這個題目（數血液細胞個數）的baseline。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="計數血液細胞-使用HOG和SVM">
+<meta property="og:url" content="https://annsonic.github.io/2020/10/30/%E8%A8%88%E6%95%B8%E8%A1%80%E6%B6%B2%E7%B4%B0%E8%83%9E-%E4%BD%BF%E7%94%A8HOG%E5%92%8CSVM/index.html">
+<meta property="og:site_name" content="Ann&#39;s Note">
+<meta property="og:description" content="個人練習，以SVM作為這個題目（數血液細胞個數）的baseline。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://annsonic.github.io/2020/10/30/%E8%A8%88%E6%95%B8%E8%A1%80%E6%B6%B2%E7%B4%B0%E8%83%9E-%E4%BD%BF%E7%94%A8HOG%E5%92%8CSVM/statistic_1.png">
+<meta property="og:image" content="https://annsonic.github.io/2020/10/30/%E8%A8%88%E6%95%B8%E8%A1%80%E6%B6%B2%E7%B4%B0%E8%83%9E-%E4%BD%BF%E7%94%A8HOG%E5%92%8CSVM/stat_w_h_count.png">
+<meta property="og:image" content="https://annsonic.github.io/2020/10/30/%E8%A8%88%E6%95%B8%E8%A1%80%E6%B6%B2%E7%B4%B0%E8%83%9E-%E4%BD%BF%E7%94%A8HOG%E5%92%8CSVM/flow.png">
+<meta property="og:image" content="https://annsonic.github.io/2020/10/30/%E8%A8%88%E6%95%B8%E8%A1%80%E6%B6%B2%E7%B4%B0%E8%83%9E-%E4%BD%BF%E7%94%A8HOG%E5%92%8CSVM/mAP.png">
+<meta property="og:image" content="https://annsonic.github.io/2020/10/30/%E8%A8%88%E6%95%B8%E8%A1%80%E6%B6%B2%E7%B4%B0%E8%83%9E-%E4%BD%BF%E7%94%A8HOG%E5%92%8CSVM/fail_Platelet_00003.jpg">
+<meta property="og:image" content="https://annsonic.github.io/2020/10/30/%E8%A8%88%E6%95%B8%E8%A1%80%E6%B6%B2%E7%B4%B0%E8%83%9E-%E4%BD%BF%E7%94%A8HOG%E5%92%8CSVM/fail_RBC_00013.jpg">
+<meta property="og:image" content="https://annsonic.github.io/2020/10/30/%E8%A8%88%E6%95%B8%E8%A1%80%E6%B6%B2%E7%B4%B0%E8%83%9E-%E4%BD%BF%E7%94%A8HOG%E5%92%8CSVM/fail_WBC_00270.jpg">
+<meta property="og:image" content="https://annsonic.github.io/2020/10/30/%E8%A8%88%E6%95%B8%E8%A1%80%E6%B6%B2%E7%B4%B0%E8%83%9E-%E4%BD%BF%E7%94%A8HOG%E5%92%8CSVM/hog_viz.png">
+<meta property="og:image" content="https://annsonic.github.io/2020/10/30/%E8%A8%88%E6%95%B8%E8%A1%80%E6%B6%B2%E7%B4%B0%E8%83%9E-%E4%BD%BF%E7%94%A8HOG%E5%92%8CSVM/roi_flow_364.png">
+<meta property="article:published_time" content="2020-10-30T13:56:20.000Z">
+<meta property="article:modified_time" content="2026-06-13T07:30:46.578Z">
+<meta property="article:author" content="Ann">
+<meta property="article:tag" content="Object detection">
+<meta property="article:tag" content="SVM">
+<meta property="article:tag" content="histogram oriented gradients (HOG)">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://annsonic.github.io/2020/10/30/%E8%A8%88%E6%95%B8%E8%A1%80%E6%B6%B2%E7%B4%B0%E8%83%9E-%E4%BD%BF%E7%94%A8HOG%E5%92%8CSVM/statistic_1.png">
+
+<link rel="canonical" href="https://annsonic.github.io/2020/10/30/%E8%A8%88%E6%95%B8%E8%A1%80%E6%B6%B2%E7%B4%B0%E8%83%9E-%E4%BD%BF%E7%94%A8HOG%E5%92%8CSVM/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-TW'
+  };
+</script>
+
+  <title>計數血液細胞-使用HOG和SVM | Ann's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Ann's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://annsonic.github.io/2020/10/30/%E8%A8%88%E6%95%B8%E8%A1%80%E6%B6%B2%E7%B4%B0%E8%83%9E-%E4%BD%BF%E7%94%A8HOG%E5%92%8CSVM/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Ann">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ann's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          計數血液細胞-使用HOG和SVM
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2020-10-30 21:56:20" itemprop="dateCreated datePublished" datetime="2020-10-30T21:56:20+08:00">2020-10-30</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2026-06-13 15:30:46" itemprop="dateModified" datetime="2026-06-13T15:30:46+08:00">2026-06-13</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Project/" itemprop="url" rel="index"><span itemprop="name">Project</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>個人練習，以SVM作為這個題目（數血液細胞個數）的baseline。</p>
+<span id="more"></span>
+
+<h2 id="主題："><a href="#主題：" class="headerlink" title="主題："></a>主題：</h2><p>計算一張血塗片影像中出現的血小板(Platelet)、紅血球(RBC)和白血球(WBC)的個數。</p>
+<h2 id="假設："><a href="#假設：" class="headerlink" title="假設："></a>假設：</h2><p>玻片的製作、細胞染色和資料標註都符合標準：</p>
+<ol>
+<li>染劑將細胞質和血紅素等染成紅色；細胞核以及白血球的嗜鹼性顆粒染成藍紫色</li>
+<li>位置一半落於邊緣或遮蔽達一半的細胞，不列計算</li>
+</ol>
+<p>如此待處理的問題是：</p>
+<ol>
+<li>不同顯微鏡下的影像都有一些色差</li>
+<li>血球顆粒沒有一定的大小</li>
+<li>血球可能彼此距離很近，看似相連</li>
+</ol>
+<h2 id="實驗限制："><a href="#實驗限制：" class="headerlink" title="實驗限制："></a>實驗限制：</h2><ol>
+<li>資料筆數不多，尤其我又刪掉一些圖片…<br>因為我查到血液中大約有 40%～50%是紅血球，<br>但是有些圖片我看起來有紅血球、但標籤卻完全沒有紅血球，<br>所以我屏除這些紅血球標籤少於5顆的圖片。</li>
+<li>白血球可再細分種類，大略分為五類[1]，<br>此資料集無細分白血球。</li>
+</ol>
+<h2 id="資料集"><a href="#資料集" class="headerlink" title="資料集"></a>資料集</h2><p>檔案來源[2]<br>我自行剔除少數圖片、切割資料集(80%-10%-10%比例)之後，<br>得到的原始統計分佈如下，<br><img src="/2020/10/30/%E8%A8%88%E6%95%B8%E8%A1%80%E6%B6%B2%E7%B4%B0%E8%83%9E-%E4%BD%BF%E7%94%A8HOG%E5%92%8CSVM/statistic_1.png" alt="annotation count and HSV color histogram" title="count statistics, Histogram in HSV space"><br><img src="/2020/10/30/%E8%A8%88%E6%95%B8%E8%A1%80%E6%B6%B2%E7%B4%B0%E8%83%9E-%E4%BD%BF%E7%94%A8HOG%E5%92%8CSVM/stat_w_h_count.png" alt="annotation size" title="size statistics"></p>
+<ol>
+<li>training dataset擁有極多數的紅血球樣本…<br>不過想要平均取樣實在有難度，<br>因為一張影像當中的紅血球的個數變異不小。<br>資料增量方面，我只用水平翻轉、垂直翻轉圖片的方式做。</li>
+<li>有些紅血球的陰影色彩與白血球的顏色相近</li>
+</ol>
+<h2 id="方法："><a href="#方法：" class="headerlink" title="方法："></a>方法：</h2><p>偵測分為2階段，<br>階段一是從顏色和圓形輪廓來選取可能有血球的畫面，<br>借助watershed[3]演算法來分割擠在一起的血球，<br>階段二是將選取的畫面給SVM分類器過目，<br>SVM[4]分類器根據HOG[5]提取的影像特徵，<br>判斷該區塊是否存在目標細胞。</p>
+<p>SVM分類器以正確截圖的圖片來做訓練。<br><img src="/2020/10/30/%E8%A8%88%E6%95%B8%E8%A1%80%E6%B6%B2%E7%B4%B0%E8%83%9E-%E4%BD%BF%E7%94%A8HOG%E5%92%8CSVM/flow.png" alt="My object detector flow" title="work flow"></p>
+<h2 id="結果"><a href="#結果" class="headerlink" title="結果:"></a>結果:</h2><ol>
+<li><p>分類</p>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Macro avg F1-score</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Platelets</td>
+<td>0.96</td>
+</tr>
+<tr>
+<td>RBC</td>
+<td>0.99</td>
+</tr>
+<tr>
+<td>WBC</td>
+<td>0.99</td>
+</tr>
+</tbody></table>
+</li>
+<li><p>偵測<br>使用 VOC-style Average Precision算法[6]。</p>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>AP</th>
+<th>IoU threshold</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Platelets</td>
+<td>34.32%</td>
+<td>0.1</td>
+</tr>
+<tr>
+<td>RBC</td>
+<td>58.64%</td>
+<td>0.1</td>
+</tr>
+<tr>
+<td>WBC</td>
+<td>91.43%</td>
+<td>0.5</td>
+</tr>
+</tbody></table>
+<p><img src="/2020/10/30/%E8%A8%88%E6%95%B8%E8%A1%80%E6%B6%B2%E7%B4%B0%E8%83%9E-%E4%BD%BF%E7%94%A8HOG%E5%92%8CSVM/mAP.png" alt="average precision" title="the AP score"></p>
+<p>偵測錯誤情況：<br>a. 誤認白血球的細胞質為血小板，這是單純用色板過濾藍紫色區域造成的缺失，<br>   如果能再將周圍的像素也一起評估，分類器才可能看出這是白血球</p>
+   <img src="fail_Platelet_00003.jpg" width=320 height=240 title="platelet_misclassication" alt="error case" />
+b. 未能將擠在一起的紅血球分辨清楚，
+   這是受限於我餵給watershed演算法的圖未能淨化成粒粒分明的圓點...但我也盡力了
+   <img src="fail_RBC_00013.jpg" width=320 height=240 title="rbc_misclassication" alt="error case" />
+c. 未帶有核分裂特徵的白血球，不容易被分類器辨識，
+   猜測是因為其訓練資料少才導致
+   <img src="fail_WBC_00270.jpg" width=320 height=240 title="wbc_misclassication" alt="error case" /></li>
+</ol>
+<h2 id="除錯心得："><a href="#除錯心得：" class="headerlink" title="除錯心得："></a>除錯心得：</h2><ol>
+<li><p>skimage&#x2F;feature&#x2F;_hog.py, Line 272: ValueError: negative dimensions are not allowed<br>原來我誤會參數的定義了，<br>HOG為了能對光照變化和陰影獲得更好的效果，<br>圖片會切區間(block)，區間內再細分格子細胞(cell)，<br>輸入影像需要配合作resize，或是動態設定pixel_per_cell [7]，<br>為了避免出錯，簡單設定：單一側的image_size &#x3D; 單一側的pixels_per_cell * 單一側的cells_per_block<br><img src="/2020/10/30/%E8%A8%88%E6%95%B8%E8%A1%80%E6%B6%B2%E7%B4%B0%E8%83%9E-%E4%BD%BF%E7%94%A8HOG%E5%92%8CSVM/hog_viz.png" alt="HOG descriptor and parameters" title="visualize the HOG descriptor"></p>
+</li>
+<li><p>這樣訓練的SVM分類器果然很弱，<br>畢竟它只看過截圖截得好好的訓練資料；<br>故意幾張餵細胞的部份截圖，還真的分類錯了。<br>我花費比較多心力在第一階段的畫面選準一點。</p>
+</li>
+<li><p>一開始我是使用sliding window來取ROI給分類器的，<br>超級沒效率，而且對於偵測血小板簡直是海底撈針一樣打不著，<br>才換成用顏色篩選要截圖的區域。</p>
+<p>紅血球有可能擠成一團，<br>參考網路作法用watershed演算法，<br>佩服想出這演算法的大神 👏<br>只是watershed前提需要一個無雜質的背景，<br>轉成灰階檔、濾雜質這步驟就可以來來回回試函數(膨脹、侵蝕…)調整好久…[8]<br>我還嘗試過用Sobel取輪廓 → 距離轉換 → watershed，<br>不過roi格子還是取得很糟、而且超細碎。<br><img src="/2020/10/30/%E8%A8%88%E6%95%B8%E8%A1%80%E6%B6%B2%E7%B4%B0%E8%83%9E-%E4%BD%BF%E7%94%A8HOG%E5%92%8CSVM/roi_flow_364.png" alt="fail_roi_flow" title="sobel_version_roi"></p>
+</li>
+<li><p>我一度納悶，<br>我得到的白血球PR curve是水平線，<br>但為何 AP只有91.43%？<br>原來是因為得到的 recall 最高只有 0.91，<br>模型不能偵測出所有的 ground truth。</p>
+</li>
+</ol>
+<p>應該可以再嘗試負樣本的資料增量，<br>例如在正樣本的周圍取樣、作為負樣本，<br>還有餵給watershed的distance閥值也可以嘗試再調整，<br>大概知道這種做法的痛點了，<br>因為我想把握時間學習deep learning了，<br>所以到此止住。</p>
+<h2 id="參考資料："><a href="#參考資料：" class="headerlink" title="參考資料："></a>參考資料：</h2><p>[1] 血球細胞種類 <a target="_blank" rel="noopener" href="http://youthyear.blogspot.com/2010/08/liu-stain.html">link</a><br>[2] 血球細胞資料集 <a target="_blank" rel="noopener" href="https://github.com/Shenggan/BCCD_Dataset">link</a><br>[3] Watershed segmentation web <a target="_blank" rel="noopener" href="https://www.itread01.com/content/1541250183.html">link</a><br>    Watershed segmentation youtube <a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=AsTvGxuiqKs">link</a><br>[4] SVM演算法的 dual <a target="_blank" rel="noopener" href="https://www.quora.com/Whats-the-point-in-using-the-dual-problem-when-fitting-SVM">link 1</a> <a target="_blank" rel="noopener" href="https://medium.com/@ashwanibhardwajcodevita16/from-zero-to-hero-in-depth-support-vector-machine-264931a1e135">link 2</a><br>[5] HOG演算法 <a target="_blank" rel="noopener" href="https://medium.com/analytics-vidhya/a-take-on-h-o-g-feature-descriptor-e839ebba1e52">link</a><br>[6] VOC-style mAP tool <a target="_blank" rel="noopener" href="https://github.com/rafaelpadilla/Object-Detection-Metrics">link</a><br>[7] 依輸入圖檔大小，動態改變HOG函式的pixel_per_cell參數 <a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/55664799/default-value-for-pixels-per-cell-skimage-feature-hog/55743702">link</a><br>[8] 框選紅血球的區域 <a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/36438313/filling-holes-of-an-image-in-python-with-cv2-not-working">link</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Object-detection/" rel="tag"># Object detection</a>
+              <a href="/tags/histogram-oriented-gradients-HOG/" rel="tag"># histogram oriented gradients (HOG)</a>
+              <a href="/tags/SVM/" rel="tag"># SVM</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/10/18/%E9%80%A0%E5%9E%8B%E6%B0%A3%E7%90%83-%E7%BE%8E%E6%A8%82%E8%92%82/" rel="prev" title="造型氣球-美樂蒂">
+      <i class="fa fa-chevron-left"></i> 造型氣球-美樂蒂
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/11/08/%E8%A8%88%E6%95%B8%E8%A1%80%E6%B6%B2%E7%B4%B0%E8%83%9E-%E4%BD%BF%E7%94%A8RetinaNet/" rel="next" title="計數血液細胞-使用RetinaNet">
+      計數血液細胞-使用RetinaNet <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BB%E9%A1%8C%EF%BC%9A"><span class="nav-number">1.</span> <span class="nav-text">主題：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%81%87%E8%A8%AD%EF%BC%9A"><span class="nav-number">2.</span> <span class="nav-text">假設：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%A6%E9%A9%97%E9%99%90%E5%88%B6%EF%BC%9A"><span class="nav-number">3.</span> <span class="nav-text">實驗限制：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B3%87%E6%96%99%E9%9B%86"><span class="nav-number">4.</span> <span class="nav-text">資料集</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%B3%95%EF%BC%9A"><span class="nav-number">5.</span> <span class="nav-text">方法：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B5%90%E6%9E%9C"><span class="nav-number">6.</span> <span class="nav-text">結果:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%99%A4%E9%8C%AF%E5%BF%83%E5%BE%97%EF%BC%9A"><span class="nav-number">7.</span> <span class="nav-text">除錯心得：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%83%E8%80%83%E8%B3%87%E6%96%99%EF%BC%9A"><span class="nav-number">8.</span> <span class="nav-text">參考資料：</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Ann</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">27</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ann</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 強力驅動
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
