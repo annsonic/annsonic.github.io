@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"annsonic.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="micro-ros-platformio 在 github 上提供了兩個範例，我先從這一個 micro-ros_publisher 範例 入門學習。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="micro-ros-platformio example - serial publisher">
+<meta property="og:url" content="https://annsonic.github.io/2026/06/14/micro-ros-platformio-example-serial-publisher/index.html">
+<meta property="og:site_name" content="Ann&#39;s Note">
+<meta property="og:description" content="micro-ros-platformio 在 github 上提供了兩個範例，我先從這一個 micro-ros_publisher 範例 入門學習。">
+<meta property="og:locale" content="zh_TW">
+<meta property="article:published_time" content="2026-06-14T09:48:05.000Z">
+<meta property="article:modified_time" content="2026-06-14T11:03:47.835Z">
+<meta property="article:author" content="Ann">
+<meta property="article:tag" content="micro-ros-platformio">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://annsonic.github.io/2026/06/14/micro-ros-platformio-example-serial-publisher/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-TW'
+  };
+</script>
+
+  <title>micro-ros-platformio example - serial publisher | Ann's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Ann's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://annsonic.github.io/2026/06/14/micro-ros-platformio-example-serial-publisher/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Ann">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ann's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          micro-ros-platformio example - serial publisher
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+              
+
+              <time title="創建時間：2026-06-14 17:48:05 / 修改時間：19:03:47" itemprop="dateCreated datePublished" datetime="2026-06-14T17:48:05+08:00">2026-06-14</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/micro-ros-%E7%AD%86%E8%A8%98/" itemprop="url" rel="index"><span itemprop="name">micro-ros 筆記</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>micro-ros-platformio 在 github 上提供了兩個範例，<br>我先從這一個 <a target="_blank" rel="noopener" href="https://github.com/micro-ROS/micro_ros_platformio/tree/main/examples/micro-ros_publisher">micro-ros_publisher 範例</a> 入門學習。</p>
+<span id="more"></span>
+
+<h2 id="環境"><a href="#環境" class="headerlink" title="環境"></a>環境</h2><ul>
+<li>作業系統 Ubuntu 24.04</li>
+<li>VS Code</li>
+<li>ESP32 (WROOM) 開發板</li>
+<li>micro_ros_platformio Jazzy</li>
+<li>micro-ROS-Agent Jazzy docker image</li>
+<li>ROS2 Kilted</li>
+</ul>
+<h4 id="開啟-micro-ros-agent-容器"><a href="#開啟-micro-ros-agent-容器" class="headerlink" title="開啟 micro-ros-agent 容器"></a>開啟 micro-ros-agent 容器</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">docker run --rm -it \</span><br><span class="line">  --net=host \</span><br><span class="line">  --device=/dev/ttyUSB0:/dev/ttyUSB0 \</span><br><span class="line">  microros/micro-ros-agent:jazzy \</span><br><span class="line">  serial --dev /dev/ttyUSB0 -b 115200</span><br></pre></td></tr></table></figure>
+<p>device 參數請依照你的情況填寫，可以從 platformio Home 的 Devices 的 Serial 的 Port 清單得知要填的值。</p>
+<p>我的情況是上傳韌體時會占用 serial port &#x2F;dev&#x2F;ttyUSB0，所以<br>上傳完成後再啟動 agent，避免同時搶 &#x2F;dev&#x2F;ttyUSB0。</p>
+<h2 id="測試"><a href="#測試" class="headerlink" title="測試"></a>測試</h2><p>開發板 每 1 秒發布一次 std_msgs&#x2F;msg&#x2F;Int32 訊息到 topic micro_ros_platformio_node_publisher，</p>
+<p>並讓數值遞增 (0,1,2,…)。</p>
+<h4 id="在-micro-ros-agent-容器的終端機訊息"><a href="#在-micro-ros-agent-容器的終端機訊息" class="headerlink" title="在 micro-ros-agent 容器的終端機訊息"></a>在 micro-ros-agent 容器的終端機訊息</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">1781432157.822946] info     | SessionManager.hpp | establish_session        | session established    | client_key: 0x19A8F6A1, address: 0</span><br><span class="line">[1781432157.885356] info     | ProxyClient.cpp    | create_participant       | participant created    | client_key: 0x19A8F6A1, participant_id: 0x000(1)</span><br><span class="line">[1781432157.902801] info     | ProxyClient.cpp    | create_topic             | topic created          | client_key: 0x19A8F6A1, topic_id: 0x000(2), participant_id: 0x000(1)</span><br><span class="line">[1781432157.912677] info     | ProxyClient.cpp    | create_publisher         | publisher created      | client_key: 0x19A8F6A1, publisher_id: 0x000(3), participant_id: 0x000(1)</span><br><span class="line">[1781432157.924255] info     | ProxyClient.cpp    | create_datawriter        | datawriter created     | client_key: 0x19A8F6A1, datawriter_id: 0x000(5), publisher_id: 0x000(3)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h4 id="在-ROS-2-主機上看-topic："><a href="#在-ROS-2-主機上看-topic：" class="headerlink" title="在 ROS 2 主機上看 topic："></a>在 ROS 2 主機上看 topic：</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ros2 topic list</span><br></pre></td></tr></table></figure>
+<p>預期看到 &#x2F;micro_ros_platformio_node_publisher topic</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ros2 topic echo /micro_ros_platformio_node_publisher</span><br></pre></td></tr></table></figure>
+<p>會看到類似</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">data: 64</span><br><span class="line">---</span><br><span class="line">data: 65</span><br><span class="line">---</span><br><span class="line">data: 66</span><br><span class="line">---</span><br></pre></td></tr></table></figure>
+<p>這樣格式的訊息。</p>
+<h2 id="程式筆記"><a href="#程式筆記" class="headerlink" title="程式筆記"></a>程式筆記</h2><h4 id="每個-micro-ROS-serial-通訊專案的固定句型"><a href="#每個-micro-ROS-serial-通訊專案的固定句型" class="headerlink" title="每個 micro-ROS serial 通訊專案的固定句型"></a>每個 micro-ROS serial 通訊專案的固定句型</h4><p>全域物件</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">rclc_executor_t executor;</span><br><span class="line">rclc_support_t support;</span><br><span class="line">rcl_allocator_t allocator;</span><br><span class="line">rcl_node_t node;</span><br></pre></td></tr></table></figure>
+
+<p>固定的 setup() 開頭流程</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">void setup() &#123;</span><br><span class="line">  // Configure serial transport</span><br><span class="line">  Serial.begin(115200);</span><br><span class="line">  set_microros_serial_transports(Serial);</span><br><span class="line">  delay(2000);</span><br><span class="line"></span><br><span class="line">  allocator = rcl_get_default_allocator();</span><br><span class="line"></span><br><span class="line">  //create init_options</span><br><span class="line">  RCCHECK(rclc_support_init(&amp;support, 0, NULL, &amp;allocator));</span><br></pre></td></tr></table></figure>
+
+<p>setup() 流程再宣告 node。</p>
+<p>setup() 流程最後是 <code>rclc_executor_init(&amp;executor, &amp;support.context, 1, &amp;allocator)</code><br>在此因為只有一個 timer 所以填入 1。</p>
+<ul>
+<li>個數：只計算需要被「監聽」或「觸發」的元件（稱為 Handles），是「被動等待通知」的元件<ul>
+<li>Subscriber（訂閱者）</li>
+<li>Timer（計時器）</li>
+<li>Server（服務端）</li>
+<li>Client（用戶端）</li>
+</ul>
+</li>
+</ul>
+<p><code>rclc_executor_spin_some()</code> 被 <code>void loop()</code> 呼叫。</p>
+<h4 id="錯誤處理"><a href="#錯誤處理" class="headerlink" title="錯誤處理"></a>錯誤處理</h4><p>在 micro-ROS 中，大部分的函式（例如建立節點、建立發布者）執行完後，都會回傳一個狀態碼（型態為 rcl_ret_t）。如果成功，會回傳 RCL_RET_OK（數值為 0）；如果失敗（例如記憶體不足、連線中斷），則會回傳錯誤碼。</p>
+<ul>
+<li><code>RCCHECK</code> 致命錯誤。</li>
+<li><code>RCSOFTCHECK</code> 非致命錯誤</li>
+</ul>
+<p>宣告巨集，</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#define RCCHECK(fn) &#123; rcl_ret_t temp_rc = fn; if((temp_rc != RCL_RET_OK))&#123;error_loop();&#125;&#125;</span><br><span class="line">#define RCSOFTCHECK(fn) &#123; rcl_ret_t temp_rc = fn; if((temp_rc != RCL_RET_OK))&#123;&#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以避免 setup() 充斥著大量的 if-else 判斷式。</p>
+<p>進入 <code>error_loop()</code> 無窮迴圈的話，就表示「初始化有嚴重錯誤」。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/micro-ros-platformio/" rel="tag"># micro-ros-platformio</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2026/06/13/micro-ros-%E5%85%A5%E9%96%80%E8%B8%A9%E5%9D%91%E7%AD%86%E8%A8%98/" rel="prev" title="micro-ros 入門踩坑筆記">
+      <i class="fa fa-chevron-left"></i> micro-ros 入門踩坑筆記
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%92%B0%E5%A2%83"><span class="nav-number">1.</span> <span class="nav-text">環境</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%96%8B%E5%95%9F-micro-ros-agent-%E5%AE%B9%E5%99%A8"><span class="nav-number">1.1.</span> <span class="nav-text">開啟 micro-ros-agent 容器</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B8%AC%E8%A9%A6"><span class="nav-number">2.</span> <span class="nav-text">測試</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9C%A8-micro-ros-agent-%E5%AE%B9%E5%99%A8%E7%9A%84%E7%B5%82%E7%AB%AF%E6%A9%9F%E8%A8%8A%E6%81%AF"><span class="nav-number">2.1.</span> <span class="nav-text">在 micro-ros-agent 容器的終端機訊息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9C%A8-ROS-2-%E4%B8%BB%E6%A9%9F%E4%B8%8A%E7%9C%8B-topic%EF%BC%9A"><span class="nav-number">2.2.</span> <span class="nav-text">在 ROS 2 主機上看 topic：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A8%8B%E5%BC%8F%E7%AD%86%E8%A8%98"><span class="nav-number">3.</span> <span class="nav-text">程式筆記</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%AF%8F%E5%80%8B-micro-ROS-serial-%E9%80%9A%E8%A8%8A%E5%B0%88%E6%A1%88%E7%9A%84%E5%9B%BA%E5%AE%9A%E5%8F%A5%E5%9E%8B"><span class="nav-number">3.1.</span> <span class="nav-text">每個 micro-ROS serial 通訊專案的固定句型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%8C%AF%E8%AA%A4%E8%99%95%E7%90%86"><span class="nav-number">3.2.</span> <span class="nav-text">錯誤處理</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Ann</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">28</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">24</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ann</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 強力驅動
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
