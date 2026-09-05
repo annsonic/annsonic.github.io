@@ -1,7 +1,7 @@
 ---
 title: blender-phobos-installation
 date: 2026-07-22 23:27:17
-tags: blender-plugin, phobos
+tags: [blender, phobos]
 categories: simulation 筆記
 ---
 
@@ -135,4 +135,18 @@ categories: simulation 筆記
 
   開啟 Blender，Blender 的畫布畫面中按 N 開啟側面板，在側面板會有一個名稱是 phobos 的標籤頁
 
+
 完成！
+
+
+5. 設定忽略材質轉換的語法錯誤
+
+  ```
+    File "~/.config/blender/4.2/scripts/addons/phobos/blender/io/blender2phobos.py", line 74, in deriveMaterial
+      specular_color = mat.node_tree.nodes["Specular BSDF"].inputs["Specular Tint"].default_value
+                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+    KeyError: 'bpy_prop_collection[key]: key "Specular Tint" not found'
+  ```
+
+  因為實在不清楚 "Specular BSDF" 在新版本的 Blender 改成什麼名稱，
+  這段程式把 Blender 材質節點裡的視覺/光影參數，轉換（匯出）成 Phobos/URDF 這類機器人描述格式所能理解的材質屬性，目前我不需要此功能，所以我把 `blender2phobos.py` 第 71 行 `if "Specular BSDF" in mat.node_tree.nodes.keys():` 條件式內的程式都註解掉，變成 `if "Specular BSDF" in mat.node_tree.nodes.keys(): pass` 來躲避問題。
