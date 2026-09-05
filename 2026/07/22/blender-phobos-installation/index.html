@@ -28,7 +28,7 @@
 <meta property="og:description" content="為了在 3D 空間中調整 URDF 檔的 link 和 joint 位置，以及考慮到免費的軟體方案，我選擇採用 blender 軟體和它的 phobos 外掛。">
 <meta property="og:locale" content="zh_TW">
 <meta property="article:published_time" content="2026-07-22T15:27:17.000Z">
-<meta property="article:modified_time" content="2026-07-26T12:51:01.763Z">
+<meta property="article:modified_time" content="2026-09-05T07:31:11.236Z">
 <meta property="article:author" content="Ann">
 <meta property="article:tag" content="blender-plugin, phobos">
 <meta name="twitter:card" content="summary">
@@ -181,7 +181,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新於</span>
-                <time title="修改時間：2026-07-26 20:51:01" itemprop="dateModified" datetime="2026-07-26T20:51:01+08:00">2026-07-26</time>
+                <time title="修改時間：2026-09-05 15:31:11" itemprop="dateModified" datetime="2026-09-05T15:31:11+08:00">2026-09-05</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -291,6 +291,12 @@
 </ol>
 <p>  開啟 Blender，Blender 的畫布畫面中按 N 開啟側面板，在側面板會有一個名稱是 phobos 的標籤頁</p>
 <p>完成！</p>
+<ol start="5">
+<li>設定忽略材質轉換的語法錯誤</li>
+</ol>
+  <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">File &quot;~/.config/blender/4.2/scripts/addons/phobos/blender/io/blender2phobos.py&quot;, line 74, in deriveMaterial</span><br><span class="line">  specular_color = mat.node_tree.nodes[&quot;Specular BSDF&quot;].inputs[&quot;Specular Tint&quot;].default_value</span><br><span class="line">                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^</span><br><span class="line">KeyError: &#x27;bpy_prop_collection[key]: key &quot;Specular Tint&quot; not found&#x27;</span><br></pre></td></tr></table></figure>
+
+<p>  因為實在不清楚 “Specular BSDF” 在新版本的 Blender 改成什麼名稱，<br>  這段程式把 Blender 材質節點裡的視覺&#x2F;光影參數，轉換（匯出）成 Phobos&#x2F;URDF 這類機器人描述格式所能理解的材質屬性，目前我不需要此功能，所以我把 <code>blender2phobos.py</code> 第 71 行 <code>if &quot;Specular BSDF&quot; in mat.node_tree.nodes.keys():</code> 條件式內的程式都註解掉，變成 <code>if &quot;Specular BSDF&quot; in mat.node_tree.nodes.keys(): pass</code> 來躲避問題。</p>
 
     </div>
 
@@ -388,7 +394,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">33</span>
+          <span class="site-state-item-count">34</span>
           <span class="site-state-item-name">文章</span>
         </a>
       </div>

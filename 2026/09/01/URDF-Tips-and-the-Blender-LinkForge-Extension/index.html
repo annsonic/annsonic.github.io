@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"annsonic.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="在 Blender 組合好 3D 物件了，接下來要用 Blender 外掛套件 LinkForge 設定 URDF 了，來學習 URDF 的概念和 LinkForge 的操作。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="URDF Tips and the Blender LinkForge Extension">
+<meta property="og:url" content="https://annsonic.github.io/2026/09/01/URDF-Tips-and-the-Blender-LinkForge-Extension/index.html">
+<meta property="og:site_name" content="Ann&#39;s Note">
+<meta property="og:description" content="在 Blender 組合好 3D 物件了，接下來要用 Blender 外掛套件 LinkForge 設定 URDF 了，來學習 URDF 的概念和 LinkForge 的操作。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://annsonic.github.io/2026/09/01/URDF-Tips-and-the-Blender-LinkForge-Extension/01_assembly.png">
+<meta property="og:image" content="https://annsonic.github.io/2026/09/01/URDF-Tips-and-the-Blender-LinkForge-Extension/02_base_link.png">
+<meta property="og:image" content="https://annsonic.github.io/2026/09/01/URDF-Tips-and-the-Blender-LinkForge-Extension/03_left_wheel.png">
+<meta property="og:image" content="https://annsonic.github.io/2026/09/01/URDF-Tips-and-the-Blender-LinkForge-Extension/04_right_wheel.png">
+<meta property="og:image" content="https://annsonic.github.io/2026/09/01/URDF-Tips-and-the-Blender-LinkForge-Extension/05_left_wheel_joint.png">
+<meta property="og:image" content="https://annsonic.github.io/2026/09/01/URDF-Tips-and-the-Blender-LinkForge-Extension/06_right_wheel_joint.png">
+<meta property="og:image" content="https://annsonic.github.io/2026/09/01/URDF-Tips-and-the-Blender-LinkForge-Extension/07_lidar_link_joint.png">
+<meta property="og:image" content="https://annsonic.github.io/2026/09/01/URDF-Tips-and-the-Blender-LinkForge-Extension/08_sensor.png">
+<meta property="og:image" content="https://annsonic.github.io/2026/09/01/URDF-Tips-and-the-Blender-LinkForge-Extension/09_export.png">
+<meta property="og:image" content="https://annsonic.github.io/2026/09/01/URDF-Tips-and-the-Blender-LinkForge-Extension/10_phobos.png">
+<meta property="article:published_time" content="2026-09-01T15:19:07.000Z">
+<meta property="article:modified_time" content="2026-09-05T09:42:02.523Z">
+<meta property="article:author" content="Ann">
+<meta property="article:tag" content="blender">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://annsonic.github.io/2026/09/01/URDF-Tips-and-the-Blender-LinkForge-Extension/01_assembly.png">
+
+<link rel="canonical" href="https://annsonic.github.io/2026/09/01/URDF-Tips-and-the-Blender-LinkForge-Extension/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-TW'
+  };
+</script>
+
+  <title>URDF Tips and the Blender LinkForge Extension | Ann's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Ann's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://annsonic.github.io/2026/09/01/URDF-Tips-and-the-Blender-LinkForge-Extension/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Ann">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ann's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          URDF Tips and the Blender LinkForge Extension
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2026-09-01 23:19:07" itemprop="dateCreated datePublished" datetime="2026-09-01T23:19:07+08:00">2026-09-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2026-09-05 17:42:02" itemprop="dateModified" datetime="2026-09-05T17:42:02+08:00">2026-09-05</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/simulation-%E7%AD%86%E8%A8%98/" itemprop="url" rel="index"><span itemprop="name">simulation 筆記</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>在 Blender 組合好 3D 物件了，<br>接下來要用 Blender 外掛套件 LinkForge 設定 URDF 了，<br>來學習 URDF 的概念和 LinkForge 的操作。</p>
+<span id="more"></span>
+
+<h3 id="環境"><a href="#環境" class="headerlink" title="環境"></a>環境</h3><ul>
+<li>作業系統 Ubuntu 24.04</li>
+<li>Blender <a target="_blank" rel="noopener" href="https://www.blender.org/download/lts/4-2/">4.2</a><ul>
+<li>Python (Blender 自己建立的 Python 環境)</li>
+<li>LinkForge <a target="_blank" rel="noopener" href="https://github.com/arounamounchili/linkforge/releases/tag/v1.5.1">1.5.1</a><ul>
+<li>從 1.5.0 版開始支援一個 link 可以由多個網格物件所組成</li>
+</ul>
+</li>
+<li>phobos <a target="_blank" rel="noopener" href="https://github.com/dfki-ric/phobos/releases/tag/2.0.2">2.0.2</a></li>
+</ul>
+</li>
+</ul>
+<h3 id="URDF"><a href="#URDF" class="headerlink" title="URDF"></a>URDF</h3><p>格式介紹請見 <a target="_blank" rel="noopener" href="https://wiki.ros.org/urdf/XML/link">link</a> 和 <a target="_blank" rel="noopener" href="https://wiki.ros.org/urdf/XML/joint">joint</a></p>
+<ul>
+<li>用 link 和 joint 展開成為一個樹狀結構</li>
+<li>link：用來定義形狀、物理性質<ul>
+<li>dummy base link<ul>
+<li>機器人的底盤中心通常會懸空有一點高度，如果直接把底盤當作 z &#x3D; 0 的地面，底盤以下的零件就像是陷進地底</li>
+<li>解法：先設一個虛擬 link 固定在 z &#x3D; 0，從這個虛擬 link 向上算一段距離，連接到機器人的實體底盤</li>
+</ul>
+</li>
+<li>visual origin<ul>
+<li>通常在本段 link 網格的中心點</li>
+<li>建議保持是本地座標的 (0, 0, 0)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>joint：定義「父 Link (上一段)」到「子 Link (下一段)」原點的相對位置與角度。<ul>
+<li>origin 通常在上一段 link 末端</li>
+<li>當旋轉軸不在 link 中心線上時，直接調整 Joint 的 origin 的 XYZ 偏移量<ul>
+<li>例如門軸通常裝在門的邊緣，不在門的正中心，調整讓 3D 門板物件的 origin 位於門板邊緣</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>相對座標系<ul>
+<li>前一個 joint 為原點，計算相對座標</li>
+<li>子 link 的原點與座標軸，完全跟隨連接它的 joint</li>
+</ul>
+</li>
+<li>joint 和 link 各自有原點和 xyz 座標軸<ul>
+<li>遇到轉折處，是改變 joint 的旋轉角度 (rpy)，來改變下一段 link 的方向</li>
+<li>盡量統一一個方向的旋轉軸，例如都是以 z 軸作為 joint 的旋轉軸，方便計算</li>
+</ul>
+</li>
+</ul>
+<h3 id="跟著-LinkForge-的教學製作-URDF"><a href="#跟著-LinkForge-的教學製作-URDF" class="headerlink" title="跟著 LinkForge 的教學製作 URDF"></a>跟著 LinkForge 的教學製作 URDF</h3><p>LinkForge 的官方文件有一篇 GUI 入門<a target="_blank" rel="noopener" href="https://linkforge.readthedocs.io/en/latest/tutorials/building_diff_drive.html">教學</a>，這個例子很單純，一個 link 只有一個網格形狀，URDF link origin 和 URDF link visual origin 都在預設的局部原點，而 URDF joint origin 都在下一段 link 的(Blender object)網格原點。</p>
+<h4 id="操作"><a href="#操作" class="headerlink" title="操作"></a>操作</h4><p>補充一些細節：</p>
+<ul>
+<li>LinkForge GUI 面板沒有提供設定 link origin, link visual origin, link collision origin, joint origin 的地方<ul>
+<li>在綁定給 link 之前，先將網格物件的 origin 設定好，它將成為 joint origin<ul>
+<li>例如這個範例中，左輪的圓柱體 origin 在 (0, 0.175, 0) 座標</li>
+</ul>
+</li>
+<li>綁定 link 之後，在 Blender 大綱可以看到新的階層<ul>
+<li>link<ul>
+<li>*_visual 名稱的物件</li>
+<li>*_collision 名稱的物件</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>在 Blender 大綱點選 link 物件，在 Blender 右下角面板 Object data property 的 Empty → Display As 選 Arrows，會在 link origin 顯示局部座標軸</li>
+<li>LinkForge link collision 點選 Auto-Generate 之後，才能再選 type</li>
+<li>LinkForge joint axis 要看的是全域座標軸的方向，不是局部座標軸<ul>
+<li>例如 left_wheel_joint 的旋轉軸要選 Y(這是全域的 Y)，而不是局部的 Z</li>
+<li>URDF 其實是看局部 (Local) 座標系的，LinkForge 匯出時會幫忙轉換</li>
+</ul>
+</li>
+<li>LinkForge Validate &amp; Export 雖然勾選 export meshes，mesh format OBJ，但是此範例只有輸出 URDF 檔而已<ul>
+<li>可能因為此範例是 URDF 本身看得懂的幾何圖形，不需要輸出成為網格</li>
+</ul>
+</li>
+</ul>
+<p><img src="/2026/09/01/URDF-Tips-and-the-Blender-LinkForge-Extension/01_assembly.png" alt="畫好 3D 物件" title="3D meshes"><br><img src="/2026/09/01/URDF-Tips-and-the-Blender-LinkForge-Extension/02_base_link.png" alt="建立 base_link" title="base_link"><br><img src="/2026/09/01/URDF-Tips-and-the-Blender-LinkForge-Extension/03_left_wheel.png" alt="建立 left_wheel link" title="left_wheel"><br><img src="/2026/09/01/URDF-Tips-and-the-Blender-LinkForge-Extension/04_right_wheel.png" alt="建立 right_wheel link" title="right_wheel"><br><img src="/2026/09/01/URDF-Tips-and-the-Blender-LinkForge-Extension/05_left_wheel_joint.png" alt="建立 left_wheel_joint" title="left_wheel_joint"><br><img src="/2026/09/01/URDF-Tips-and-the-Blender-LinkForge-Extension/06_right_wheel_joint.png" alt="建立 right_wheel_joint" title="right_wheel_joint"><br><img src="/2026/09/01/URDF-Tips-and-the-Blender-LinkForge-Extension/07_lidar_link_joint.png" alt="建立 lidar_link_joint" title="lidar_link_joint"><br><img src="/2026/09/01/URDF-Tips-and-the-Blender-LinkForge-Extension/08_sensor.png" alt="建立 sensor" title="set sensor attribute"><br><img src="/2026/09/01/URDF-Tips-and-the-Blender-LinkForge-Extension/09_export.png" alt="匯出 URDF" title="export"></p>
+<h4 id="用-Blender-phobos-做驗證"><a href="#用-Blender-phobos-做驗證" class="headerlink" title="用 Blender phobos 做驗證"></a>用 Blender phobos 做驗證</h4><p>如果不想要打包成為 ROS2 專案的話，可以簡單地用 Blender phobos 套件來檢查機器人關節的活動狀態。</p>
+<p>開啟新的 Blender 視窗，在 Phobos 面板點擊 Import Robot Model，選取 URDF 檔。</p>
+<p>在 Blender 大綱面板點選其中一個 joint，會看到一個類似螺絲釘的網格物件被選取，按下快捷鍵 R 和方向(x, y 或 z)，移動滑鼠，可以看到關節帶動 link 旋轉的效果。</p>
+<p><img src="/2026/09/01/URDF-Tips-and-the-Blender-LinkForge-Extension/10_phobos.png" alt="用 phobos 讀取 URDF 檔" title="import by phobos"></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/blender/" rel="tag"># blender</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2026/08/19/blender-%E7%B7%A8%E8%BC%AF3D%E7%89%A9%E4%BB%B6%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/" rel="prev" title="blender-編輯 3D 物件常用操作">
+      <i class="fa fa-chevron-left"></i> blender-編輯 3D 物件常用操作
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%92%B0%E5%A2%83"><span class="nav-number">1.</span> <span class="nav-text">環境</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#URDF"><span class="nav-number">2.</span> <span class="nav-text">URDF</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B7%9F%E8%91%97-LinkForge-%E7%9A%84%E6%95%99%E5%AD%B8%E8%A3%BD%E4%BD%9C-URDF"><span class="nav-number">3.</span> <span class="nav-text">跟著 LinkForge 的教學製作 URDF</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%93%8D%E4%BD%9C"><span class="nav-number">3.1.</span> <span class="nav-text">操作</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%94%A8-Blender-phobos-%E5%81%9A%E9%A9%97%E8%AD%89"><span class="nav-number">3.2.</span> <span class="nav-text">用 Blender phobos 做驗證</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Ann</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">34</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ann</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 強力驅動
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
