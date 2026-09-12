@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"annsonic.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="這一篇來練習撰寫 launch.py，將 URDF 載入 RViz，透過 joint_state_publisher_gui 控制介面調整關節角度，以及 robot_state_publisher 輔助計算機器人元件在 3D 空間的位置，讓 Rviz 即時更新機器人的外觀。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RViz 檢視可動作的機器人">
+<meta property="og:url" content="https://annsonic.github.io/2026/09/12/RViz-%E6%AA%A2%E8%A6%96%E5%8F%AF%E5%8B%95%E4%BD%9C%E7%9A%84%E6%A9%9F%E5%99%A8%E4%BA%BA/index.html">
+<meta property="og:site_name" content="Ann&#39;s Note">
+<meta property="og:description" content="這一篇來練習撰寫 launch.py，將 URDF 載入 RViz，透過 joint_state_publisher_gui 控制介面調整關節角度，以及 robot_state_publisher 輔助計算機器人元件在 3D 空間的位置，讓 Rviz 即時更新機器人的外觀。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://annsonic.github.io/2026/09/12/RViz-%E6%AA%A2%E8%A6%96%E5%8F%AF%E5%8B%95%E4%BD%9C%E7%9A%84%E6%A9%9F%E5%99%A8%E4%BA%BA/rviz.png">
+<meta property="article:published_time" content="2026-09-12T07:52:23.000Z">
+<meta property="article:modified_time" content="2026-09-12T09:41:05.125Z">
+<meta property="article:author" content="Ann">
+<meta property="article:tag" content="Rviz">
+<meta property="article:tag" content="joint_state_publisher_gui">
+<meta property="article:tag" content="launch.py">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://annsonic.github.io/2026/09/12/RViz-%E6%AA%A2%E8%A6%96%E5%8F%AF%E5%8B%95%E4%BD%9C%E7%9A%84%E6%A9%9F%E5%99%A8%E4%BA%BA/rviz.png">
+
+<link rel="canonical" href="https://annsonic.github.io/2026/09/12/RViz-%E6%AA%A2%E8%A6%96%E5%8F%AF%E5%8B%95%E4%BD%9C%E7%9A%84%E6%A9%9F%E5%99%A8%E4%BA%BA/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-TW'
+  };
+</script>
+
+  <title>RViz 檢視可動作的機器人 | Ann's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Ann's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://annsonic.github.io/2026/09/12/RViz-%E6%AA%A2%E8%A6%96%E5%8F%AF%E5%8B%95%E4%BD%9C%E7%9A%84%E6%A9%9F%E5%99%A8%E4%BA%BA/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Ann">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ann's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          RViz 檢視可動作的機器人
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+              
+
+              <time title="創建時間：2026-09-12 15:52:23 / 修改時間：17:41:05" itemprop="dateCreated datePublished" datetime="2026-09-12T15:52:23+08:00">2026-09-12</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/simulation-%E7%AD%86%E8%A8%98/" itemprop="url" rel="index"><span itemprop="name">simulation 筆記</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>這一篇來練習撰寫 launch.py，<br>將 URDF 載入 RViz，<br>透過 joint_state_publisher_gui 控制介面調整關節角度，<br>以及 robot_state_publisher 輔助計算機器人元件在 3D 空間的位置，<br>讓 Rviz 即時更新機器人的外觀。</p>
+<span id="more"></span>
+
+<h3 id="環境"><a href="#環境" class="headerlink" title="環境"></a>環境</h3><ul>
+<li>作業系統 Ubuntu 24.04</li>
+<li>ROS2 Kilted<ul>
+<li><code>sudo apt install python3-colcon-common-extensions</code></li>
+<li><code>sudo apt install ros-kilted-joint-state-publisher-gui</code></li>
+<li><code>sudo apt install ros-kilted-robot-state-publisher</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="URDF"><a href="#URDF" class="headerlink" title="URDF"></a>URDF</h3><p>上一篇筆記製作的 URDF 檔<br><a target="_blank" rel="noopener" href="https://linkforge.readthedocs.io/en/latest/tutorials/building_diff_drive.html">LinkForge 教學有現成的 URDF</a>，<br>為了方便檢視元件，<br>所以我手動填上了 material 設定。</p>
+<h3 id="產生專案目錄"><a href="#產生專案目錄" class="headerlink" title="產生專案目錄"></a>產生專案目錄</h3><p>給這個專案命名 <code>diffcar</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ mkdir -p diffcar_ws/src</span><br><span class="line">$ cd diffcar_ws</span><br><span class="line">diffcar_ws$ colcon build</span><br></pre></td></tr></table></figure>
+
+<p>現在專案工作目錄長相如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">diffcar_ws</span><br><span class="line">├── build</span><br><span class="line">├── install</span><br><span class="line">├── log</span><br><span class="line">└── src</span><br></pre></td></tr></table></figure>
+
+<h3 id="產生自訂套件的目錄"><a href="#產生自訂套件的目錄" class="headerlink" title="產生自訂套件的目錄"></a>產生自訂套件的目錄</h3><p>給這個套件命名 <code>car_description</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">diffcar_ws$ cd src</span><br><span class="line">diffcar_ws/src$ ros2 pkg create --build-type ament_cmake car_description</span><br></pre></td></tr></table></figure>
+
+<p>現在專案工作目錄長相如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">diffcar_ws</span><br><span class="line">├── build</span><br><span class="line">├── install</span><br><span class="line">├── log</span><br><span class="line">└── src</span><br><span class="line">    └── car_description</span><br><span class="line">        ├── CMakeLists.txt</span><br><span class="line">        ├── include</span><br><span class="line">        │   └── car_description</span><br><span class="line">        ├── package.xml</span><br><span class="line">        └── src</span><br></pre></td></tr></table></figure>
+
+<h3 id="新增資料夾、複製檔案"><a href="#新增資料夾、複製檔案" class="headerlink" title="新增資料夾、複製檔案"></a>新增資料夾、複製檔案</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">diffcar_ws</span><br><span class="line">└── src</span><br><span class="line">    └── car_description</span><br><span class="line">        ├── CMakeLists.txt</span><br><span class="line">        ├── include</span><br><span class="line">        │   └── car_description</span><br><span class="line">        ├── launch                       &lt;&lt; 手動新增 launch 資料夾</span><br><span class="line">        ├── package.xml</span><br><span class="line">        ├── rviz                         &lt;&lt; 手動新增 rviz 資料夾</span><br><span class="line">        │   └── display.rviz             &lt;&lt; 從 ROS2 官方範例複製 rviz 設定檔</span><br><span class="line">        ├── src</span><br><span class="line">        └── urdf                         &lt;&lt; 手動新增 urdf 資料夾</span><br><span class="line">            └── diff_drive_robot.urdf    &lt;&lt; 這是先前製作的 URDF 檔</span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://github.com/ros/urdf_tutorial/blob/ros2/rviz/urdf.rviz">ROS2 官方範例的 RViz 設定檔</a></p>
+<p>注意：</p>
+<ul>
+<li>Fixed Frame: base_link<ul>
+<li>URDF 檔也必須宣告一樣的字串 <code>base_link</code>，作為機器人的底盤名稱</li>
+<li>作為 RViz 世界座標的座標系</li>
+</ul>
+</li>
+<li>Description Topic:<ul>
+<li>Value: &#x2F;robot_description<ul>
+<li>指示 RViz 去訂閱名為 <code>/robot_description</code> 的 ROS2 Topic，以取得機器人的 URDF</li>
+<li><code>robot_state_publisher</code> 這個節點預設的話題就是 <code>/robot_description</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="撰寫-launch-py-檔案"><a href="#撰寫-launch-py-檔案" class="headerlink" title="撰寫 launch.py 檔案"></a>撰寫 launch.py 檔案</h3><p>在 launch 資料夾新增 display.launch.py 檔案，<br>在此因為只練習 URDF 格式，不是 xacro 格式，<br>所以用 python 的 open 函數讀檔，<br>暫時犧牲 <code>model_arg</code> 所提供的彈性讀檔功能。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line">import os</span><br><span class="line">from ament_index_python.packages import get_package_share_directory</span><br><span class="line"></span><br><span class="line">from launch import LaunchDescription</span><br><span class="line">from launch.actions import DeclareLaunchArgument</span><br><span class="line"></span><br><span class="line">from launch_ros.actions import Node</span><br><span class="line">from launch_ros.parameter_descriptions import ParameterValue</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def generate_launch_description():</span><br><span class="line">    car_description_dir = get_package_share_directory(&quot;car_description&quot;)</span><br><span class="line"></span><br><span class="line">    urdf_path = os.path.join(car_description_dir, &quot;urdf&quot;, &quot;diff_drive_robot.urdf&quot;)</span><br><span class="line"></span><br><span class="line">    model_arg = DeclareLaunchArgument(</span><br><span class="line">        name=&quot;model&quot;,</span><br><span class="line">        default_value=urdf_path,</span><br><span class="line">        description=&quot;Absolute path to robot urdf file&quot;,</span><br><span class="line">    )</span><br><span class="line"></span><br><span class="line">    with open(urdf_path, &#x27;r&#x27;) as infp:</span><br><span class="line">        robot_description_content = infp.read()</span><br><span class="line"></span><br><span class="line">    robot_state_publisher_node = Node(</span><br><span class="line">        package=&quot;robot_state_publisher&quot;,</span><br><span class="line">        executable=&quot;robot_state_publisher&quot;,</span><br><span class="line">        parameters=[&#123;&quot;robot_description&quot;: robot_description_content&#125;],</span><br><span class="line">    )</span><br><span class="line"></span><br><span class="line">    joint_state_publisher_gui_node = Node(</span><br><span class="line">        package=&quot;joint_state_publisher_gui&quot;, executable=&quot;joint_state_publisher_gui&quot;</span><br><span class="line">    )</span><br><span class="line"></span><br><span class="line">    rviz_node = Node(</span><br><span class="line">        package=&quot;rviz2&quot;,</span><br><span class="line">        executable=&quot;rviz2&quot;,</span><br><span class="line">        name=&quot;rviz2&quot;,</span><br><span class="line">        output=&quot;screen&quot;,</span><br><span class="line">        arguments=[</span><br><span class="line">            &quot;-d&quot;,</span><br><span class="line">            os.path.join(car_description_dir, &quot;rviz&quot;, &quot;display.rviz&quot;),</span><br><span class="line">        ],</span><br><span class="line">    )</span><br><span class="line"></span><br><span class="line">    return LaunchDescription(</span><br><span class="line">        [</span><br><span class="line">            model_arg,</span><br><span class="line">            joint_state_publisher_gui_node,</span><br><span class="line">            robot_state_publisher_node,</span><br><span class="line">            rviz_node,</span><br><span class="line">        ]</span><br><span class="line">    )</span><br></pre></td></tr></table></figure>
+
+<h3 id="編輯-CMakeLists-txt-檔案"><a href="#編輯-CMakeLists-txt-檔案" class="headerlink" title="編輯 CMakeLists.txt 檔案"></a>編輯 CMakeLists.txt 檔案</h3><p><code>diffcar_ws/src/car_description/CMakeLists.txt</code> 這份檔案加上以下設定</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">install(</span><br><span class="line">  DIRECTORY launch urdf rviz</span><br><span class="line">  DESTINATION share/$&#123;PROJECT_NAME&#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h3 id="編輯-package-xml-檔案"><a href="#編輯-package-xml-檔案" class="headerlink" title="編輯 package.xml 檔案"></a>編輯 package.xml 檔案</h3><p><code>diffcar_ws/src/car_description/package.xml</code> 這份檔案加上以下設定</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;exec_depend&gt;robot_state_publisher&lt;/exec_depend&gt;</span><br><span class="line">&lt;exec_depend&gt;urdf&lt;/exec_depend&gt;</span><br><span class="line">&lt;exec_depend&gt;joint_state_publisher_gui&lt;/exec_depend&gt;</span><br><span class="line">&lt;exec_depend&gt;rviz2&lt;/exec_depend&gt;</span><br><span class="line">&lt;exec_depend&gt;ros2launch&lt;/exec_depend&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="編譯、執行"><a href="#編譯、執行" class="headerlink" title="編譯、執行"></a>編譯、執行</h3><p>回到根目錄，執行</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">diffcar_ws$ colcon build</span><br><span class="line">diffcar_ws$ . install/setup.sh</span><br><span class="line">diffcar_ws$ ros2 launch car_description display.launch.py</span><br></pre></td></tr></table></figure>
+
+<p>會看到 Rviz 視窗和 joint_state_publisher_gui 視窗，可以移動小視窗的拉桿轉動輪子。</p>
+<p><img src="/2026/09/12/RViz-%E6%AA%A2%E8%A6%96%E5%8F%AF%E5%8B%95%E4%BD%9C%E7%9A%84%E6%A9%9F%E5%99%A8%E4%BA%BA/rviz.png" alt="rviz" title="modify the joint state"></p>
+<p>在終端機按下 ctrl + C，便可以關閉 RViz 和小視窗。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Rviz/" rel="tag"># Rviz</a>
+              <a href="/tags/launch-py/" rel="tag"># launch.py</a>
+              <a href="/tags/joint-state-publisher-gui/" rel="tag"># joint_state_publisher_gui</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2026/09/01/URDF-Tips-and-the-Blender-LinkForge-Extension/" rel="prev" title="URDF Tips and the Blender LinkForge Extension">
+      <i class="fa fa-chevron-left"></i> URDF Tips and the Blender LinkForge Extension
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%92%B0%E5%A2%83"><span class="nav-number">1.</span> <span class="nav-text">環境</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#URDF"><span class="nav-number">2.</span> <span class="nav-text">URDF</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A2%E7%94%9F%E5%B0%88%E6%A1%88%E7%9B%AE%E9%8C%84"><span class="nav-number">3.</span> <span class="nav-text">產生專案目錄</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A2%E7%94%9F%E8%87%AA%E8%A8%82%E5%A5%97%E4%BB%B6%E7%9A%84%E7%9B%AE%E9%8C%84"><span class="nav-number">4.</span> <span class="nav-text">產生自訂套件的目錄</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B0%E5%A2%9E%E8%B3%87%E6%96%99%E5%A4%BE%E3%80%81%E8%A4%87%E8%A3%BD%E6%AA%94%E6%A1%88"><span class="nav-number">5.</span> <span class="nav-text">新增資料夾、複製檔案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%92%B0%E5%AF%AB-launch-py-%E6%AA%94%E6%A1%88"><span class="nav-number">6.</span> <span class="nav-text">撰寫 launch.py 檔案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B7%A8%E8%BC%AF-CMakeLists-txt-%E6%AA%94%E6%A1%88"><span class="nav-number">7.</span> <span class="nav-text">編輯 CMakeLists.txt 檔案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B7%A8%E8%BC%AF-package-xml-%E6%AA%94%E6%A1%88"><span class="nav-number">8.</span> <span class="nav-text">編輯 package.xml 檔案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B7%A8%E8%AD%AF%E3%80%81%E5%9F%B7%E8%A1%8C"><span class="nav-number">9.</span> <span class="nav-text">編譯、執行</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Ann</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">35</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">32</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ann</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 強力驅動
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

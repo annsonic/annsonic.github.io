@@ -38,7 +38,7 @@
 <meta property="og:image" content="https://annsonic.github.io/2026/09/01/URDF-Tips-and-the-Blender-LinkForge-Extension/09_export.png">
 <meta property="og:image" content="https://annsonic.github.io/2026/09/01/URDF-Tips-and-the-Blender-LinkForge-Extension/10_phobos.png">
 <meta property="article:published_time" content="2026-09-01T15:19:07.000Z">
-<meta property="article:modified_time" content="2026-09-12T07:35:17.718Z">
+<meta property="article:modified_time" content="2026-09-12T07:46:21.207Z">
 <meta property="article:author" content="Ann">
 <meta property="article:tag" content="LinkForge">
 <meta property="article:tag" content="blender">
@@ -194,7 +194,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新於</span>
-                <time title="修改時間：2026-09-12 15:35:17" itemprop="dateModified" datetime="2026-09-12T15:35:17+08:00">2026-09-12</time>
+                <time title="修改時間：2026-09-12 15:46:21" itemprop="dateModified" datetime="2026-09-12T15:46:21+08:00">2026-09-12</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -302,9 +302,9 @@
 <p>開啟新的 Blender 視窗，在 Phobos 面板點擊 Import Robot Model，選取 URDF 檔。</p>
 <p>在 Blender 大綱面板點選其中一個 joint，會看到一個類似螺絲釘的網格物件被選取，按下快捷鍵 R 和方向(x, y 或 z)，移動滑鼠，可以看到關節帶動 link 旋轉的效果。</p>
 <ul>
-<li>附圖是 left_wheel_joint 在 URDF 設定繞 Y 軸旋轉的結果<ul>
-<li>這在 Blender phobos 是正確的設定、但是對 rviz 來說是錯誤的設定</li>
-<li>不知道原因，我感到好混亂呀</li>
+<li>附圖是 left_wheel_joint 在 URDF 設定繞 Z 軸旋轉的結果<ul>
+<li>這在 Blender phobos 會看到符合預期的螺絲釘方向（平行圓柱體的中軸線）</li>
+<li>只是在 Blender 檢視輪子旋轉效果要按下 R 和方向 y，不是 z，我也會感到腦袋錯亂</li>
 </ul>
 </li>
 </ul>
@@ -332,7 +332,10 @@
     <a href="/2026/08/19/blender-%E7%B7%A8%E8%BC%AF3D%E7%89%A9%E4%BB%B6%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/" rel="prev" title="blender-編輯 3D 物件常用操作">
       <i class="fa fa-chevron-left"></i> blender-編輯 3D 物件常用操作
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2026/09/12/RViz-%E6%AA%A2%E8%A6%96%E5%8F%AF%E5%8B%95%E4%BD%9C%E7%9A%84%E6%A9%9F%E5%99%A8%E4%BA%BA/" rel="next" title="RViz 檢視可動作的機器人">
+      RViz 檢視可動作的機器人 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -405,7 +408,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">34</span>
+          <span class="site-state-item-count">35</span>
           <span class="site-state-item-name">文章</span>
         </a>
       </div>
@@ -416,7 +419,7 @@
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
-        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-count">32</span>
         <span class="site-state-item-name">標籤</span></a>
       </div>
   </nav>
