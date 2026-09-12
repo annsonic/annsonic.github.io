@@ -61,9 +61,9 @@ LinkForge 的官方文件有一篇 GUI 入門[教學](https://linkforge.readthed
       - *_collision 名稱的物件
 - 在 Blender 大綱點選 link 物件，在 Blender 右下角面板 Object data property 的 Empty → Display As 選 Arrows，會在 link origin 顯示局部座標軸
 - LinkForge link collision 點選 Auto-Generate 之後，才能再選 type
-- LinkForge joint axis 要看的是全域座標軸的方向，不是局部座標軸
-  - 例如 left_wheel_joint 的旋轉軸要選 Y(這是全域的 Y)，而不是局部的 Z
-  - URDF 其實是看局部 (Local) 座標系的，LinkForge 匯出時會幫忙轉換
+- LinkForge joint axis 要看的是局部座標軸
+  - 範例 left_wheel_joint 的旋轉軸要選 Y(這是全域的 Y)，我後來用 rviz 驗證實發現這是錯誤的
+  - URDF 其實是看局部 (Local) 座標系的，所以 left_wheel_joint 應該選擇局部的 Z 軸做旋轉
 - LinkForge Validate & Export 雖然勾選 export meshes，mesh format OBJ，但是此範例只有輸出 URDF 檔而已
   - 可能因為此範例是 URDF 本身看得懂的幾何圖形，不需要輸出成為網格
 
@@ -84,6 +84,10 @@ LinkForge 的官方文件有一篇 GUI 入門[教學](https://linkforge.readthed
 開啟新的 Blender 視窗，在 Phobos 面板點擊 Import Robot Model，選取 URDF 檔。
 
 在 Blender 大綱面板點選其中一個 joint，會看到一個類似螺絲釘的網格物件被選取，按下快捷鍵 R 和方向(x, y 或 z)，移動滑鼠，可以看到關節帶動 link 旋轉的效果。
+
+  - 附圖是 left_wheel_joint 在 URDF 設定繞 Z 軸旋轉的結果
+    - 這在 Blender phobos 會看到符合預期的螺絲釘方向（平行圓柱體的中軸線）
+    - 只是在 Blender 檢視輪子旋轉效果要按下 R 和方向 y，不是 z，我也會感到腦袋錯亂
 
 ![用 phobos 讀取 URDF 檔](10_phobos.png "import by phobos")
 
