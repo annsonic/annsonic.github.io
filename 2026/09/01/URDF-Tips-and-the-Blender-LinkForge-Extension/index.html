@@ -38,9 +38,11 @@
 <meta property="og:image" content="https://annsonic.github.io/2026/09/01/URDF-Tips-and-the-Blender-LinkForge-Extension/09_export.png">
 <meta property="og:image" content="https://annsonic.github.io/2026/09/01/URDF-Tips-and-the-Blender-LinkForge-Extension/10_phobos.png">
 <meta property="article:published_time" content="2026-09-01T15:19:07.000Z">
-<meta property="article:modified_time" content="2026-09-05T09:42:02.523Z">
+<meta property="article:modified_time" content="2026-09-12T07:35:17.718Z">
 <meta property="article:author" content="Ann">
+<meta property="article:tag" content="LinkForge">
 <meta property="article:tag" content="blender">
+<meta property="article:tag" content="phobos">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://annsonic.github.io/2026/09/01/URDF-Tips-and-the-Blender-LinkForge-Extension/01_assembly.png">
 
@@ -192,7 +194,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新於</span>
-                <time title="修改時間：2026-09-05 17:42:02" itemprop="dateModified" datetime="2026-09-05T17:42:02+08:00">2026-09-05</time>
+                <time title="修改時間：2026-09-12 15:35:17" itemprop="dateModified" datetime="2026-09-12T15:35:17+08:00">2026-09-12</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -285,9 +287,9 @@
 </li>
 <li>在 Blender 大綱點選 link 物件，在 Blender 右下角面板 Object data property 的 Empty → Display As 選 Arrows，會在 link origin 顯示局部座標軸</li>
 <li>LinkForge link collision 點選 Auto-Generate 之後，才能再選 type</li>
-<li>LinkForge joint axis 要看的是全域座標軸的方向，不是局部座標軸<ul>
-<li>例如 left_wheel_joint 的旋轉軸要選 Y(這是全域的 Y)，而不是局部的 Z</li>
-<li>URDF 其實是看局部 (Local) 座標系的，LinkForge 匯出時會幫忙轉換</li>
+<li>LinkForge joint axis 要看的是局部座標軸<ul>
+<li>範例 left_wheel_joint 的旋轉軸要選 Y(這是全域的 Y)，我後來用 rviz 驗證實發現這是錯誤的</li>
+<li>URDF 其實是看局部 (Local) 座標系的，所以 left_wheel_joint 應該選擇局部的 Z 軸做旋轉</li>
 </ul>
 </li>
 <li>LinkForge Validate &amp; Export 雖然勾選 export meshes，mesh format OBJ，但是此範例只有輸出 URDF 檔而已<ul>
@@ -299,6 +301,13 @@
 <h4 id="用-Blender-phobos-做驗證"><a href="#用-Blender-phobos-做驗證" class="headerlink" title="用 Blender phobos 做驗證"></a>用 Blender phobos 做驗證</h4><p>如果不想要打包成為 ROS2 專案的話，可以簡單地用 Blender phobos 套件來檢查機器人關節的活動狀態。</p>
 <p>開啟新的 Blender 視窗，在 Phobos 面板點擊 Import Robot Model，選取 URDF 檔。</p>
 <p>在 Blender 大綱面板點選其中一個 joint，會看到一個類似螺絲釘的網格物件被選取，按下快捷鍵 R 和方向(x, y 或 z)，移動滑鼠，可以看到關節帶動 link 旋轉的效果。</p>
+<ul>
+<li>附圖是 left_wheel_joint 在 URDF 設定繞 Y 軸旋轉的結果<ul>
+<li>這在 Blender phobos 是正確的設定、但是對 rviz 來說是錯誤的設定</li>
+<li>不知道原因，我感到好混亂呀</li>
+</ul>
+</li>
+</ul>
 <p><img src="/2026/09/01/URDF-Tips-and-the-Blender-LinkForge-Extension/10_phobos.png" alt="用 phobos 讀取 URDF 檔" title="import by phobos"></p>
 
     </div>
@@ -310,6 +319,8 @@
       <footer class="post-footer">
           <div class="post-tags">
               <a href="/tags/blender/" rel="tag"># blender</a>
+              <a href="/tags/phobos/" rel="tag"># phobos</a>
+              <a href="/tags/LinkForge/" rel="tag"># LinkForge</a>
           </div>
 
         
@@ -405,7 +416,7 @@
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
-        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-count">29</span>
         <span class="site-state-item-name">標籤</span></a>
       </div>
   </nav>
