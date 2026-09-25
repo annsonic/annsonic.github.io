@@ -20,21 +20,24 @@
     var CONFIG = {"hostname":"annsonic.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta property="og:type" content="article">
-<meta property="og:title" content="造型氣球-小公雞">
-<meta property="og:url" content="https://annsonic.github.io/2020/06/27/%E9%80%A0%E5%9E%8B%E6%B0%A3%E7%90%83-%E5%B0%8F%E5%85%AC%E9%9B%9E/index.html">
+  <meta name="description" content="這一篇是照著官方教學走一遍，紀錄一些自己的小筆記。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Gazebo(gz) 入門練習">
+<meta property="og:url" content="https://annsonic.github.io/2026/09/16/Gazebo-gz-%E5%85%A5%E9%96%80%E7%B7%B4%E7%BF%92/index.html">
 <meta property="og:site_name" content="Ann&#39;s Note">
+<meta property="og:description" content="這一篇是照著官方教學走一遍，紀錄一些自己的小筆記。">
 <meta property="og:locale" content="zh_TW">
-<meta property="og:image" content="https://annsonic.github.io/2020/06/27/%E9%80%A0%E5%9E%8B%E6%B0%A3%E7%90%83-%E5%B0%8F%E5%85%AC%E9%9B%9E/rooster.jpg">
-<meta property="og:image" content="https://annsonic.github.io/2020/06/27/%E9%80%A0%E5%9E%8B%E6%B0%A3%E7%90%83-%E5%B0%8F%E5%85%AC%E9%9B%9E/g.jpg">
-<meta property="article:published_time" content="2020-06-27T05:08:06.000Z">
-<meta property="article:modified_time" content="2026-06-13T07:30:46.593Z">
+<meta property="og:image" content="https://annsonic.github.io/2026/09/16/Gazebo-gz-%E5%85%A5%E9%96%80%E7%B7%B4%E7%BF%92/keyboard_1.png">
+<meta property="og:image" content="https://annsonic.github.io/2026/09/16/Gazebo-gz-%E5%85%A5%E9%96%80%E7%B7%B4%E7%BF%92/keyboard_2.png">
+<meta property="og:image" content="https://annsonic.github.io/2026/09/16/Gazebo-gz-%E5%85%A5%E9%96%80%E7%B7%B4%E7%BF%92/keyboard_3.png">
+<meta property="article:published_time" content="2026-09-16T14:00:43.000Z">
+<meta property="article:modified_time" content="2026-09-25T05:57:19.818Z">
 <meta property="article:author" content="Ann">
-<meta property="article:tag" content="rooster">
+<meta property="article:tag" content="Gazebo">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://annsonic.github.io/2020/06/27/%E9%80%A0%E5%9E%8B%E6%B0%A3%E7%90%83-%E5%B0%8F%E5%85%AC%E9%9B%9E/rooster.jpg">
+<meta name="twitter:image" content="https://annsonic.github.io/2026/09/16/Gazebo-gz-%E5%85%A5%E9%96%80%E7%B7%B4%E7%BF%92/keyboard_1.png">
 
-<link rel="canonical" href="https://annsonic.github.io/2020/06/27/%E9%80%A0%E5%9E%8B%E6%B0%A3%E7%90%83-%E5%B0%8F%E5%85%AC%E9%9B%9E/">
+<link rel="canonical" href="https://annsonic.github.io/2026/09/16/Gazebo-gz-%E5%85%A5%E9%96%80%E7%B7%B4%E7%BF%92/">
 
 
 <script id="page-configurations">
@@ -47,7 +50,7 @@
   };
 </script>
 
-  <title>造型氣球-小公雞 | Ann's Note</title>
+  <title>Gazebo(gz) 入門練習 | Ann's Note</title>
   
 
 
@@ -152,7 +155,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
-    <link itemprop="mainEntityOfPage" href="https://annsonic.github.io/2020/06/27/%E9%80%A0%E5%9E%8B%E6%B0%A3%E7%90%83-%E5%B0%8F%E5%85%AC%E9%9B%9E/">
+    <link itemprop="mainEntityOfPage" href="https://annsonic.github.io/2026/09/16/Gazebo-gz-%E5%85%A5%E9%96%80%E7%B7%B4%E7%BF%92/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -165,7 +168,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          造型氣球-小公雞
+          Gazebo(gz) 入門練習
         </h1>
 
         <div class="post-meta">
@@ -175,14 +178,14 @@
               </span>
               <span class="post-meta-item-text">發表於</span>
 
-              <time title="創建時間：2020-06-27 13:08:06" itemprop="dateCreated datePublished" datetime="2020-06-27T13:08:06+08:00">2020-06-27</time>
+              <time title="創建時間：2026-09-16 22:00:43" itemprop="dateCreated datePublished" datetime="2026-09-16T22:00:43+08:00">2026-09-16</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新於</span>
-                <time title="修改時間：2026-06-13 15:30:46" itemprop="dateModified" datetime="2026-06-13T15:30:46+08:00">2026-06-13</time>
+                <time title="修改時間：2026-09-25 13:57:19" itemprop="dateModified" datetime="2026-09-25T13:57:19+08:00">2026-09-25</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -190,7 +193,7 @@
               </span>
               <span class="post-meta-item-text">分類於</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Balloon-Twisting/" itemprop="url" rel="index"><span itemprop="name">Balloon Twisting</span></a>
+                  <a href="/categories/simulation-%E7%AD%86%E8%A8%98/" itemprop="url" rel="index"><span itemprop="name">simulation 筆記</span></a>
                 </span>
             </span>
 
@@ -205,19 +208,79 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p><img src="/2020/06/27/%E9%80%A0%E5%9E%8B%E6%B0%A3%E7%90%83-%E5%B0%8F%E5%85%AC%E9%9B%9E/rooster.jpg" alt="rooster" title="balloon twisting rooster"></p>
+        <p>這一篇是照著官方教學走一遍，紀錄一些自己的小筆記。</p>
 <span id="more"></span>
 
-<p>參考李明波先生的教學做的~ <a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=gllDu2FH_GQ">教學影片傳送門</a><br>材料:</p>
-<ul>
-<li>身體:白色260氣球，充氣至尾端留8指</li>
-<li>喙足:黃色260氣球，充氣至半條長</li>
-<li>雞冠:紅色260氣球，充氣至半條長</li>
-<li>剪刀</li>
-<li>黑色奇異筆</li>
+<h3 id="環境"><a href="#環境" class="headerlink" title="環境"></a>環境</h3><ul>
+<li>作業系統 Ubuntu 24.04</li>
+<li>ROS2 Kilted</li>
+<li>Gazebo Ionic<ul>
+<li><a target="_blank" rel="noopener" href="https://gazebosim.org/docs/jetty/ros_installation/">官方文件的 ROS2 和 Gz 配對版本</a></li>
+<li><code>sudo apt-get install ros-kilted-ros-gz</code></li>
+<li>注意別安裝 Gazebo classic，因為新版 Gazebo (gz) 才是支援新版 Ubuntu 和 ROS2</li>
 </ul>
-<p>非常推薦這個造型!!!<br>簡單做、又可愛，<br>帶給我滿滿成就感。<br>因為比較喜歡圓滾滾的感覺，我便略過雞爪了。</p>
-<p>因為我自己容易倒帶之後反而忘記我目前做到哪一個步驟,<br>所以參考台大氣球社一位學長提出的記譜方式製作這張流程圖<br><img src="/2020/06/27/%E9%80%A0%E5%9E%8B%E6%B0%A3%E7%90%83-%E5%B0%8F%E5%85%AC%E9%9B%9E/g.jpg" alt="flow" title="balloon twisting flow"><br>氣球譜 <a target="_blank" rel="noopener" href="https://mropengate.blogspot.com/2016/03/blog-post_87.html">原文</a><br>邊上的文字是表示 – 第幾個步驟:氣泡長度(單位是自己的手指頭寬度）</p>
+</li>
+</ul>
+<h3 id="操作"><a href="#操作" class="headerlink" title="操作"></a>操作</h3><p>我是照著這兩篇教學做，</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://gazebosim.org/docs/latest/building_robot/">從零建立 SDF 檔</a></li>
+<li><a target="_blank" rel="noopener" href="https://gazebosim.org/docs/latest/moving_robot/">模擬移動行為</a></li>
+</ul>
+<p>類似 ROS2 官方教學的移動小烏龜範例，<br>不過我的目標是求大致了解 Gazebo 的特性即可，<br>所以沒有多花精神查找語法；<br>官方文件寫得很仔細，<br>只有在加入 Key Publisher 這一步讓我找不到按鈕。<br>以下是 Key Publisher 小筆記：</p>
+<p><img src="/2026/09/16/Gazebo-gz-%E5%85%A5%E9%96%80%E7%B7%B4%E7%BF%92/keyboard_1.png" alt="視窗右上角的三個點按鈕，點擊後出現輸入框和下拉選單"></p>
+<p><img src="/2026/09/16/Gazebo-gz-%E5%85%A5%E9%96%80%E7%B7%B4%E7%BF%92/keyboard_2.png" alt="在輸入框進行關鍵字搜尋"></p>
+<p><img src="/2026/09/16/Gazebo-gz-%E5%85%A5%E9%96%80%E7%B7%B4%E7%BF%92/keyboard_3.png" alt="這是加入 Key Publisher 後的樣子"></p>
+<h3 id="Gezobo-的特點"><a href="#Gezobo-的特點" class="headerlink" title="Gezobo 的特點"></a>Gezobo 的特點</h3><ul>
+<li>Gazebo 是獨立的軟體，它的資料格式和 ROS2 不同<ul>
+<li>通常使用 ros_gz_sim 提供的 bridge，或是 ros2_control 的 gz_ros2_control 來作為兩者溝通的橋樑</li>
+<li>ros_gz_sim 負責從 gazebo 端往 ROS2 端，發送感測器的模擬數據，不涉及控制</li>
+<li>gz_ros2_control 讓 ros2_control 的程式可以控制 gazebo 世界的機器人，這樣模擬和真實機器可以共用一套控制器程式</li>
+</ul>
+</li>
+<li>Gazebo 是打造虛擬世界<ul>
+<li>除了機器人模型，還需要有地景等等互動物體的物理模型，進行物理特性運算</li>
+<li>相對的，ROS2 Rviz 是數據可視化工具，例如：機器人本體狀態，感測器數據視覺化：點雲、軌跡、路徑規劃結果</li>
+<li>通常會是物理描述 SDF 檔搭配機器人關節定義 xacro 檔</li>
+<li>官方提供的 SDF 檔倉庫<ul>
+<li><a target="_blank" rel="noopener" href="https://app.gazebosim.org/dashboard">Fuel</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/gazebosim/gz-sim/tree/main/examples/worlds">github</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Gazebo plugin 分成四大類型<ul>
+<li>System Plugin，以下列出這次學習遇到的<ul>
+<li>gz-sim-physics-system，(必備)計算重力、摩擦力、碰撞…</li>
+<li>gz-sim-user-commands-system (必備)例如用滑鼠拖曳機器人</li>
+<li>gz-sim-scene-broadcaster-system (必備)更新 3D 畫面</li>
+<li>gz-sim-diff-drive-system (依機器人而變)接收速度指令，轉動輪子</li>
+<li>gz-sim-triggered-publisher-system (依機器人而變)設定觸發事件和發送觸發信號</li>
+</ul>
+</li>
+<li>Sensor Plugin</li>
+<li>GUI Plugin</li>
+<li>Visual Plugin</li>
+</ul>
+</li>
+<li>Gazebo 有自己的主題與訊息機制 (Topics and Messages)<ul>
+<li>教學中訂閱的 cmd_vel 主題，這個名稱 cmd_vel 是可以自由命名的<ul>
+<li>範例中機器人叫 vehicle_blue，若不宣告 plugin 的 topic 標籤，預設的 topic 名稱會是 <code>/model/vehicle_blue/cmd_vel</code></li>
+</ul>
+</li>
+<li>似乎藉由抄 <a target="_blank" rel="noopener" href="https://github.com/gazebosim/gz-sim/tree/main/examples/worlds">github</a> 範例來學習<ul>
+<li>各種機器人與外掛的組合</li>
+<li>外掛提供哪些參數</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>播放鍵<ul>
+<li>代表開啟物理引擎的時間推進（Unpause Physics），讓重力、摩擦力、關節力矩開始隨時間進行數值積分（Numerical Integration）運算</li>
+<li>播放的不是預先錄製好的動畫，可以用滑鼠在 Gazebo 畫面中強行拉扯或推動機器人</li>
+<li>可以暫停，進行除錯與逐幀分析（Step-by-Step）</li>
+</ul>
+</li>
+</ul>
 
     </div>
 
@@ -227,7 +290,7 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/rooster/" rel="tag"># rooster</a>
+              <a href="/tags/Gazebo/" rel="tag"># Gazebo</a>
           </div>
 
         
@@ -236,13 +299,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2020/05/09/Jointly-Optimizing-Diversity-and-Relevance-in-Neural-Response-Generation/" rel="prev" title="Jointly Optimizing Diversity and Relevance in Neural Response Generation">
-      <i class="fa fa-chevron-left"></i> Jointly Optimizing Diversity and Relevance in Neural Response Generation
+    <a href="/2026/09/12/RViz-%E6%AA%A2%E8%A6%96%E5%8F%AF%E5%8B%95%E4%BD%9C%E7%9A%84%E6%A9%9F%E5%99%A8%E4%BA%BA/" rel="prev" title="RViz 檢視可動作的機器人">
+      <i class="fa fa-chevron-left"></i> RViz 檢視可動作的機器人
     </a></div>
-      <div class="post-nav-item">
-    <a href="/2020/08/31/%E9%80%A0%E5%9E%8B%E6%B0%A3%E7%90%83-%E4%BD%A9%E4%BD%A9%E8%B1%AC-2/" rel="next" title="造型氣球-佩佩豬-2">
-      造型氣球-佩佩豬-2 <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -301,6 +361,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%92%B0%E5%A2%83"><span class="nav-number">1.</span> <span class="nav-text">環境</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%93%8D%E4%BD%9C"><span class="nav-number">2.</span> <span class="nav-text">操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Gezobo-%E7%9A%84%E7%89%B9%E9%BB%9E"><span class="nav-number">3.</span> <span class="nav-text">Gezobo 的特點</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
