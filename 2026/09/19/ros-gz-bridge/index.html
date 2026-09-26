@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"annsonic.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="練習 ROS2 結合 Gazebo 做模擬。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ros_gz_bridge">
+<meta property="og:url" content="https://annsonic.github.io/2026/09/19/ros-gz-bridge/index.html">
+<meta property="og:site_name" content="Ann&#39;s Note">
+<meta property="og:description" content="練習 ROS2 結合 Gazebo 做模擬。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://annsonic.github.io/2026/09/19/ros-gz-bridge/odometry.png">
+<meta property="article:published_time" content="2026-09-19T07:27:10.000Z">
+<meta property="article:modified_time" content="2026-09-26T06:22:00.381Z">
+<meta property="article:author" content="Ann">
+<meta property="article:tag" content="Gazebo">
+<meta property="article:tag" content="ROS2">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://annsonic.github.io/2026/09/19/ros-gz-bridge/odometry.png">
+
+<link rel="canonical" href="https://annsonic.github.io/2026/09/19/ros-gz-bridge/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-TW'
+  };
+</script>
+
+  <title>ros_gz_bridge | Ann's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Ann's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://annsonic.github.io/2026/09/19/ros-gz-bridge/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Ann">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ann's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ros_gz_bridge
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2026-09-19 15:27:10" itemprop="dateCreated datePublished" datetime="2026-09-19T15:27:10+08:00">2026-09-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2026-09-26 14:22:00" itemprop="dateModified" datetime="2026-09-26T14:22:00+08:00">2026-09-26</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/simulation-%E7%AD%86%E8%A8%98/" itemprop="url" rel="index"><span itemprop="name">simulation 筆記</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>練習 ROS2 結合 Gazebo 做模擬。</p>
+<span id="more"></span>
+
+<h3 id="環境"><a href="#環境" class="headerlink" title="環境"></a>環境</h3><ul>
+<li>作業系統 Ubuntu 24.04</li>
+<li>ROS2 Kilted</li>
+<li>Gazebo Ionic</li>
+</ul>
+<p>推薦這一堂 <a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=wOa1m8hzrgQ">YouTube 課程</a>，<br>很完整地走過安裝、製作三輪小車和模擬光達偵測障礙物，<br>不過因為有版權，<br>現在這一篇筆記是針對 Gazebo 官方文件做的筆記</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://gazebosim.org/docs/latest/building_robot/">從零建立 SDF 檔</a></li>
+<li><a target="_blank" rel="noopener" href="https://gazebosim.org/docs/latest/moving_robot/">模擬移動行為</a></li>
+</ul>
+<h3 id="練習一：單純啟動-Gazebo-GUI"><a href="#練習一：單純啟動-Gazebo-GUI" class="headerlink" title="練習一：單純啟動 Gazebo GUI"></a>練習一：單純啟動 Gazebo GUI</h3><ul>
+<li><p>建立專案</p>
+<p>Gazebo 文件推薦用 git clone 的方式，複製這個<a target="_blank" rel="noopener" href="https://github.com/gazebosim/ros_gz_project_template">專案樣板</a>，</p>
+<p>不過用另一個方式：下指令 <code>ros2 pkg create</code> 來創建專案是更自由的。</p>
+<p>給這個套件命名 <code>gz_tutorial</code>，專案資料夾結構：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">diffcar_ws</span><br><span class="line">└── src</span><br><span class="line">    └── gz_tutorial/</span><br><span class="line">        ├── CMakeLists.txt</span><br><span class="line">        ├── package.xml</span><br><span class="line">        ├── src/</span><br><span class="line">        ├── include/</span><br><span class="line">        ├── launch/                   # 手動新增</span><br><span class="line">        │   └── gazebo_launch.py</span><br><span class="line">        ├── config/                   # 手動新增</span><br><span class="line">        │   └── keypublisher_gui.config</span><br><span class="line">        └── worlds/                   # 手動新增</span><br><span class="line">            └── building_robot.sdf    # 這是在上一篇筆記製作的 SDF 檔</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>撰寫 launch.py 檔案</p>
+<ul>
+<li>最小可執行版本，會啟動 Gazebo GUI，效果跟執行指令 <code>gz sim building_robot.sdf</code> 一樣。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">import os</span><br><span class="line"></span><br><span class="line">from ament_index_python.packages import get_package_share_directory</span><br><span class="line">from launch import LaunchDescription</span><br><span class="line">from launch.actions import IncludeLaunchDescription</span><br><span class="line">from launch.launch_description_sources import PythonLaunchDescriptionSource</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def generate_launch_description():</span><br><span class="line">    pkg = get_package_share_directory(&#x27;gz_tutorial&#x27;)</span><br><span class="line">    # 使用官方的 gz_sim.launch.py（包含 GUI）</span><br><span class="line">    pkg_ros_gz_sim = get_package_share_directory(&#x27;ros_gz_sim&#x27;)</span><br><span class="line"></span><br><span class="line">    gz_sim = IncludeLaunchDescription(</span><br><span class="line">        PythonLaunchDescriptionSource(</span><br><span class="line">            os.path.join(pkg_ros_gz_sim, &#x27;launch&#x27;, &#x27;gz_sim.launch.py&#x27;)</span><br><span class="line">        ),</span><br><span class="line">        # 3. Pass arguments to Gazebo: load an empty world and run immediately (-r)</span><br><span class="line">        launch_arguments=&#123;</span><br><span class="line">            &#x27;gz_args&#x27;: os.path.join(pkg, &#x27;worlds&#x27;, &#x27;building_robot.sdf&#x27;)</span><br><span class="line">            &#125;.items(),</span><br><span class="line">    )</span><br><span class="line"></span><br><span class="line">    return LaunchDescription([</span><br><span class="line">        gz_sim</span><br><span class="line">    ])</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>撰寫 keypublisher_gui.config</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">&lt;gui fullscreen=&quot;0&quot;&gt;</span><br><span class="line">    &lt;plugin filename=&quot;MinimalScene&quot; name=&quot;3D View&quot;&gt;</span><br><span class="line">        &lt;gz-gui&gt;</span><br><span class="line">            &lt;title&gt;3D View&lt;/title&gt;</span><br><span class="line">            &lt;property type=&quot;bool&quot; key=&quot;showTitleBar&quot;&gt;false&lt;/property&gt;</span><br><span class="line">            &lt;property type=&quot;string&quot; key=&quot;state&quot;&gt;docked&lt;/property&gt;</span><br><span class="line">        &lt;/gz-gui&gt;</span><br><span class="line">        &lt;engine&gt;ogre2&lt;/engine&gt;</span><br><span class="line">        &lt;scene&gt;scene&lt;/scene&gt;</span><br><span class="line">        &lt;ambient_light&gt;0.4 0.4 0.4&lt;/ambient_light&gt;</span><br><span class="line">        &lt;background_color&gt;0.8 0.8 0.8&lt;/background_color&gt;</span><br><span class="line">        &lt;camera_pose&gt;-6 0 6 0 0.5 0&lt;/camera_pose&gt;</span><br><span class="line">    &lt;/plugin&gt;</span><br><span class="line"></span><br><span class="line">    &lt;plugin filename=&quot;GzSceneManager&quot; name=&quot;Scene Manager&quot;&gt;</span><br><span class="line">        &lt;gz-gui&gt;&lt;property key=&quot;resizable&quot; type=&quot;bool&quot;&gt;false&lt;/property&gt;</span><br><span class="line">            &lt;property key=&quot;width&quot; type=&quot;double&quot;&gt;5&lt;/property&gt;</span><br><span class="line">            &lt;property key=&quot;height&quot; type=&quot;double&quot;&gt;5&lt;/property&gt;</span><br><span class="line">            &lt;property key=&quot;state&quot; type=&quot;string&quot;&gt;floating&lt;/property&gt;</span><br><span class="line">            &lt;property key=&quot;showTitleBar&quot; type=&quot;bool&quot;&gt;false&lt;/property&gt;</span><br><span class="line">        &lt;/gz-gui&gt;</span><br><span class="line">    &lt;/plugin&gt;</span><br><span class="line"></span><br><span class="line">    &lt;!-- 鍵盤事件發布到 /keyboard/keypress --&gt;</span><br><span class="line">    &lt;plugin filename=&quot;KeyPublisher&quot; name=&quot;Key Publisher&quot;/&gt;</span><br><span class="line">&lt;/gui&gt;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>編輯 CMakeLists.txt 檔案</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">install(</span><br><span class="line">  DIRECTORY config launch worlds</span><br><span class="line">  DESTINATION share/$&#123;PROJECT_NAME&#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>編輯 package.xml 檔案</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;exec_depend&gt;ros_gz_sim&lt;/exec_depend&gt; </span><br><span class="line">&lt;exec_depend&gt;ros2launch&lt;/exec_depend&gt;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>編譯、執行</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">diffcar_ws$ colcon build --packages-select gz_tutorial</span><br><span class="line">diffcar_ws$ . install/setup.sh</span><br><span class="line">diffcar_ws$ ros2 launch gz_tutorial gazebo_launch.py</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="練習二：Gazebo-控制小車，同時在-RViz-檢視里程計"><a href="#練習二：Gazebo-控制小車，同時在-RViz-檢視里程計" class="headerlink" title="練習二：Gazebo 控制小車，同時在 RViz 檢視里程計"></a>練習二：Gazebo 控制小車，同時在 RViz 檢視里程計</h3><ul>
+<li><p>專案資料夾</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">diffcar_ws</span><br><span class="line">└── src</span><br><span class="line">    └── gz_tutorial/</span><br><span class="line">        ├── CMakeLists.txt</span><br><span class="line">        ├── package.xml</span><br><span class="line">        ├── src/</span><br><span class="line">        ├── include/</span><br><span class="line">        ├── launch/</span><br><span class="line">        │   └── gazebo_launch.py</span><br><span class="line">        ├── config/</span><br><span class="line">        │   └── bridge.yaml         # 新增</span><br><span class="line">        │   └── diff_drive.rviz            # 新增</span><br><span class="line">        │   └── keypublisher_gui.config</span><br><span class="line">        └── worlds/</span><br><span class="line">            └── building_robot.sdf</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>ros_gz_bridge 把 Gazebo 的 <code>/model/vehicle_blue/odometry</code> 橋接到 ROS2 的 <code>nav_msgs/msg/Odometry</code></li>
+<li>RViz2 訂閱到這個 topic</li>
+</ul>
+</li>
+<li><p>調整 launch.py 檔案</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line">import os</span><br><span class="line"></span><br><span class="line">from ament_index_python.packages import get_package_share_directory</span><br><span class="line">from launch import LaunchDescription</span><br><span class="line">from launch.actions import IncludeLaunchDescription</span><br><span class="line">from launch.launch_description_sources import PythonLaunchDescriptionSource</span><br><span class="line">from launch_ros.actions import Node</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def generate_launch_description():</span><br><span class="line">    pkg = get_package_share_directory(&quot;gz_tutorial&quot;)</span><br><span class="line">    pkg_ros_gz_sim = get_package_share_directory(&quot;ros_gz_sim&quot;)</span><br><span class="line"></span><br><span class="line">    world_path = os.path.join(pkg, &quot;worlds&quot;, &quot;building_robot.sdf&quot;)</span><br><span class="line">    gui_config_path = os.path.join(pkg, &quot;config&quot;, &quot;keypublisher_gui.config&quot;)</span><br><span class="line"></span><br><span class="line">    gz_sim = IncludeLaunchDescription(</span><br><span class="line">        PythonLaunchDescriptionSource(</span><br><span class="line">            os.path.join(pkg_ros_gz_sim, &quot;launch&quot;, &quot;gz_sim.launch.py&quot;)</span><br><span class="line">        ),</span><br><span class="line">        launch_arguments=&#123;</span><br><span class="line">            &quot;gz_args&quot;: f&quot;-r --gui-config &#123;gui_config_path&#125; &#123;world_path&#125;&quot;</span><br><span class="line">        &#125;.items(),</span><br><span class="line">    )</span><br><span class="line"></span><br><span class="line">    bridge = Node(</span><br><span class="line">        package=&quot;ros_gz_bridge&quot;,</span><br><span class="line">        executable=&quot;parameter_bridge&quot;,</span><br><span class="line">        parameters=[</span><br><span class="line">            &#123;</span><br><span class="line">                &quot;config_file&quot;: os.path.join(pkg, &quot;config&quot;, &quot;bridge.yaml&quot;),</span><br><span class="line">                &quot;qos_overrides./tf_static.publisher.durability&quot;: &quot;transient_local&quot;,</span><br><span class="line">                &quot;use_sim_time&quot;: True,</span><br><span class="line">            &#125;</span><br><span class="line">        ],</span><br><span class="line">        output=&quot;screen&quot;,</span><br><span class="line">    )</span><br><span class="line"></span><br><span class="line">    rviz = Node(</span><br><span class="line">       package=&#x27;rviz2&#x27;,</span><br><span class="line">       executable=&#x27;rviz2&#x27;,</span><br><span class="line">       arguments=[&#x27;-d&#x27;, os.path.join(pkg, &#x27;config&#x27;, &#x27;diff_drive.rviz&#x27;)],</span><br><span class="line">       parameters=[&#123;&#x27;use_sim_time&#x27;: True&#125;],</span><br><span class="line">    )</span><br><span class="line"></span><br><span class="line">    return LaunchDescription(</span><br><span class="line">        [</span><br><span class="line">            gz_sim,</span><br><span class="line">            bridge,</span><br><span class="line">            rviz,</span><br><span class="line">        ]</span><br><span class="line">    )</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>建立 bridge.yaml</p>
+<ul>
+<li>從<a target="_blank" rel="noopener" href="https://github.com/gazebosim/ros_gz_project_template/blob/main/ros_gz_example_bringup/config/ros_gz_example_bridge.yaml">樣板</a>複製得到</li>
+</ul>
+</li>
+<li><p>建立 diff_drive.rviz</p>
+<ul>
+<li>從<a target="_blank" rel="noopener" href="https://github.com/gazebosim/ros_gz_project_template/blob/main/ros_gz_example_bringup/config/diff_drive.rviz">樣板</a>複製得到</li>
+</ul>
+</li>
+<li><p>編輯 package.xml 檔案</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;exec_depend&gt;ros_gz_bridge&lt;/exec_depend&gt;</span><br><span class="line">&lt;exec_depend&gt;rviz2&lt;/exec_depend&gt;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>編譯、執行</p>
+<ul>
+<li><p>Step - 1: 在終端機</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">diffcar_ws$ colcon build --packages-select gz_tutorial</span><br><span class="line">diffcar_ws$ . install/setup.sh</span><br><span class="line">diffcar_ws$ ros2 launch gz_tutorial gazebo_launch.py</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p>檢查 Topic，預期要看到</p>
+<p>&#x2F;model&#x2F;vehicle_blue&#x2F;odometry</p>
+<p>&#x2F;model&#x2F;vehicle_blue&#x2F;tf</p>
+<ul>
+<li><p>Step - 2: 在 RViz 視窗</p>
+<ul>
+<li><p>Odometry Display 的 Topic 選 &#x2F;model&#x2F;vehicle_blue&#x2F;odometry</p>
+</li>
+<li><p>Fixed Frame 改成 odom（不是 diff_drive&#x2F;odom）</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>在 Gazebo 視窗用鍵盤移動小車，Rviz 視窗會同步繪製紅色箭頭</p>
+<ul>
+<li>紅色箭頭就是機器人隨時間移動留下的一系列 pose（位置+方向）</li>
+</ul>
+<p><img src="/2026/09/19/ros-gz-bridge/odometry.png" alt="里程計訊息視覺化"></p>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Gazebo/" rel="tag"># Gazebo</a>
+              <a href="/tags/ROS2/" rel="tag"># ROS2</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2026/09/16/Gazebo-gz-%E5%85%A5%E9%96%80%E7%B7%B4%E7%BF%92/" rel="prev" title="Gazebo(gz) 入門練習">
+      <i class="fa fa-chevron-left"></i> Gazebo(gz) 入門練習
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%92%B0%E5%A2%83"><span class="nav-number">1.</span> <span class="nav-text">環境</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B7%B4%E7%BF%92%E4%B8%80%EF%BC%9A%E5%96%AE%E7%B4%94%E5%95%9F%E5%8B%95-Gazebo-GUI"><span class="nav-number">2.</span> <span class="nav-text">練習一：單純啟動 Gazebo GUI</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B7%B4%E7%BF%92%E4%BA%8C%EF%BC%9AGazebo-%E6%8E%A7%E5%88%B6%E5%B0%8F%E8%BB%8A%EF%BC%8C%E5%90%8C%E6%99%82%E5%9C%A8-RViz-%E6%AA%A2%E8%A6%96%E9%87%8C%E7%A8%8B%E8%A8%88"><span class="nav-number">3.</span> <span class="nav-text">練習二：Gazebo 控制小車，同時在 RViz 檢視里程計</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Ann</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">37</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">34</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ann</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 強力驅動
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
