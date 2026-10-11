@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"annsonic.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="練習 ros2_control mock 元件來控制虛擬的三輪小車。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ros2_control-入門練習">
+<meta property="og:url" content="https://annsonic.github.io/2026/10/01/ros2-control-%E5%85%A5%E9%96%80%E7%B7%B4%E7%BF%92/index.html">
+<meta property="og:site_name" content="Ann&#39;s Note">
+<meta property="og:description" content="練習 ros2_control mock 元件來控制虛擬的三輪小車。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://annsonic.github.io/2026/10/01/ros2-control-%E5%85%A5%E9%96%80%E7%B7%B4%E7%BF%92/add_odom.png">
+<meta property="og:image" content="https://annsonic.github.io/2026/10/01/ros2-control-%E5%85%A5%E9%96%80%E7%B7%B4%E7%BF%92/odometry.png">
+<meta property="article:published_time" content="2026-10-01T13:29:22.000Z">
+<meta property="article:modified_time" content="2026-10-11T16:04:55.264Z">
+<meta property="article:author" content="Ann">
+<meta property="article:tag" content="ros2_control">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://annsonic.github.io/2026/10/01/ros2-control-%E5%85%A5%E9%96%80%E7%B7%B4%E7%BF%92/add_odom.png">
+
+<link rel="canonical" href="https://annsonic.github.io/2026/10/01/ros2-control-%E5%85%A5%E9%96%80%E7%B7%B4%E7%BF%92/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-TW'
+  };
+</script>
+
+  <title>ros2_control-入門練習 | Ann's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Ann's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://annsonic.github.io/2026/10/01/ros2-control-%E5%85%A5%E9%96%80%E7%B7%B4%E7%BF%92/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Ann">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ann's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ros2_control-入門練習
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2026-10-01 21:29:22" itemprop="dateCreated datePublished" datetime="2026-10-01T21:29:22+08:00">2026-10-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2026-10-12 00:04:55" itemprop="dateModified" datetime="2026-10-12T00:04:55+08:00">2026-10-12</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/simulation-%E7%AD%86%E8%A8%98/" itemprop="url" rel="index"><span itemprop="name">simulation 筆記</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>練習 ros2_control mock 元件來控制虛擬的三輪小車。</p>
+<span id="more"></span>
+
+<h3 id="環境"><a href="#環境" class="headerlink" title="環境"></a>環境</h3><ul>
+<li><p>作業系統 Ubuntu 24.04</p>
+</li>
+<li><p>ROS2 Kilted</p>
+<p><code>sudo apt install ros-kilted-ros2-control ros-kilted-ros2-controllers</code></p>
+</li>
+</ul>
+<h3 id="練習"><a href="#練習" class="headerlink" title="練習"></a>練習</h3><ul>
+<li><p>建立專案</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">diffcar_ws/src$ ros2 pkg create --build-type ament_cmake control_tutorial</span><br></pre></td></tr></table></figure>
+
+<p>現在專案工作目錄長相如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">diffcar_ws</span><br><span class="line">├── build</span><br><span class="line">├── install</span><br><span class="line">├── log</span><br><span class="line">└── src</span><br><span class="line">    └── control_tutorial</span><br><span class="line">        ├── CMakeLists.txt</span><br><span class="line">        ├── include</span><br><span class="line">        ├── package.xml</span><br><span class="line">        └── src</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>新增資料夾、編輯檔案</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">diffcar_ws</span><br><span class="line">├── build</span><br><span class="line">├── install</span><br><span class="line">├── log</span><br><span class="line">└── src</span><br><span class="line">    └── control_tutorial</span><br><span class="line">        ├── CMakeLists.txt</span><br><span class="line">        ├── config                &lt;&lt; 新增資料夾</span><br><span class="line">        │   ├── controllers.yaml  &lt;&lt; 編輯檔案</span><br><span class="line">        │   └── display.rviz      &lt;&lt; 編輯檔案</span><br><span class="line">        ├── include</span><br><span class="line">        ├── launch                &lt;&lt; 新增資料夾</span><br><span class="line">        │   └── launch.py         &lt;&lt; 編輯檔案</span><br><span class="line">        ├── package.xml           &lt;&lt; 編輯檔案</span><br><span class="line">        ├── src</span><br><span class="line">        └── urdf                  &lt;&lt; 新增資料夾</span><br><span class="line">            └── car.xacro         &lt;&lt; 編輯檔案</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>製作 Xacro</p>
+<ul>
+<li><p><code>urdf/car.xacro</code> 的內容</p>
+<p>根據 <a target="_blank" rel="noopener" href="https://github.com/gazebosim/docs/blob/master/jetty/tutorials/building_robot/building_robot.sdf">Gazebo 官方文件 - 從零建立 SDF 檔</a> ，請 AI 生成的 Xacro 檔案。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot;?&gt;</span><br><span class="line"></span><br><span class="line">&lt;robot xmlns:xacro=&quot;http://ros.org/wiki/xacro&quot; name=&quot;vehicle_blue&quot;&gt;</span><br><span class="line">  &lt;!-- Properties --&gt;</span><br><span class="line">  &lt;xacro:property name=&quot;blue&quot; value=&quot;0 0 1 1&quot; /&gt;</span><br><span class="line">  &lt;xacro:property name=&quot;red&quot; value=&quot;1 0 0 1&quot; /&gt;</span><br><span class="line">  &lt;xacro:property name=&quot;green&quot; value=&quot;0 1 0 1&quot; /&gt;</span><br><span class="line">  &lt;xacro:property name=&quot;wheel_radius&quot; value=&quot;0.4&quot; /&gt;</span><br><span class="line">  &lt;xacro:property name=&quot;wheel_length&quot; value=&quot;0.2&quot; /&gt;</span><br><span class="line">  &lt;!-- Materials --&gt;</span><br><span class="line">  &lt;material name=&quot;blue&quot;&gt;</span><br><span class="line">    &lt;color rgba=&quot;$&#123;blue&#125;&quot; /&gt;</span><br><span class="line">  &lt;/material&gt;</span><br><span class="line">  &lt;material name=&quot;red&quot;&gt;</span><br><span class="line">    &lt;color rgba=&quot;$&#123;red&#125;&quot; /&gt;</span><br><span class="line">  &lt;/material&gt;</span><br><span class="line">  &lt;material name=&quot;green&quot;&gt;</span><br><span class="line">    &lt;color rgba=&quot;$&#123;green&#125;&quot; /&gt;</span><br><span class="line">  &lt;/material&gt;</span><br><span class="line">  &lt;!-- Links --&gt;</span><br><span class="line">  &lt;link name=&quot;caster&quot;&gt;</span><br><span class="line">    &lt;inertial&gt;</span><br><span class="line">      &lt;mass value=&quot;1&quot; /&gt;</span><br><span class="line">      &lt;inertia ixx=&quot;0.016&quot; ixy=&quot;0&quot; ixz=&quot;0&quot; iyy=&quot;0.016&quot; iyz=&quot;0&quot; izz=&quot;0.016&quot; /&gt;</span><br><span class="line">    &lt;/inertial&gt;</span><br><span class="line">    &lt;visual&gt;</span><br><span class="line">      &lt;origin xyz=&quot;0 0 0&quot; rpy=&quot;0 0 0&quot; /&gt;</span><br><span class="line">      &lt;geometry&gt;</span><br><span class="line">        &lt;sphere radius=&quot;0.2&quot; /&gt;</span><br><span class="line">      &lt;/geometry&gt;</span><br><span class="line">      &lt;material name=&quot;green&quot; /&gt;</span><br><span class="line">    &lt;/visual&gt;</span><br><span class="line">    &lt;collision&gt;</span><br><span class="line">      &lt;origin xyz=&quot;0 0 0&quot; rpy=&quot;0 0 0&quot; /&gt;</span><br><span class="line">      &lt;geometry&gt;</span><br><span class="line">        &lt;sphere radius=&quot;0.2&quot; /&gt;</span><br><span class="line">      &lt;/geometry&gt;</span><br><span class="line">    &lt;/collision&gt;</span><br><span class="line">  &lt;/link&gt;</span><br><span class="line">  &lt;link name=&quot;chassis&quot;&gt;</span><br><span class="line">    &lt;inertial&gt;</span><br><span class="line">      &lt;mass value=&quot;1.14395&quot; /&gt;</span><br><span class="line">      &lt;inertia ixx=&quot;0.119161&quot; ixy=&quot;0&quot; ixz=&quot;0&quot; iyy=&quot;0.405149&quot; iyz=&quot;0&quot; izz=&quot;0.476646&quot; /&gt;</span><br><span class="line">    &lt;/inertial&gt;</span><br><span class="line">    &lt;visual&gt;</span><br><span class="line">      &lt;geometry&gt;</span><br><span class="line">        &lt;box size=&quot;2 1 0.5&quot; /&gt;</span><br><span class="line">      &lt;/geometry&gt;</span><br><span class="line">      &lt;material name=&quot;blue&quot; /&gt;</span><br><span class="line">    &lt;/visual&gt;</span><br><span class="line">    &lt;collision&gt;</span><br><span class="line">      &lt;geometry&gt;</span><br><span class="line">        &lt;box size=&quot;2 1 0.5&quot; /&gt;</span><br><span class="line">      &lt;/geometry&gt;</span><br><span class="line">    &lt;/collision&gt;</span><br><span class="line">  &lt;/link&gt;</span><br><span class="line">  &lt;link name=&quot;left_wheel&quot;&gt;</span><br><span class="line">    &lt;inertial&gt;</span><br><span class="line">      &lt;mass value=&quot;1&quot; /&gt;</span><br><span class="line">      &lt;inertia ixx=&quot;0.043333&quot; ixy=&quot;0&quot; ixz=&quot;0&quot; iyy=&quot;0.043333&quot; iyz=&quot;0&quot; izz=&quot;0.08&quot; /&gt;</span><br><span class="line">    &lt;/inertial&gt;</span><br><span class="line">    &lt;visual&gt;</span><br><span class="line">      &lt;origin xyz=&quot;0 0 0&quot; rpy=&quot;0 0 0&quot; /&gt;</span><br><span class="line">      &lt;geometry&gt;</span><br><span class="line">        &lt;cylinder radius=&quot;$&#123;wheel_radius&#125;&quot; length=&quot;$&#123;wheel_length&#125;&quot; /&gt;</span><br><span class="line">      &lt;/geometry&gt;</span><br><span class="line">      &lt;material name=&quot;red&quot; /&gt;</span><br><span class="line">    &lt;/visual&gt;</span><br><span class="line">    &lt;collision&gt;</span><br><span class="line">      &lt;origin xyz=&quot;0 0 0&quot; rpy=&quot;0 0 0&quot; /&gt;</span><br><span class="line">      &lt;geometry&gt;</span><br><span class="line">        &lt;cylinder radius=&quot;$&#123;wheel_radius&#125;&quot; length=&quot;$&#123;wheel_length&#125;&quot; /&gt;</span><br><span class="line">      &lt;/geometry&gt;</span><br><span class="line">    &lt;/collision&gt;</span><br><span class="line">  &lt;/link&gt;</span><br><span class="line">  &lt;link name=&quot;right_wheel&quot;&gt;</span><br><span class="line">    &lt;inertial&gt;</span><br><span class="line">      &lt;mass value=&quot;1&quot; /&gt;</span><br><span class="line">      &lt;inertia ixx=&quot;0.043333&quot; ixy=&quot;0&quot; ixz=&quot;0&quot; iyy=&quot;0.043333&quot; iyz=&quot;0&quot; izz=&quot;0.08&quot; /&gt;</span><br><span class="line">    &lt;/inertial&gt;</span><br><span class="line">    &lt;visual&gt;</span><br><span class="line">      &lt;origin xyz=&quot;0 0 0&quot; rpy=&quot;0 0 0&quot; /&gt;</span><br><span class="line">      &lt;geometry&gt;</span><br><span class="line">        &lt;cylinder radius=&quot;$&#123;wheel_radius&#125;&quot; length=&quot;$&#123;wheel_length&#125;&quot; /&gt;</span><br><span class="line">      &lt;/geometry&gt;</span><br><span class="line">      &lt;material name=&quot;red&quot; /&gt;</span><br><span class="line">    &lt;/visual&gt;</span><br><span class="line">    &lt;collision&gt;</span><br><span class="line">      &lt;origin xyz=&quot;0 0 0&quot; rpy=&quot;0 0 0&quot; /&gt;</span><br><span class="line">      &lt;geometry&gt;</span><br><span class="line">        &lt;cylinder radius=&quot;$&#123;wheel_radius&#125;&quot; length=&quot;$&#123;wheel_length&#125;&quot; /&gt;</span><br><span class="line">      &lt;/geometry&gt;</span><br><span class="line">    &lt;/collision&gt;</span><br><span class="line">  &lt;/link&gt;</span><br><span class="line">  &lt;link name=&quot;base_link&quot;&gt;&lt;/link&gt;</span><br><span class="line">  &lt;!-- Joints --&gt;</span><br><span class="line">  &lt;joint name=&quot;caster_wheel&quot; type=&quot;fixed&quot;&gt;</span><br><span class="line">    &lt;origin xyz=&quot;0.8 0 -0.2&quot; rpy=&quot;0 0 0&quot; /&gt;</span><br><span class="line">    &lt;parent link=&quot;chassis&quot; /&gt;</span><br><span class="line">    &lt;child link=&quot;caster&quot; /&gt;</span><br><span class="line">  &lt;/joint&gt;</span><br><span class="line">  &lt;joint name=&quot;left_wheel_joint&quot; type=&quot;continuous&quot;&gt;</span><br><span class="line">    &lt;origin xyz=&quot;-0.5 0.6 0&quot; rpy=&quot;-1.5707 0 0&quot; /&gt;</span><br><span class="line">    &lt;parent link=&quot;chassis&quot; /&gt;</span><br><span class="line">    &lt;child link=&quot;left_wheel&quot; /&gt;</span><br><span class="line">    &lt;axis xyz=&quot;0 0 1&quot; /&gt;</span><br><span class="line">    &lt;limit effort=&quot;10&quot; velocity=&quot;10&quot; /&gt;</span><br><span class="line">  &lt;/joint&gt;</span><br><span class="line">  &lt;joint name=&quot;right_wheel_joint&quot; type=&quot;continuous&quot;&gt;</span><br><span class="line">    &lt;origin xyz=&quot;-0.5 -0.6 0&quot; rpy=&quot;-1.5707 0 0&quot; /&gt;</span><br><span class="line">    &lt;parent link=&quot;chassis&quot; /&gt;</span><br><span class="line">    &lt;child link=&quot;right_wheel&quot; /&gt;</span><br><span class="line">    &lt;axis xyz=&quot;0 0 1&quot; /&gt;</span><br><span class="line">    &lt;limit effort=&quot;10&quot; velocity=&quot;10&quot; /&gt;</span><br><span class="line">  &lt;/joint&gt;</span><br><span class="line">  &lt;joint name=&quot;base_link_to_chassis&quot; type=&quot;fixed&quot;&gt;</span><br><span class="line">    &lt;origin xyz=&quot;0.5 0 0.4&quot; rpy=&quot;0 0 0&quot; /&gt;</span><br><span class="line">    &lt;parent link=&quot;base_link&quot; /&gt;</span><br><span class="line">    &lt;child link=&quot;chassis&quot; /&gt;</span><br><span class="line">  &lt;/joint&gt;</span><br><span class="line">  &lt;!-- ROS 2 Control --&gt;</span><br><span class="line">  &lt;ros2_control name=&quot;MockSimSystem&quot; type=&quot;system&quot;&gt;</span><br><span class="line">    &lt;hardware&gt;</span><br><span class="line">      &lt;plugin&gt;mock_components/GenericSystem&lt;/plugin&gt;</span><br><span class="line">      &lt;param name=&quot;calculate_dynamics&quot;&gt;true&lt;/param&gt;</span><br><span class="line">    &lt;/hardware&gt;</span><br><span class="line">    &lt;joint name=&quot;left_wheel_joint&quot;&gt;</span><br><span class="line">      &lt;command_interface name=&quot;velocity&quot; /&gt;</span><br><span class="line">      &lt;state_interface name=&quot;position&quot; /&gt;</span><br><span class="line">      &lt;state_interface name=&quot;velocity&quot; /&gt;</span><br><span class="line">      &lt;param name=&quot;min&quot;&gt;-10&lt;/param&gt;</span><br><span class="line">      &lt;param name=&quot;max&quot;&gt;10&lt;/param&gt;</span><br><span class="line">    &lt;/joint&gt;</span><br><span class="line">    &lt;joint name=&quot;right_wheel_joint&quot;&gt;</span><br><span class="line">      &lt;command_interface name=&quot;velocity&quot; /&gt;</span><br><span class="line">      &lt;state_interface name=&quot;position&quot; /&gt;</span><br><span class="line">      &lt;state_interface name=&quot;velocity&quot; /&gt;</span><br><span class="line">      &lt;param name=&quot;min&quot;&gt;-10&lt;/param&gt;</span><br><span class="line">      &lt;param name=&quot;max&quot;&gt;10&lt;/param&gt;</span><br><span class="line">    &lt;/joint&gt;</span><br><span class="line">  &lt;/ros2_control&gt;</span><br><span class="line">&lt;/robot&gt;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>本來的 SDF 宣告 <code>&lt;joint name=&#39;caster_wheel&#39; type=&#39;ball&#39;&gt;</code>，因為 URDF 不支援 ball 型態，我先用 <code>&lt;joint name=&quot;caster_wheel&quot; type=&quot;fixed&quot;&gt;</code> 代替，等之後練習 ros2_control 控制 gazebo 再來想辦法 </li>
+<li>name&#x3D;”MockSimSystem” 給這個硬體元件一個我們可讀的識別名稱，方便在 log 訊息辨識，這個名稱不會被controller 的 YAML 或 launch.py 檔引用</li>
+<li><code>mock_components/GenericSystem</code> 只負責測試 controller 是否正確送出 command，需要 <code>&lt;param name=&quot;calculate_dynamics&quot;&gt;true&lt;/param&gt;</code> 計算動力學積分，讓 <code>robot_state_publisher</code> 的 <code>/joint_states</code> topic 可以看到位置的變化數據</li>
+<li><code>base_link</code> 是機器人基座投影到地表的點，會隨著輪子轉動而移動，所以不是世界座標</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>建立 config&#x2F;controllers.yaml</p>
+  <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">controller_manager:</span><br><span class="line">  ros__parameters:</span><br><span class="line">    update_rate: 50 # Hz</span><br><span class="line"></span><br><span class="line">    joint_state_broadcaster:</span><br><span class="line">      type: joint_state_broadcaster/JointStateBroadcaster</span><br><span class="line"></span><br><span class="line">    my_robot_controller:</span><br><span class="line">      type: diff_drive_controller/DiffDriveController</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">my_robot_controller:</span><br><span class="line">  ros__parameters:</span><br><span class="line">    left_wheel_names: [&#x27;left_wheel_joint&#x27;]</span><br><span class="line">    right_wheel_names: [&#x27;right_wheel_joint&#x27;]</span><br><span class="line"></span><br><span class="line">    wheel_separation: 1.2</span><br><span class="line">    wheel_radius: 0.4</span><br><span class="line"></span><br><span class="line">    publish_rate: 50.0</span><br><span class="line">    base_frame_id: base_link</span><br><span class="line">    enable_odom_tf: true</span><br><span class="line"></span><br><span class="line">    cmd_vel_timeout: 0.5</span><br><span class="line"></span><br><span class="line">    linear.x.has_velocity_limits: true</span><br><span class="line">    linear.x.max_velocity: 0.7</span><br><span class="line">    linear.x.min_velocity: -0.7</span><br><span class="line"></span><br><span class="line">    angular.z.has_velocity_limits: true</span><br><span class="line">    angular.z.max_velocity: 4.0</span><br><span class="line">    angular.z.min_velocity: -4.0</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>設定 <code>type: joint_state_broadcaster/JointStateBroadcaster</code> 以及 <code>type: diff_drive_controller/DiffDriveController</code> 是因為我們要控制差動驅動的三輪小車<ul>
+<li><code>joint_state_broadcaster</code> 會發布 topic <code>/joint_states</code>，負責接上 <code>car.xacro</code> 宣告的 ros2_control joint 們</li>
+<li><code>diff_drive_controller</code> 根據輪速算 odometry 並發布 TF</li>
+</ul>
+</li>
+<li><code>controller_manager.ros__parameters </code> 區塊內的 <code>my_robot_controller</code> 名稱是自訂的<ul>
+<li><code>launch.py</code> 的 spawner 用這個名字去呼叫 &#x2F;controller_manager 的 service</li>
+</ul>
+</li>
+<li>第二個 <code>my_robot_controller</code> 區塊下的 <code>ros__parameters</code> 是要按照 <code>diff_drive_controller</code> 文件來填寫<ul>
+<li>注意到 joint 名稱(<code>left_wheel_joint</code>) 和在 <code>car.xacro</code> 宣告的一樣</li>
+<li>這裡是簡化的範例，很多參數省略不做設定</li>
+</ul>
+</li>
+<li><code>wheel_separation: 1.2</code> 和 <code>wheel_radius: 0.4</code> 要符合 <code>car.xacro</code> 輪子的間距和尺寸</li>
+<li><code>base_frame_id: base_link</code> 是讓 <code>diff_drive_controller</code> 將計算出來的里程串接到 base_frame_id 指定的那個 frame 上，亦即額外發佈一條 odom -&gt; base_link 的 TF</li>
+<li><code>cmd_vel_timeout: 0.5</code> 在 timeout 之後，車子自動煞車，速度降為 0</li>
+</ul>
+</li>
+<li><p>建立 <code>config/display.rviz</code></p>
+<p>複製 <a target="_blank" rel="noopener" href="https://github.com/ros/urdf_tutorial/blob/ros2/rviz/urdf.rviz">ROS2 官方範例的 RViz 設定檔</a></p>
+<p>注意：</p>
+<ul>
+<li><p>Fixed Frame: odom</p>
+<ul>
+<li>配合 <code>diff_drive_controller</code> 自動建立的 TF，此時的 TF 根節點已經是 odom</li>
+</ul>
+</li>
+<li><p>Description Topic:</p>
+<p>Value: &#x2F;robot_description</p>
+<ul>
+<li>指示 RViz 去訂閱名為 <code>/robot_description</code> 的 ROS2 Topic，以取得機器人的 URDF</li>
+<li><code>robot_state_publisher</code> 這個節點預設的話題就是 <code>/robot_description</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>撰寫 <code>launch/launch.py</code> 檔案</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line">import os</span><br><span class="line">from launch import LaunchDescription</span><br><span class="line">from launch.actions import DeclareLaunchArgument</span><br><span class="line">from launch_ros.actions import Node</span><br><span class="line">from launch_ros.parameter_descriptions import ParameterValue</span><br><span class="line">from launch.substitutions import Command, LaunchConfiguration, PathJoinSubstitution</span><br><span class="line">from ament_index_python.packages import get_package_share_directory</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def generate_launch_description():</span><br><span class="line">    pkg_description = get_package_share_directory(&quot;control_tutorial&quot;)</span><br><span class="line">    xacro_file = os.path.join(pkg_description, &quot;urdf&quot;, &quot;car.xacro&quot;)</span><br><span class="line"></span><br><span class="line">    robot_description = ParameterValue(Command([&quot;xacro &quot;, xacro_file]), value_type=str)</span><br><span class="line"></span><br><span class="line">    robot_state_publisher = Node(</span><br><span class="line">        package=&quot;robot_state_publisher&quot;,</span><br><span class="line">        executable=&quot;robot_state_publisher&quot;,</span><br><span class="line">        parameters=[&#123;&quot;robot_description&quot;: robot_description&#125;],</span><br><span class="line">    )</span><br><span class="line"></span><br><span class="line">    controller_manager = Node(</span><br><span class="line">        package=&quot;controller_manager&quot;,</span><br><span class="line">        executable=&quot;ros2_control_node&quot;,</span><br><span class="line">        parameters=[</span><br><span class="line">            &#123;&quot;robot_description&quot;: robot_description&#125;,</span><br><span class="line">            os.path.join(</span><br><span class="line">                pkg_description,</span><br><span class="line">                &quot;config&quot;,</span><br><span class="line">                &quot;controllers.yaml&quot;,</span><br><span class="line">            ),</span><br><span class="line">        ],</span><br><span class="line">        output=&quot;screen&quot;,</span><br><span class="line">    )</span><br><span class="line"></span><br><span class="line">    joint_state_broadcaster_spawner = Node(</span><br><span class="line">        package=&quot;controller_manager&quot;,</span><br><span class="line">        executable=&quot;spawner&quot;,</span><br><span class="line">        arguments=[</span><br><span class="line">            &quot;joint_state_broadcaster&quot;,</span><br><span class="line">            &quot;--controller-manager&quot;,</span><br><span class="line">            &quot;/controller_manager&quot;,</span><br><span class="line">        ],</span><br><span class="line">    )</span><br><span class="line"></span><br><span class="line">    wheel_controller_spawner = Node(</span><br><span class="line">        package=&quot;controller_manager&quot;,</span><br><span class="line">        executable=&quot;spawner&quot;,</span><br><span class="line">        arguments=[</span><br><span class="line">            &quot;my_robot_controller&quot;,</span><br><span class="line">            &quot;--controller-manager&quot;,</span><br><span class="line">            &quot;/controller_manager&quot;,</span><br><span class="line">        ],</span><br><span class="line">    )</span><br><span class="line"></span><br><span class="line">    rviz_config = os.path.join(pkg_description, &quot;config&quot;, &quot;display.rviz&quot;)</span><br><span class="line">    rviz_node = Node(</span><br><span class="line">        package=&quot;rviz2&quot;,</span><br><span class="line">        executable=&quot;rviz2&quot;,</span><br><span class="line">        arguments=[&quot;-d&quot;, rviz_config],</span><br><span class="line">        name=&quot;rviz2&quot;,</span><br><span class="line">        output=&quot;screen&quot;,</span><br><span class="line">    )</span><br><span class="line"></span><br><span class="line">    return LaunchDescription(</span><br><span class="line">        [</span><br><span class="line">            robot_state_publisher,</span><br><span class="line">            controller_manager,</span><br><span class="line">            joint_state_broadcaster_spawner,</span><br><span class="line">            wheel_controller_spawner,</span><br><span class="line">            rviz_node,</span><br><span class="line">        ]</span><br><span class="line">    )</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>呼叫 controller_manager 的 service，把 <code>controllers.yaml</code> 宣告的控制器載入（load）並啟用（activate），後續發布 topic 才有反應<ul>
+<li><code>joint_state_broadcaster_spawner</code> 對應 <code>joint_state_broadcaster</code></li>
+<li><code>wheel_controller_spawner</code> 對應 <code>diff_drive_controller</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>編輯 package.xml 檔案</p>
+<p>加上以下設定</p>
+  <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;exec_depend&gt;xacro&lt;/exec_depend&gt;</span><br><span class="line">&lt;exec_depend&gt;ros2launch&lt;/exec_depend&gt;</span><br><span class="line">&lt;exec_depend&gt;ros2_control&lt;/exec_depend&gt;</span><br><span class="line">&lt;exec_depend&gt;ros2_controllers&lt;/exec_depend&gt;</span><br><span class="line">&lt;exec_depend&gt;controller_manager&lt;/exec_depend&gt;</span><br><span class="line">&lt;exec_depend&gt;robot_state_publisher&lt;/exec_depend&gt;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>編輯 CMakeLists.txt 檔案</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">install(</span><br><span class="line">  DIRECTORY config launch urdf</span><br><span class="line">  DESTINATION share/$&#123;PROJECT_NAME&#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="編譯、執行"><a href="#編譯、執行" class="headerlink" title="編譯、執行"></a>編譯、執行</h3><ul>
+<li><p>回到根目錄，執行</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">diffcar_ws$ colcon build --packages-select control_tutorial</span><br><span class="line">diffcar_ws$ . install/setup.sh</span><br><span class="line">diffcar_ws$ ros2 launch control_tutorial launch.py</span><br></pre></td></tr></table></figure>
+
+<p>會看到 Rviz 視窗，已設定好</p>
+<ul>
+<li>RobotModel</li>
+<li>TF，看到輪子上的座標軸</li>
+</ul>
+<p><img src="/2026/10/01/ros2-control-%E5%85%A5%E9%96%80%E7%B7%B4%E7%BF%92/add_odom.png" alt="顯示 odom" title="add the odom"></p>
+<p>手動設定 Odometry Display 的 Topic 選 <code>/my_robot_controller/odom</code></p>
+</li>
+<li><p>用 <code>ros2 topic pub</code> 控制 mock 小車</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">  $ ros2 topic pub /my_robot_controller/cmd_vel geometry_msgs/msg/TwistStamped \</span><br><span class="line">&quot;&#123;twist: &#123;linear: &#123;x: 0.2, y: 0.0, z: 0.0&#125;, angular: &#123;x: 0.0, y: 0.0, z: 0.1&#125;&#125;&#125;&quot; --rate 10</span><br></pre></td></tr></table></figure>
+
+<p>RViz 看到左右輪子的座標軸持續旋轉，以及紅色箭頭形成的軌跡。</p>
+<p><img src="/2026/10/01/ros2-control-%E5%85%A5%E9%96%80%E7%B7%B4%E7%BF%92/odometry.png" alt="軌跡" title="control the car to move"></p>
+<ul>
+<li>rate 10 是配合 <code>cmd_vel_timeout: 0.5</code>，要在 timeout 之前持續發布信息</li>
+</ul>
+</li>
+<li><p>檢查 topic 數值</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ros2 topic echo /joint_states</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在終端機按下 ctrl + C，便可以關閉 RViz 和小視窗。</p>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/ros2-control/" rel="tag"># ros2_control</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2026/09/19/ros-gz-bridge/" rel="prev" title="ros_gz_bridge">
+      <i class="fa fa-chevron-left"></i> ros_gz_bridge
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%92%B0%E5%A2%83"><span class="nav-number">1.</span> <span class="nav-text">環境</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B7%B4%E7%BF%92"><span class="nav-number">2.</span> <span class="nav-text">練習</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B7%A8%E8%AD%AF%E3%80%81%E5%9F%B7%E8%A1%8C"><span class="nav-number">3.</span> <span class="nav-text">編譯、執行</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Ann</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">38</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">35</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ann</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 強力驅動
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
