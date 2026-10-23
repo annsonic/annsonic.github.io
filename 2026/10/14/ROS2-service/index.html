@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"annsonic.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="練習 ROS2 service，延續控制上一篇的三輪小車，加上一個決定小車車速上限的塔台。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ROS2 service">
+<meta property="og:url" content="https://annsonic.github.io/2026/10/14/ROS2-service/index.html">
+<meta property="og:site_name" content="Ann&#39;s Note">
+<meta property="og:description" content="練習 ROS2 service，延續控制上一篇的三輪小車，加上一個決定小車車速上限的塔台。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://annsonic.github.io/2026/10/14/ROS2-service/rviz.png">
+<meta property="article:published_time" content="2026-10-14T13:56:11.000Z">
+<meta property="article:modified_time" content="2026-10-23T10:29:24.976Z">
+<meta property="article:author" content="Ann">
+<meta property="article:tag" content="service">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://annsonic.github.io/2026/10/14/ROS2-service/rviz.png">
+
+<link rel="canonical" href="https://annsonic.github.io/2026/10/14/ROS2-service/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-TW'
+  };
+</script>
+
+  <title>ROS2 service | Ann's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Ann's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://annsonic.github.io/2026/10/14/ROS2-service/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Ann">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ann's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ROS2 service
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2026-10-14 21:56:11" itemprop="dateCreated datePublished" datetime="2026-10-14T21:56:11+08:00">2026-10-14</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2026-10-23 18:29:24" itemprop="dateModified" datetime="2026-10-23T18:29:24+08:00">2026-10-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/simulation-%E7%AD%86%E8%A8%98/" itemprop="url" rel="index"><span itemprop="name">simulation 筆記</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>練習 ROS2 service，<br>延續控制上一篇的三輪小車，<br>加上一個決定小車車速上限的塔台。</p>
+<span id="more"></span>
+
+<h3 id="環境"><a href="#環境" class="headerlink" title="環境"></a>環境</h3><ul>
+<li>作業系統 Ubuntu 24.04</li>
+<li>ROS2 Kilted<ul>
+<li><p><a target="_blank" rel="noopener" href="https://docs.ros.org/en/kilted/Tutorials/Intermediate/Rosdep.html">安裝 rosdep</a></p>
+<p><code>sudo apt install python3-rosdep</code></p>
+<p><code>sudo rosdep init</code></p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="專案概念"><a href="#專案概念" class="headerlink" title="專案概念"></a>專案概念</h3><ul>
+<li><p>適合 ROS2 service 的情境</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">這是持續更新的資料嗎？</span><br><span class="line">├─ 是 → Topic</span><br><span class="line">└─ 否 → 這是節點的設定值嗎？</span><br><span class="line">        ├─ 是 → Parameter</span><br><span class="line">        └─ 否 → 我要請別的節點做一件事嗎？</span><br><span class="line">                ├─ 很快做完，且要知道結果 → Service</span><br><span class="line">                └─ 要很久、要進度或可取消 → Action</span><br></pre></td></tr></table></figure>
+
+<p>跟 AI 討論的結果，這個專案讓 service server 擔任評估剩餘電量、決定速度上限的塔台角色。</p>
+</li>
+<li><p>用里程計模擬電量消耗</p>
+<ul>
+<li>三輪小車 <code>diff_drive_controller</code> 會發布 <code>/my_robot_controller/odom</code> 消息，型別是 <code>nav_msgs/msg/Odometry</code></li>
+</ul>
+</li>
+<li><p>電量低時，service server「限制最高速度」或「強制降速」</p>
+<ul>
+<li><p>三輪小車 <code>controllers.yaml</code> 設定了 linear.x.max_velocity: 0.7 和 angular.z.max_velocity: 4.0，設計 service server 最高速度也要落在此範圍</p>
+</li>
+<li><p>設計規則</p>
+<table>
+<thead>
+<tr>
+<th>模擬電量</th>
+<th>行為</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>&gt;&#x3D; 50%</td>
+<td>允許 slow &#x2F; normal &#x2F; fast</td>
+</tr>
+<tr>
+<td>20%–50%</td>
+<td>拒絕 fast，允許 slow &#x2F; normal</td>
+</tr>
+<tr>
+<td>&lt;&#x3D; 20%</td>
+<td>只允許 slow</td>
+</tr>
+</tbody></table>
+</li>
+</ul>
+</li>
+<li><p>在終端機按下鍵盤按鈕，控制小車的移動和切換速度</p>
+<ul>
+<li>按 w&#x2F;s&#x2F;a&#x2F;d：前進、後退、原地左轉、原地右轉</li>
+<li>按 1&#x2F;2&#x2F;3：低速檔位、常速檔位、高速檔位</li>
+</ul>
+</li>
+</ul>
+<h3 id="練習"><a href="#練習" class="headerlink" title="練習"></a>練習</h3><ul>
+<li><p>建立專案</p>
+<p>這是三輪小車的專案工作目錄：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">diffcar_ws</span><br><span class="line">├── build</span><br><span class="line">├── install</span><br><span class="line">├── log</span><br><span class="line">└── src</span><br><span class="line">    └── control_tutorial</span><br><span class="line">        ├── CMakeLists.txt</span><br><span class="line">        ├── config</span><br><span class="line">        │   ├── controllers.yaml</span><br><span class="line">        │   └── display.rviz</span><br><span class="line">        ├── include</span><br><span class="line">        ├── launch</span><br><span class="line">        │   ├── launch.py</span><br><span class="line">        │   └── service.launch.py  &lt;&lt; 這次要新增的 launch.py</span><br><span class="line">        ├── package.xml</span><br><span class="line">        ├── src</span><br><span class="line">        └── urdf</span><br><span class="line">            └── car.xacro</span><br></pre></td></tr></table></figure>
+
+<p>新增一個用來定義 service 資料格式的專案，我命名為 <code>set_velocity_interface</code></p>
+<p><code>diffcar_ws/src$ ros2 pkg create --build-type ament_cmake set_velocity_interface</code></p>
+<p>以及專門放 service 定義檔的資料夾</p>
+<p><code>diffcar_ws/src$ mkdir -p set_velocity_interface/srv</code></p>
+<p>專門放 topic message 定義檔的資料夾</p>
+<p><code>diffcar_ws/src$ mkdir -p set_velocity_interface/msg</code></p>
+<p>set_velocity_interface 專案工作目錄：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">diffcar_ws</span><br><span class="line">├── build</span><br><span class="line">├── install</span><br><span class="line">├── log</span><br><span class="line">└── src</span><br><span class="line">    └── set_velocity_interface</span><br><span class="line">        ├── CMakeLists.txt</span><br><span class="line">        ├── include</span><br><span class="line">        ├── msg</span><br><span class="line">        │   └── SpeedProfileState.msg</span><br><span class="line">        ├── package.xml</span><br><span class="line">        ├── src</span><br><span class="line">        └── srv</span><br><span class="line">            └── SetSpeedProfile.srv    &lt;&lt; 主角</span><br></pre></td></tr></table></figure>
+
+<p>新增一個用來定義 service client 的專案，我命名為 <code>teleoperation</code></p>
+<p><code>diffcar_ws/src$ ros2 pkg create --build-type ament_python teleoperation</code></p>
+<p>以及 3 個資料夾</p>
+<p><code>diffcar_ws/src$ mkdir -p teleoperation/{resource,teleoperation,scripts}</code></p>
+<p>還有 2 個空檔案</p>
+<p><code>diffcar_ws/src$ touch teleoperation/resource/teleoperation</code></p>
+<p><code>diffcar_ws/src$ touch teleoperation/teleoperation/__init__.py</code></p>
+<p>teleoperation 專案工作目錄：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">diffcar_ws/</span><br><span class="line">└── src/</span><br><span class="line">    └── teleoperation/</span><br><span class="line">        ├── package.xml</span><br><span class="line">        ├── resource</span><br><span class="line">        │   └── teleoperation</span><br><span class="line">        ├── setup.cfg</span><br><span class="line">        ├── setup.py</span><br><span class="line">        └── teleoperation</span><br><span class="line">            ├── __init__.py</span><br><span class="line">            ├── speed_profile_server.py   &lt;&lt; 主角 service server</span><br><span class="line">            └── teleop_keyboard.py        &lt;&lt; 主角 service client</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="自定義的-Service"><a href="#自定義的-Service" class="headerlink" title="自定義的 Service"></a>自定義的 Service</h4><ul>
+<li><p>撰寫 service 定義檔 <code>set_velocity_interface/srv/SetSpeedProfile.srv</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># range: slow, normal, fast</span><br><span class="line">string profile</span><br><span class="line">---</span><br><span class="line">bool success</span><br><span class="line">string message</span><br><span class="line"></span><br><span class="line">string active_profile</span><br><span class="line"># 單位：m/s, 正值</span><br><span class="line">float64 linear_speed</span><br><span class="line"># 單位：m/s, 正值</span><br><span class="line">float64 angular_speed</span><br><span class="line"></span><br><span class="line"># 模擬電量 0.0 ~ 100.0，由 odom 累積里程換算</span><br><span class="line">float64 battery_percent</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>撰寫 <code>set_velocity_interface/msg/SpeedProfileState.msg</code> 定義檔</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">string active_profile</span><br><span class="line">float64 linear_speed</span><br><span class="line">float64 angular_speed</span><br><span class="line">float64 battery_percent</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>修改 <code>set_velocity_interface/CMakeLists.txt</code></p>
+<p>加上以下設定</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">find_package(ament_cmake REQUIRED)</span><br><span class="line">find_package(rosidl_default_generators REQUIRED)</span><br><span class="line"></span><br><span class="line">rosidl_generate_interfaces($&#123;PROJECT_NAME&#125;</span><br><span class="line">  &quot;srv/SetSpeedProfile.srv&quot;</span><br><span class="line">  &quot;msg/SpeedProfileState.msg&quot;</span><br><span class="line">)</span><br><span class="line">ament_export_dependencies(rosidl_default_runtime)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>修改 <code>set_velocity_interface/package.xml</code></p>
+<p>加上以下設定</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;buildtool_depend&gt;rosidl_default_generators&lt;/buildtool_depend&gt;</span><br><span class="line">&lt;exec_depend&gt;rosidl_default_runtime&lt;/exec_depend&gt;</span><br><span class="line">&lt;member_of_group&gt;rosidl_interface_packages&lt;/member_of_group&gt;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>驗證 set_velocity_interface 專案</p>
+<p><code>diffcar_ws$ colcon build --packages-select set_velocity_interface</code></p>
+<p><code>diffcar_ws$ source install/setup.bash</code></p>
+<p><code>diffcar_ws$ ros2 interface show set_velocity_interface/srv/SetSpeedProfile</code></p>
+<p>可以看到 service 資料格式。</p>
+</li>
+</ul>
+<h4 id="建立-Service-Server-節點"><a href="#建立-Service-Server-節點" class="headerlink" title="建立 Service Server 節點"></a>建立 Service Server 節點</h4><ul>
+<li><p>撰寫 <code>teleoperation/setup.py</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">from setuptools import find_packages, setup</span><br><span class="line"></span><br><span class="line">package_name = &quot;teleoperation&quot;</span><br><span class="line"></span><br><span class="line">setup(</span><br><span class="line">    name=package_name,</span><br><span class="line">    version=&quot;0.0.1&quot;,</span><br><span class="line">    packages=find_packages(exclude=[&quot;test&quot;]),</span><br><span class="line">    data_files=[</span><br><span class="line">        (</span><br><span class="line">            &quot;share/ament_index/resource_index/packages&quot;,</span><br><span class="line">            [&quot;resource/&quot; + package_name],</span><br><span class="line">        ),</span><br><span class="line">        (</span><br><span class="line">            &quot;share/&quot; + package_name,</span><br><span class="line">            [&quot;package.xml&quot;],</span><br><span class="line">        ),</span><br><span class="line">    ],</span><br><span class="line">    install_requires=[&quot;setuptools&quot;],</span><br><span class="line">    zip_safe=True,</span><br><span class="line">    maintainer=&quot;somebody&quot;,</span><br><span class="line">    maintainer_email=&quot;somebody@domain&quot;,</span><br><span class="line">    description=&quot;Speed profile service for mock robot teleoperation.&quot;,</span><br><span class="line">    license=&quot;Apache-2.0&quot;,</span><br><span class="line">    entry_points=&#123;</span><br><span class="line">        &quot;console_scripts&quot;: [</span><br><span class="line">            &quot;speed_profile_server = teleoperation.speed_profile_server:main&quot;,</span><br><span class="line">            &quot;teleop_keyboard = teleoperation.teleop_keyboard:main&quot;,</span><br><span class="line">        ],</span><br><span class="line">    &#125;,</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>撰寫 <code>teleoperation/setup.cfg</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[develop]</span><br><span class="line">script_dir=$base/lib/teleoperation</span><br><span class="line"></span><br><span class="line">[install]</span><br><span class="line">install_scripts=$base/lib/teleoperation</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>撰寫 <code>teleoperation/package.xml</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;exec_depend&gt;rclpy&lt;/exec_depend&gt;</span><br><span class="line">&lt;exec_depend&gt;geometry_msgs&lt;/exec_depend&gt;</span><br><span class="line">&lt;exec_depend&gt;set_velocity_interface&lt;/exec_depend&gt;</span><br><span class="line">&lt;exec_depend&gt;nav_msgs&lt;/exec_depend&gt;</span><br><span class="line">&lt;exec_depend&gt;std_srvs&lt;/exec_depend&gt;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>撰寫 <code>teleoperation/teleoperation/speed_profile_server.py</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br></pre></td><td class="code"><pre><span class="line">import math</span><br><span class="line"></span><br><span class="line">import rclpy</span><br><span class="line">from nav_msgs.msg import Odometry</span><br><span class="line">from rclpy.executors import ExternalShutdownException</span><br><span class="line">from rclpy.node import Node</span><br><span class="line">from rclpy.qos import DurabilityPolicy, HistoryPolicy, QoSProfile, ReliabilityPolicy</span><br><span class="line">from std_srvs.srv import Trigger</span><br><span class="line"></span><br><span class="line">from set_velocity_interface.msg import SpeedProfileState</span><br><span class="line">from set_velocity_interface.srv import SetSpeedProfile</span><br><span class="line"></span><br><span class="line"># 由慢到快排序，index 越大越快</span><br><span class="line">PROFILE_ORDER = [&quot;slow&quot;, &quot;normal&quot;, &quot;fast&quot;]</span><br><span class="line"></span><br><span class="line"># 每個 profile 的速度大小：(m/s, rad/s)</span><br><span class="line">PROFILES = &#123;</span><br><span class="line">    &quot;slow&quot;: (0.1, 0.3),</span><br><span class="line">    &quot;normal&quot;: (0.2, 0.6),</span><br><span class="line">    &quot;fast&quot;: (0.4, 1.0),</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># 電量分級：(電量下限%, 此區間允許的最快 profile)，由高到低比對</span><br><span class="line">BATTERY_TIERS = [</span><br><span class="line">    (50.0, &quot;fast&quot;),    # &gt; 50%：全部允許</span><br><span class="line">    (20.0, &quot;normal&quot;),  # 20% ~ 50%：最快到 normal</span><br><span class="line">    (0.0, &quot;slow&quot;),     # &lt; 20%：只允許 slow（含 0%，避免完全鎖死）</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line"># 單次位移小於此值視為雜訊；大於此值視為 odom 重置/跳變，都不累積</span><br><span class="line">MIN_STEP_M = 0.001</span><br><span class="line">MAX_STEP_M = 1.0</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def rank(profile: str) -&gt; int:</span><br><span class="line">    return PROFILE_ORDER.index(profile)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class SpeedProfileServer(Node):</span><br><span class="line">    def __init__(self):</span><br><span class="line">        super().__init__(&quot;speed_profile_server&quot;)</span><br><span class="line"></span><br><span class="line">        self.declare_parameter(&quot;odom_topic&quot;, &quot;/my_robot_controller/odom&quot;)</span><br><span class="line">        # 假設跑滿這個距離，電量歸零（練習用，設小一點比較容易測試）</span><br><span class="line">        self.declare_parameter(&quot;full_range_m&quot;, 20.0)</span><br><span class="line"></span><br><span class="line">        odom_topic = self.get_parameter(&quot;odom_topic&quot;).value</span><br><span class="line">        self._full_range_m = float(self.get_parameter(&quot;full_range_m&quot;).value)</span><br><span class="line"></span><br><span class="line">        self._active_profile = &quot;normal&quot;</span><br><span class="line">        self._distance_m = 0.0</span><br><span class="line">        self._last_xy = None</span><br><span class="line"></span><br><span class="line">        self._odom_sub = self.create_subscription(</span><br><span class="line">            Odometry, odom_topic, self._on_odom, 10</span><br><span class="line">        )</span><br><span class="line">        self._speed_srv = self.create_service(</span><br><span class="line">            SetSpeedProfile, &quot;/set_speed_profile&quot;, self._on_set_profile</span><br><span class="line">        )</span><br><span class="line">        self._reset_srv = self.create_service(</span><br><span class="line">            Trigger, &quot;/reset_battery&quot;, self._on_reset_battery</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">        self.get_logger().info(</span><br><span class="line">            f&quot;Ready. odom_topic=&#123;odom_topic&#125;, full_range_m=&#123;self._full_range_m&#125;. &quot;</span><br><span class="line">            &quot;Services: /set_speed_profile, /reset_battery&quot;</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">        # latched：後來才啟動的 client 也能立刻拿到最新狀態</span><br><span class="line">        state_qos = QoSProfile(</span><br><span class="line">            history=HistoryPolicy.KEEP_LAST,</span><br><span class="line">            depth=1,</span><br><span class="line">            reliability=ReliabilityPolicy.RELIABLE,</span><br><span class="line">            durability=DurabilityPolicy.TRANSIENT_LOCAL,</span><br><span class="line">        )</span><br><span class="line">        self._state_pub = self.create_publisher(</span><br><span class="line">            SpeedProfileState, &quot;/speed_profile_state&quot;, state_qos</span><br><span class="line">        )</span><br><span class="line">        # 電量會持續變化，每秒也發一次</span><br><span class="line">        self._state_timer = self.create_timer(1.0, self._publish_state)</span><br><span class="line">        self._publish_state()</span><br><span class="line"></span><br><span class="line">    # ---------- 電量模擬 ----------</span><br><span class="line">    def _on_odom(self, msg: Odometry):</span><br><span class="line">        x = msg.pose.pose.position.x</span><br><span class="line">        y = msg.pose.pose.position.y</span><br><span class="line"></span><br><span class="line">        if self._last_xy is not None:</span><br><span class="line">            step = math.hypot(x - self._last_xy[0], y - self._last_xy[1])</span><br><span class="line">            if MIN_STEP_M &lt; step &lt; MAX_STEP_M:</span><br><span class="line">                self._distance_m += step</span><br><span class="line">        self._last_xy = (x, y)</span><br><span class="line"></span><br><span class="line">        self._enforce_battery_limit()</span><br><span class="line"></span><br><span class="line">    def _battery_percent(self) -&gt; float:</span><br><span class="line">        remaining = 1.0 - self._distance_m / self._full_range_m</span><br><span class="line">        return max(0.0, min(100.0, 100.0 * remaining))</span><br><span class="line"></span><br><span class="line">    def _max_allowed_profile(self) -&gt; str:</span><br><span class="line">        battery = self._battery_percent()</span><br><span class="line">        for lower_bound, max_profile in BATTERY_TIERS:</span><br><span class="line">            if battery &gt; lower_bound:</span><br><span class="line">                return max_profile</span><br><span class="line">        return &quot;slow&quot;  # 電量剛好 0%</span><br><span class="line"></span><br><span class="line">    def _enforce_battery_limit(self):</span><br><span class="line">        &quot;&quot;&quot;電量下降導致目前 profile 超出允許範圍時，主動降速。&quot;&quot;&quot;</span><br><span class="line">        max_profile = self._max_allowed_profile()</span><br><span class="line">        if rank(self._active_profile) &gt; rank(max_profile):</span><br><span class="line">            self.get_logger().warning(</span><br><span class="line">                f&quot;Battery &#123;self._battery_percent():.0f&#125;%: &quot;</span><br><span class="line">                f&quot;forced profile &#123;self._active_profile&#125; -&gt; &#123;max_profile&#125;&quot;</span><br><span class="line">            )</span><br><span class="line">            self._active_profile = max_profile</span><br><span class="line">            self._publish_state()</span><br><span class="line"></span><br><span class="line">    # ---------- Services ----------</span><br><span class="line">    def _on_set_profile(self, request, response):</span><br><span class="line">        requested = request.profile</span><br><span class="line"></span><br><span class="line">        if requested not in PROFILES:</span><br><span class="line">            response.success = False</span><br><span class="line">            response.message = (</span><br><span class="line">                f&quot;Unknown profile: &#123;requested!r&#125;. Expected slow, normal, or fast.&quot;</span><br><span class="line">            )</span><br><span class="line">            self.get_logger().warning(response.message)</span><br><span class="line">        else:</span><br><span class="line">            max_profile = self._max_allowed_profile()</span><br><span class="line">            is_speeding_up = rank(requested) &gt; rank(self._active_profile)</span><br><span class="line"></span><br><span class="line">            # 只有「往更快」才檢查電量；降速或維持永遠允許</span><br><span class="line">            if is_speeding_up and rank(requested) &gt; rank(max_profile):</span><br><span class="line">                response.success = False</span><br><span class="line">                response.message = (</span><br><span class="line">                    f&quot;Battery low (&#123;self._battery_percent():.0f&#125;%): &quot;</span><br><span class="line">                    f&quot;&#123;requested!r&#125; not allowed, max is &#123;max_profile!r&#125;.&quot;</span><br><span class="line">                )</span><br><span class="line">                self.get_logger().warning(response.message)</span><br><span class="line">            else:</span><br><span class="line">                self._active_profile = requested</span><br><span class="line">                self._publish_state()</span><br><span class="line">                response.success = True</span><br><span class="line">                response.message = f&quot;Activated profile: &#123;self._active_profile&#125;&quot;</span><br><span class="line">                self.get_logger().info(response.message)</span><br><span class="line"></span><br><span class="line">        # 無論成功或失敗，都回報目前實際生效的設定</span><br><span class="line">        linear_speed, angular_speed = PROFILES[self._active_profile]</span><br><span class="line">        response.active_profile = self._active_profile</span><br><span class="line">        response.linear_speed = linear_speed</span><br><span class="line">        response.angular_speed = angular_speed</span><br><span class="line">        response.battery_percent = self._battery_percent()</span><br><span class="line">        return response</span><br><span class="line"></span><br><span class="line">    def _on_reset_battery(self, request, response):</span><br><span class="line">        self._distance_m = 0.0</span><br><span class="line">        self._publish_state()</span><br><span class="line">        response.success = True</span><br><span class="line">        response.message = &quot;Battery recharged to 100%&quot;</span><br><span class="line">        self.get_logger().info(response.message)</span><br><span class="line">        return response</span><br><span class="line"></span><br><span class="line">    def _publish_state(self):</span><br><span class="line">        linear_speed, angular_speed = PROFILES[self._active_profile]</span><br><span class="line">        msg = SpeedProfileState()</span><br><span class="line">        msg.active_profile = self._active_profile</span><br><span class="line">        msg.linear_speed = linear_speed</span><br><span class="line">        msg.angular_speed = angular_speed</span><br><span class="line">        msg.battery_percent = self._battery_percent()</span><br><span class="line">        self._state_pub.publish(msg)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def main(args=None):</span><br><span class="line">    rclpy.init(args=args)</span><br><span class="line">    node = SpeedProfileServer()</span><br><span class="line"></span><br><span class="line">    try:</span><br><span class="line">        rclpy.spin(node)</span><br><span class="line">    except (KeyboardInterrupt, ExternalShutdownException):</span><br><span class="line">        pass</span><br><span class="line">    finally:</span><br><span class="line">        node.destroy_node()</span><br><span class="line">        rclpy.try_shutdown()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">if __name__ == &quot;__main__&quot;:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>驗證 teleoperation 專案</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">diffcar_ws$ colcon build --packages-select teleoperation</span><br><span class="line">diffcar_ws$ source install/setup.bash</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">diffcar_ws$ ros2 service list -t</span><br><span class="line">diffcar_ws$ ros2 service type /set_speed_profile</span><br><span class="line">diffcar_ws$ ros2 service call /set_speed_profile set_velocity_interface/srv/SetSpeedProfile &quot;&#123;profile: slow&#125;&quot;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="建立-Service-Client-節點"><a href="#建立-Service-Client-節點" class="headerlink" title="建立 Service Client 節點"></a>建立 Service Client 節點</h4><ul>
+<li><p>修改 <code>teleoperation/setup.py</code></p>
+<p>console_scripts 加上 teleop_keyboard，如下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">entry_points=&#123;</span><br><span class="line">    &quot;console_scripts&quot;: [</span><br><span class="line">        &quot;speed_profile_server = teleoperation.speed_profile_server:main&quot;,</span><br><span class="line">        &quot;teleop_keyboard = teleoperation.teleop_keyboard:main&quot;,</span><br><span class="line">    ],</span><br><span class="line">&#125;,</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>撰寫 <code>teleoperation/teleoperation/teleop_keyboard.py</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br></pre></td><td class="code"><pre><span class="line">import select</span><br><span class="line">import sys</span><br><span class="line">import termios</span><br><span class="line">import threading</span><br><span class="line">import tty</span><br><span class="line"></span><br><span class="line">import rclpy</span><br><span class="line">from geometry_msgs.msg import TwistStamped</span><br><span class="line">from rclpy.executors import ExternalShutdownException</span><br><span class="line">from rclpy.node import Node</span><br><span class="line">from rclpy.qos import DurabilityPolicy, HistoryPolicy, QoSProfile, ReliabilityPolicy</span><br><span class="line"></span><br><span class="line">from set_velocity_interface.msg import SpeedProfileState</span><br><span class="line">from set_velocity_interface.srv import SetSpeedProfile</span><br><span class="line"></span><br><span class="line"># 停止逾時：超過這段時間沒有新的移動輸入，就自動停止</span><br><span class="line">INPUT_TIMEOUT_SEC = 0.5</span><br><span class="line"># cmd_vel 發布頻率</span><br><span class="line">PUBLISH_PERIOD_SEC = 0.1</span><br><span class="line"></span><br><span class="line">INSTRUCTIONS = &quot;&quot;&quot;</span><br><span class="line">鍵盤控制：</span><br><span class="line">  w：前進     s：後退</span><br><span class="line">  a：左轉(原地)  d：右轉(原地)</span><br><span class="line">  空白鍵：停止</span><br><span class="line"></span><br><span class="line">  1：慢速  2：正常  3：快速</span><br><span class="line">  （實際速度由 server 決定，可能因電量不足被拒絕或自動降速）</span><br><span class="line"></span><br><span class="line">Ctrl+C 離開</span><br><span class="line">&quot;&quot;&quot;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def get_key(settings):</span><br><span class="line">    tty.setcbreak(sys.stdin.fileno())</span><br><span class="line">    rlist, _, _ = select.select([sys.stdin], [], [], 0.1)</span><br><span class="line">    key = sys.stdin.read(1) if rlist else &quot;&quot;</span><br><span class="line">    termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)</span><br><span class="line">    return key</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class TeleopKeyboard(Node):</span><br><span class="line">    def __init__(self):</span><br><span class="line">        super().__init__(&quot;teleop_keyboard&quot;)</span><br><span class="line"></span><br><span class="line">        self._cmd_pub = self.create_publisher(</span><br><span class="line">            TwistStamped, &quot;/my_robot_controller/cmd_vel&quot;, 10</span><br><span class="line">        )</span><br><span class="line">        self._speed_client = self.create_client(SetSpeedProfile, &quot;/set_speed_profile&quot;)</span><br><span class="line"></span><br><span class="line">        # 速度大小完全由 server 決定；收到第一筆狀態前保持 0，車子不會動</span><br><span class="line">        self._linear_speed = 0.0</span><br><span class="line">        self._angular_speed = 0.0</span><br><span class="line">        self._active_profile = None</span><br><span class="line">        self._have_state = False</span><br><span class="line"></span><br><span class="line">        state_qos = QoSProfile(</span><br><span class="line">            history=HistoryPolicy.KEEP_LAST,</span><br><span class="line">            depth=1,</span><br><span class="line">            reliability=ReliabilityPolicy.RELIABLE,</span><br><span class="line">            durability=DurabilityPolicy.TRANSIENT_LOCAL,</span><br><span class="line">        )</span><br><span class="line">        self._state_sub = self.create_subscription(</span><br><span class="line">            SpeedProfileState, &quot;/speed_profile_state&quot;, self._on_state, state_qos</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">        # 目前方向：-1, 0, 1（代表倍率），分別給 linear / angular</span><br><span class="line">        self._linear_dir = 0.0</span><br><span class="line">        self._angular_dir = 0.0</span><br><span class="line"></span><br><span class="line">        self._last_key_time = self.get_clock().now()</span><br><span class="line">        self._lock = threading.Lock()</span><br><span class="line"></span><br><span class="line">        self._timer = self.create_timer(PUBLISH_PERIOD_SEC, self._on_timer)</span><br><span class="line"></span><br><span class="line">        self.get_logger().info(INSTRUCTIONS)</span><br><span class="line"></span><br><span class="line">    # ---------- Server 狀態（唯一的速度來源） ----------</span><br><span class="line">    def _on_state(self, msg: SpeedProfileState):</span><br><span class="line">        with self._lock:</span><br><span class="line">            changed = msg.active_profile != self._active_profile</span><br><span class="line">            self._active_profile = msg.active_profile</span><br><span class="line">            self._linear_speed = msg.linear_speed</span><br><span class="line">            self._angular_speed = msg.angular_speed</span><br><span class="line">            self._have_state = True</span><br><span class="line"></span><br><span class="line">        if changed:</span><br><span class="line">            self.get_logger().info(</span><br><span class="line">                f&quot;目前 profile: &#123;msg.active_profile&#125; &quot;</span><br><span class="line">                f&quot;(&#123;msg.linear_speed&#125; m/s, &#123;msg.angular_speed&#125; rad/s), &quot;</span><br><span class="line">                f&quot;電量 &#123;msg.battery_percent:.0f&#125;%&quot;</span><br><span class="line">            )</span><br><span class="line"></span><br><span class="line">    # ---------- Service 呼叫（非阻塞） ----------</span><br><span class="line">    def request_profile(self, profile: str):</span><br><span class="line">        if not self._speed_client.service_is_ready():</span><br><span class="line">            self.get_logger().warning(&quot;Service 尚未就緒，稍後再試&quot;)</span><br><span class="line">            return</span><br><span class="line"></span><br><span class="line">        request = SetSpeedProfile.Request()</span><br><span class="line">        request.profile = profile</span><br><span class="line">        future = self._speed_client.call_async(request)</span><br><span class="line">        future.add_done_callback(self._on_profile_response)</span><br><span class="line"></span><br><span class="line">    def _on_profile_response(self, future):</span><br><span class="line">        try:</span><br><span class="line">            response = future.result()</span><br><span class="line">        except Exception as exc:  # noqa: BLE001</span><br><span class="line">            self.get_logger().error(f&quot;Service 呼叫失敗: &#123;exc&#125;&quot;)</span><br><span class="line">            return</span><br><span class="line"></span><br><span class="line">        # 這裡只顯示結果；速度的更新一律走 /speed_profile_state</span><br><span class="line">        text = f&quot;&#123;response.message&#125; (電量 &#123;response.battery_percent:.0f&#125;%)&quot;</span><br><span class="line">        if response.success:</span><br><span class="line">            self.get_logger().info(text)</span><br><span class="line">        else:</span><br><span class="line">            self.get_logger().warning(text)</span><br><span class="line"></span><br><span class="line">    # ---------- 按鍵處理 ----------</span><br><span class="line">    def handle_key(self, key: str):</span><br><span class="line">        if key in (&quot;w&quot;, &quot;s&quot;, &quot;a&quot;, &quot;d&quot;):</span><br><span class="line">            with self._lock:</span><br><span class="line">                if key == &quot;w&quot;:</span><br><span class="line">                    self._linear_dir, self._angular_dir = 1.0, 0.0</span><br><span class="line">                elif key == &quot;s&quot;:</span><br><span class="line">                    self._linear_dir, self._angular_dir = -1.0, 0.0</span><br><span class="line">                elif key == &quot;a&quot;:</span><br><span class="line">                    self._linear_dir, self._angular_dir = 0.0, 1.0</span><br><span class="line">                elif key == &quot;d&quot;:</span><br><span class="line">                    self._linear_dir, self._angular_dir = 0.0, -1.0</span><br><span class="line">                self._last_key_time = self.get_clock().now()</span><br><span class="line"></span><br><span class="line">        elif key == &quot; &quot;:</span><br><span class="line">            with self._lock:</span><br><span class="line">                self._linear_dir = 0.0</span><br><span class="line">                self._angular_dir = 0.0</span><br><span class="line">                self._last_key_time = self.get_clock().now()</span><br><span class="line"></span><br><span class="line">        elif key == &quot;1&quot;:</span><br><span class="line">            self.request_profile(&quot;slow&quot;)</span><br><span class="line">        elif key == &quot;2&quot;:</span><br><span class="line">            self.request_profile(&quot;normal&quot;)</span><br><span class="line">        elif key == &quot;3&quot;:</span><br><span class="line">            self.request_profile(&quot;fast&quot;)</span><br><span class="line"></span><br><span class="line">    # ---------- Timer：統一發布 cmd_vel + 逾時停止 ----------</span><br><span class="line">    def _on_timer(self):</span><br><span class="line">        now = self.get_clock().now()</span><br><span class="line"></span><br><span class="line">        with self._lock:</span><br><span class="line">            elapsed = (now - self._last_key_time).nanoseconds / 1e9</span><br><span class="line">            if elapsed &gt; INPUT_TIMEOUT_SEC:</span><br><span class="line">                self._linear_dir = 0.0</span><br><span class="line">                self._angular_dir = 0.0</span><br><span class="line"></span><br><span class="line">            msg = TwistStamped()</span><br><span class="line">            msg.header.stamp = now.to_msg()</span><br><span class="line">            msg.header.frame_id = &quot;base_link&quot;</span><br><span class="line">            if self._have_state:</span><br><span class="line">                msg.twist.linear.x = self._linear_dir * self._linear_speed</span><br><span class="line">                msg.twist.angular.z = self._angular_dir * self._angular_speed</span><br><span class="line"></span><br><span class="line">        self._cmd_pub.publish(msg)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def _spin(node):</span><br><span class="line">    try:</span><br><span class="line">        rclpy.spin(node)</span><br><span class="line">    except ExternalShutdownException:</span><br><span class="line">        pass</span><br><span class="line">    except Exception as exc:  # noqa: BLE001</span><br><span class="line">        node.get_logger().error(f&quot;spin 執行緒異常終止: &#123;exc!r&#125;&quot;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def main(args=None):</span><br><span class="line">    rclpy.init(args=args)</span><br><span class="line">    node = TeleopKeyboard()</span><br><span class="line"></span><br><span class="line">    spin_thread = threading.Thread(target=_spin, args=(node,), daemon=True)</span><br><span class="line">    spin_thread.start()</span><br><span class="line"></span><br><span class="line">    settings = termios.tcgetattr(sys.stdin)</span><br><span class="line">    try:</span><br><span class="line">        while rclpy.ok():</span><br><span class="line">            key = get_key(settings)</span><br><span class="line">            if key:</span><br><span class="line">                if key == &quot;\x03&quot;:  # Ctrl+C</span><br><span class="line">                    break</span><br><span class="line">                node.handle_key(key)</span><br><span class="line">    except (KeyboardInterrupt, ExternalShutdownException):</span><br><span class="line">        pass</span><br><span class="line">    finally:</span><br><span class="line">        termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)</span><br><span class="line"></span><br><span class="line">        stop = TwistStamped()</span><br><span class="line">        stop.header.stamp = node.get_clock().now().to_msg()</span><br><span class="line">        node._cmd_pub.publish(stop)</span><br><span class="line">        node.destroy_node()</span><br><span class="line"></span><br><span class="line">        rclpy.try_shutdown()</span><br><span class="line">        spin_thread.join(timeout=1.0)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">if __name__ == &quot;__main__&quot;:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>驗證 teleoperation.teleop_keyboard 節點</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">diffcar_ws$ colcon build --packages-select teleoperation</span><br><span class="line">diffcar_ws$ source install/setup.bash</span><br></pre></td></tr></table></figure>
+
+<p>[terminal-A]</p>
+<p><code>$ ros2 run teleoperation speed_profile_server --ros-args -p full_range_m:=5.0</code></p>
+<p>[terminal-B]</p>
+<p><code>$ ros2 run teleoperation teleop_keyboard</code></p>
+<p>[terminal-C]</p>
+<p><code>$ ros2 topic echo /my_robot_controller/cmd_vel</code></p>
+<p>在 B 終端機按鈕控制，預期在 C 終端機看到以下格式的訊息(數值隨按鈕而不同)：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">header:</span><br><span class="line">  stamp:</span><br><span class="line">    sec: 1792596751</span><br><span class="line">    nanosec: 786300383</span><br><span class="line">  frame_id: base_link</span><br><span class="line">twist:</span><br><span class="line">  linear:</span><br><span class="line">    x: 0.0</span><br><span class="line">    y: 0.0</span><br><span class="line">    z: 0.0</span><br><span class="line">  angular:</span><br><span class="line">    x: 0.0</span><br><span class="line">    y: 0.0</span><br><span class="line">    z: 0.6</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="練習在-Rviz-視覺化小車的移動速度"><a href="#練習在-Rviz-視覺化小車的移動速度" class="headerlink" title="練習在 Rviz 視覺化小車的移動速度"></a>練習在 Rviz 視覺化小車的移動速度</h4><ul>
+<li><p>撰寫 <code>control_tutorial/launch/service.launch.py</code></p>
+<p>以既有的 <code>launch.py</code> 為基底，加上以下設定</p>
+</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">full_range_arg = DeclareLaunchArgument(</span><br><span class="line">    &quot;full_range_m&quot;,</span><br><span class="line">    default_value=&quot;10.0&quot;,</span><br><span class="line">    description=&quot;Distance (m) to drain the simulated battery to 0%&quot;,</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">speed_profile_server = Node(</span><br><span class="line">    package=&quot;teleoperation&quot;,</span><br><span class="line">    executable=&quot;speed_profile_server&quot;,</span><br><span class="line">    output=&quot;screen&quot;,</span><br><span class="line">    parameters=[</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;full_range_m&quot;: ParameterValue(</span><br><span class="line">                LaunchConfiguration(&quot;full_range_m&quot;), value_type=float</span><br><span class="line">            )</span><br><span class="line">        &#125;</span><br><span class="line">    ],</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">return LaunchDescription(</span><br><span class="line">    [</span><br><span class="line">        full_range_arg,</span><br><span class="line">        robot_state_publisher,</span><br><span class="line">        controller_manager,</span><br><span class="line">        joint_state_broadcaster_spawner,</span><br><span class="line">        wheel_controller_spawner,</span><br><span class="line">        rviz_node,</span><br><span class="line">        speed_profile_server</span><br><span class="line">    ]</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>註：teleop_keyboard 是互動式 CLI 工具，在「使用者親自打開的終端機」裡執行，不能被包含進入 launch.py 裡</p>
+</li>
+<li><p>驗證</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">diffcar_ws$ colcon build --packages-select control_tutorial</span><br><span class="line">diffcar_ws$ source install/setup.bash</span><br></pre></td></tr></table></figure>
+
+<p>[terminal-A]</p>
+<p><code>$ ros2 launch control_tutorial service.launch.py full_range_m:=5.0</code></p>
+<p>會看到 Rviz 視窗，手動設定 Odometry Display 的 Topic 選 <code>/my_robot_controller/odom</code></p>
+<p>[terminal-B]</p>
+<p><code>$ ros2 run teleoperation teleop_keyboard</code></p>
+<p>一樣在 B 終端機用鍵盤操控小車的移動。</p>
+<p><img src="/2026/10/14/ROS2-service/rviz.png" alt="軌跡" title="control the car to move with speed profiling"></p>
+</li>
+</ul>
+<p>附上終端機訊息紀錄：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">[speed_profile_server-6] [INFO] [1792741526.466690555] [speed_profile_server]: Activated profile: fast</span><br><span class="line">[speed_profile_server-6] [WARN] [1792741534.970832161] [speed_profile_server]: Battery 50%: forced profile fast -&gt; normal</span><br><span class="line">[speed_profile_server-6] [WARN] [1792741545.791433873] [speed_profile_server]: Battery 20%: forced profile normal -&gt; slow</span><br><span class="line">[speed_profile_server-6] [WARN] [1792741600.007717328] [speed_profile_server]: Battery low (0%): &#x27;normal&#x27; not allowed, max is &#x27;slow&#x27;.</span><br><span class="line"></span><br><span class="line">[INFO] [1792741500.687418003] [teleop_keyboard]: </span><br><span class="line">鍵盤控制：</span><br><span class="line">  w：前進     s：後退</span><br><span class="line">  a：左轉(原地)  d：右轉(原地)</span><br><span class="line">  空白鍵：停止</span><br><span class="line"></span><br><span class="line">  1：慢速  2：正常  3：快速</span><br><span class="line">  （實際速度由 server 決定，可能因電量不足被拒絕或自動降速）</span><br><span class="line"></span><br><span class="line">Ctrl+C 離開</span><br><span class="line"></span><br><span class="line">[INFO] [1792741500.760331939] [teleop_keyboard]: 目前 profile: normal (0.2 m/s, 0.6 rad/s), 電量 100%</span><br><span class="line">[INFO] [1792741526.467627262] [teleop_keyboard]: 目前 profile: fast (0.4 m/s, 1.0 rad/s), 電量 87%</span><br><span class="line">[INFO] [1792741526.470997588] [teleop_keyboard]: Activated profile: fast (電量 87%)</span><br><span class="line">[INFO] [1792741534.971797625] [teleop_keyboard]: 目前 profile: normal (0.2 m/s, 0.6 rad/s), 電量 50%</span><br><span class="line">[INFO] [1792741545.793041235] [teleop_keyboard]: 目前 profile: slow (0.1 m/s, 0.3 rad/s), 電量 20%</span><br><span class="line">[WARN] [1792741600.010662495] [teleop_keyboard]: Battery low (0%): &#x27;normal&#x27; not allowed, max is &#x27;slow&#x27;. (電量 0%)</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/service/" rel="tag"># service</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2026/10/01/ros2-control-%E5%85%A5%E9%96%80%E7%B7%B4%E7%BF%92/" rel="prev" title="ros2_control-入門練習">
+      <i class="fa fa-chevron-left"></i> ros2_control-入門練習
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%92%B0%E5%A2%83"><span class="nav-number">1.</span> <span class="nav-text">環境</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%88%E6%A1%88%E6%A6%82%E5%BF%B5"><span class="nav-number">2.</span> <span class="nav-text">專案概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B7%B4%E7%BF%92"><span class="nav-number">3.</span> <span class="nav-text">練習</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%87%AA%E5%AE%9A%E7%BE%A9%E7%9A%84-Service"><span class="nav-number">3.1.</span> <span class="nav-text">自定義的 Service</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BB%BA%E7%AB%8B-Service-Server-%E7%AF%80%E9%BB%9E"><span class="nav-number">3.2.</span> <span class="nav-text">建立 Service Server 節點</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BB%BA%E7%AB%8B-Service-Client-%E7%AF%80%E9%BB%9E"><span class="nav-number">3.3.</span> <span class="nav-text">建立 Service Client 節點</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%B7%B4%E7%BF%92%E5%9C%A8-Rviz-%E8%A6%96%E8%A6%BA%E5%8C%96%E5%B0%8F%E8%BB%8A%E7%9A%84%E7%A7%BB%E5%8B%95%E9%80%9F%E5%BA%A6"><span class="nav-number">3.4.</span> <span class="nav-text">練習在 Rviz 視覺化小車的移動速度</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Ann</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">39</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ann</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 強力驅動
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
