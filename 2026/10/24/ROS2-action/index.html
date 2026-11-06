@@ -29,7 +29,7 @@
 <meta property="og:locale" content="zh_TW">
 <meta property="og:image" content="https://annsonic.github.io/2026/10/24/ROS2-action/action.png">
 <meta property="article:published_time" content="2026-10-24T08:43:43.000Z">
-<meta property="article:modified_time" content="2026-10-31T15:32:59.610Z">
+<meta property="article:modified_time" content="2026-11-06T13:56:24.513Z">
 <meta property="article:author" content="Ann">
 <meta property="article:tag" content="action">
 <meta name="twitter:card" content="summary">
@@ -183,7 +183,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新於</span>
-                <time title="修改時間：2026-10-31 23:32:59" itemprop="dateModified" datetime="2026-10-31T23:32:59+08:00">2026-10-31</time>
+                <time title="修改時間：2026-11-06 21:56:24" itemprop="dateModified" datetime="2026-11-06T21:56:24+08:00">2026-11-06</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -290,6 +290,11 @@
 </li>
 <li>這裡的 callback 函數跟 python async 函數沒有關係喔<ul>
 <li>平行性來自執行緒：MultiThreadedExecutor 用 thread pool 同時跑多個 callback</li>
+</ul>
+</li>
+<li>這個例子中導航任務是閉環控制，收到一次 goal 之後，要進行讀狀態、算控制量、發佈指令、發佈 feedback 的輪迴，直到達成目標、被取消或節點關閉，所以架構上是一個 while 迴圈<ul>
+<li>在 while 迴圈裡加 sleep 是避免空轉時佔用 CPU</li>
+<li>等新資料進來，否則會一直讀到 odom 舊值</li>
 </ul>
 </li>
 </ul>
