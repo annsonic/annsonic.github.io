@@ -348,6 +348,9 @@ if __name__ == "__main__":
     - execute 在 while 迴圈裡 time.sleep 時，不會擋住其他 callback，所以 odom 能持續更新、cancel 也能即時處理
   - 這裡的 callback 函數跟 python async 函數沒有關係喔
     - 平行性來自執行緒：MultiThreadedExecutor 用 thread pool 同時跑多個 callback
+  - 這個例子中導航任務是閉環控制，收到一次 goal 之後，要進行讀狀態、算控制量、發佈指令、發佈 feedback 的輪迴，直到達成目標、被取消或節點關閉，所以架構上是一個 while 迴圈
+    - 在 while 迴圈裡加 sleep 是避免空轉時佔用 CPU
+    - 等新資料進來，否則會一直讀到 odom 舊值
 
 - 驗證 action server 節點
 
