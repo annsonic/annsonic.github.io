@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"annsonic.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="安裝環境和執行現成的 MoveIt 範例程式。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MoveIt Getting Started">
+<meta property="og:url" content="https://annsonic.github.io/2026/11/14/MoveIt-Getting-Started/index.html">
+<meta property="og:site_name" content="Ann&#39;s Note">
+<meta property="og:description" content="安裝環境和執行現成的 MoveIt 範例程式。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://annsonic.github.io/2026/11/14/MoveIt-Getting-Started/gui.png">
+<meta property="article:published_time" content="2026-11-14T05:58:20.000Z">
+<meta property="article:modified_time" content="2026-11-15T04:08:27.573Z">
+<meta property="article:author" content="Ann">
+<meta property="article:tag" content="Gazebo">
+<meta property="article:tag" content="MoveIt">
+<meta property="article:tag" content="RViz">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://annsonic.github.io/2026/11/14/MoveIt-Getting-Started/gui.png">
+
+<link rel="canonical" href="https://annsonic.github.io/2026/11/14/MoveIt-Getting-Started/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-TW'
+  };
+</script>
+
+  <title>MoveIt Getting Started | Ann's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Ann's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://annsonic.github.io/2026/11/14/MoveIt-Getting-Started/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Ann">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ann's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          MoveIt Getting Started
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2026-11-14 13:58:20" itemprop="dateCreated datePublished" datetime="2026-11-14T13:58:20+08:00">2026-11-14</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2026-11-15 12:08:27" itemprop="dateModified" datetime="2026-11-15T12:08:27+08:00">2026-11-15</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/simulation-%E7%AD%86%E8%A8%98/" itemprop="url" rel="index"><span itemprop="name">simulation 筆記</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>安裝環境和執行現成的 MoveIt 範例程式。</p>
+<span id="more"></span>
+
+<h3 id="環境"><a href="#環境" class="headerlink" title="環境"></a>環境</h3><ul>
+<li>作業系統 Ubuntu 24.04</li>
+<li>ROS2 Kilted</li>
+<li>Gazebo Ionic</li>
+<li>Universal Robots 驅動與模擬套件  <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt install ros-kilted-moveit</span><br><span class="line">$ sudo apt install ros-kilted-ur</span><br><span class="line">$ sudo apt install ros-kilted-ur-simulation-gz</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="啟動"><a href="#啟動" class="headerlink" title="啟動"></a>啟動</h3><p><code>$ ros2 launch ur_simulation_gz ur_sim_moveit.launch.py ur_type:=ur5e</code></p>
+<h3 id="認識-RViz-GUI"><a href="#認識-RViz-GUI" class="headerlink" title="認識 RViz GUI"></a>認識 RViz GUI</h3><p><img src="/2026/11/14/MoveIt-Getting-Started/gui.png" alt="MoveIt" title="MoveIt with ur5e"></p>
+<ul>
+<li><p>planning group </p>
+<ul>
+<li>是「一組要一起規劃的關節（或連桿）」</li>
+<li>定義在 MoveIt config 的 SRDF 裡。規劃器只會移動這些關節</li>
+<li>機械手臂常見分成兩個 planning group：手肘手腕一組、夾爪自己一組</li>
+</ul>
+</li>
+<li><p>Goal State</p>
+<ul>
+<li><code>&lt;random valid&gt;</code><ul>
+<li>隨機產生一組「無碰撞（Collision-free）」且符合運動學的合法目標位置（Goal State）</li>
+</ul>
+</li>
+<li>Named States（具名姿態）<ul>
+<li>定義在 SRDF 的 <code>&lt;group_state&gt;</code>，給姿態命名在 Python 控制時很實用</li>
+</ul>
+</li>
+<li>state 對應哪一隻手臂<ul>
+<li>可以在 RViz 的左側 Displays 面板展開 MotionPlanning 樹狀圖查看對應的顏色<ul>
+<li>Planning Request：Query Start State 與 Query Goal State 核取方塊</li>
+<li>我的例子中，草綠色是初始狀態、橘色是目標狀態、紅色是發生了碰撞</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>互動標記（interactive marker）</p>
+<ul>
+<li>左鍵拖曳：旋轉視角</li>
+<li>右鍵：縮放</li>
+<li>一次只動一個軸：滑鼠在箭頭上會換符號、箭頭是沿單軸平移，滑鼠在圓環上是另一個符號、圓環是繞單軸旋轉</li>
+<li>在 Displays → MotionPlanning → Planning Request 裡有 Interactive Marker Size 設定</li>
+</ul>
+</li>
+<li><p>workspace</p>
+<ul>
+<li>規劃路徑用的工作空間邊界(只會在此範圍內做計算)</li>
+<li>不是手臂實際可達範圍!!</li>
+<li>用來限制浮動或平面虛擬關節的取樣範圍</li>
+<li>在 RViz 的左側 Displays 面板展開 MotionPlanning 樹狀圖查看工作範圍<ul>
+<li>Planning Request：show workspace，會畫出海軍藍色方塊</li>
+<li>畫出工作範圍的缺點：海軍藍色方塊圖層會妨礙點選互動標記</li>
+</ul>
+</li>
+<li>在 MotionPlanning 面板的 Context 分頁裡，有 Workspace 的 Center 和 Size 欄位，可以調整</li>
+</ul>
+</li>
+<li><p>OMPL 是通用的取樣式規劃器，結果可能繞路、不平滑。需要換的情境：</p>
+<ul>
+<li>畫圖：直線／平滑路徑，用 Pilz Industrial Motion Planner</li>
+<li>想要軌跡更平滑或最佳化：CHOMP 或 STOMP</li>
+<li>只是自由空間移動、避障：OMPL 就夠用</li>
+</ul>
+</li>
+<li><p>Joints 分頁直接調每個關節角度，最精準也最不會超出工作區</p>
+</li>
+<li><p>Execute 執行的是「最近一次 Plan 產生的軌跡」，然後該軌跡失效，不能重複執行，需要重新 Plan</p>
+</li>
+<li><p>Gazebo 按下暫停後 RViz 的手臂也不動</p>
+<ul>
+<li>ros2_control 在 Gazebo 裡由模擬時鐘驅動，暫停後模擬時間不前進，controller 不會更新，RViz 看到的手臂狀態來自 &#x2F;joint_states，也就跟著停住</li>
+</ul>
+</li>
+</ul>
+<h3 id="手動進行規劃路徑"><a href="#手動進行規劃路徑" class="headerlink" title="手動進行規劃路徑"></a>手動進行規劃路徑</h3><p><a target="_blank" rel="noopener" href="https://docs.ros.org/en/kinetic/api/moveit_tutorials/html/doc/quickstart_in_rviz/quickstart_in_rviz_tutorial.html">Rviz 官方教學</a></p>
+<ul>
+<li>在 RViz 的 MotionPlanning 面板選 Planning 分頁</li>
+<li>拖曳手臂末端的互動標記（interactive marker）到新位置<ul>
+<li>不需要花時間用互動標記去指導機械手臂抓取物件，在 3D 空間中很難用肉眼看準位置，放置互動標記的位置難以精確</li>
+</ul>
+</li>
+<li>按 Plan，觀察規劃軌跡動畫</li>
+<li>按 Execute，確認 Gazebo 裡的手臂也跟著動</li>
+</ul>
+<h3 id="確認-MoveIt-的-action"><a href="#確認-MoveIt-的-action" class="headerlink" title="確認 MoveIt 的 action"></a>確認 MoveIt 的 action</h3><p>另開終端機執行：</p>
+<p><code>$ ros2 action list</code></p>
+<p>終端機印出</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">/execute_trajectory</span><br><span class="line">/joint_trajectory_controller/follow_joint_trajectory</span><br><span class="line">/move_action</span><br><span class="line">/scaled_joint_trajectory_controller/follow_joint_trajectory</span><br><span class="line">/sequence_move_group</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>&#x2F;execute_trajectory 為執行軌跡 action</li>
+<li>&#x2F;move_action：MoveIt 的規劃 action</li>
+<li>&#x2F;scaled_joint_trajectory_controller&#x2F;follow_joint_trajectory：實際執行軌跡的 action</li>
+</ul>
+<p>繼續執行</p>
+<p><code>$ ros2 control list_controllers</code></p>
+<p>終端機印出</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">scaled_joint_trajectory_controller ur_controllers/ScaledJointTrajectoryController  active</span><br><span class="line">joint_state_broadcaster            joint_state_broadcaster/JointStateBroadcaster   active</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>scaled_joint_trajectory_controller 負責執行軌跡</li>
+</ul>
+<p>在 MoveIt 按一次 Execute，接著終端機執行</p>
+<p><code>$ ros2 topic echo /joint_states --once</code></p>
+<p>終端機印出</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">header:</span><br><span class="line">  stamp:</span><br><span class="line">    sec: 230</span><br><span class="line">    nanosec: 506000000</span><br><span class="line">  frame_id: base_link</span><br><span class="line">name:</span><br><span class="line">- elbow_joint</span><br><span class="line">- shoulder_lift_joint</span><br><span class="line">- shoulder_pan_joint</span><br><span class="line">- wrist_1_joint</span><br><span class="line">- wrist_2_joint</span><br><span class="line">- wrist_3_joint</span><br><span class="line">position:</span><br><span class="line">- 3.061531835299185e-15</span><br><span class="line">- -1.5699999999999965</span><br><span class="line">- 6.847049869711555e-22</span><br><span class="line">- -1.56999999999999</span><br><span class="line">- -5.068582043810573e-15</span><br><span class="line">- 1.4536457371886133e-21</span><br><span class="line">velocity:</span><br><span class="line">- -4.0657581468206416e-20</span><br><span class="line">- -8.950368793553612e-14</span><br><span class="line">- 1.3552527156068805e-20</span><br><span class="line">- -9.422947448364805e-14</span><br><span class="line">- -2.710505431213761e-20</span><br><span class="line">- 0.0</span><br><span class="line">effort:</span><br><span class="line">- -0.017572432177420723</span><br><span class="line">- -0.05044093661208997</span><br><span class="line">- -1.6940658945086007e-18</span><br><span class="line">- -0.0029038103866075985</span><br><span class="line">- 0.0008923555566335767</span><br><span class="line">- 9.510277373872623e-20</span><br><span class="line">---</span><br></pre></td></tr></table></figure>
+
+<p>這是模擬時間（230秒）當下各個關節的狀態值</p>
+<ul>
+<li>name 是以字母做關節名稱的排序，不是動力鏈的順序</li>
+<li>position：關節角度（弧度）。</li>
+<li>velocity：關節角速度。log 中的值接近零，表示手臂靜止。</li>
+<li>effort：關節力矩，主要是重力補償等造成的小值。</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Gazebo/" rel="tag"># Gazebo</a>
+              <a href="/tags/MoveIt/" rel="tag"># MoveIt</a>
+              <a href="/tags/RViz/" rel="tag"># RViz</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2026/11/06/ros2-control-gazebo/" rel="prev" title="ros2_control_gazebo">
+      <i class="fa fa-chevron-left"></i> ros2_control_gazebo
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%92%B0%E5%A2%83"><span class="nav-number">1.</span> <span class="nav-text">環境</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%95%9F%E5%8B%95"><span class="nav-number">2.</span> <span class="nav-text">啟動</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AA%8D%E8%AD%98-RViz-GUI"><span class="nav-number">3.</span> <span class="nav-text">認識 RViz GUI</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%8B%E5%8B%95%E9%80%B2%E8%A1%8C%E8%A6%8F%E5%8A%83%E8%B7%AF%E5%BE%91"><span class="nav-number">4.</span> <span class="nav-text">手動進行規劃路徑</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A2%BA%E8%AA%8D-MoveIt-%E7%9A%84-action"><span class="nav-number">5.</span> <span class="nav-text">確認 MoveIt 的 action</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Ann</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">42</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ann</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 強力驅動
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
