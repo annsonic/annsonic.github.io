@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"annsonic.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="MoveIt Action 控制機械手臂的點到點移動。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MoveIt Path Planning">
+<meta property="og:url" content="https://annsonic.github.io/2026/11/16/MoveIt-Path-Planning/index.html">
+<meta property="og:site_name" content="Ann&#39;s Note">
+<meta property="og:description" content="MoveIt Action 控制機械手臂的點到點移動。">
+<meta property="og:locale" content="zh_TW">
+<meta property="article:published_time" content="2026-11-16T14:45:22.000Z">
+<meta property="article:modified_time" content="2026-11-22T08:29:10.083Z">
+<meta property="article:author" content="Ann">
+<meta property="article:tag" content="Gazebo">
+<meta property="article:tag" content="MoveIt">
+<meta property="article:tag" content="RViz">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://annsonic.github.io/2026/11/16/MoveIt-Path-Planning/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-TW'
+  };
+</script>
+
+  <title>MoveIt Path Planning | Ann's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Ann's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://annsonic.github.io/2026/11/16/MoveIt-Path-Planning/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Ann">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ann's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          MoveIt Path Planning
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2026-11-16 22:45:22" itemprop="dateCreated datePublished" datetime="2026-11-16T22:45:22+08:00">2026-11-16</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2026-11-22 16:29:10" itemprop="dateModified" datetime="2026-11-22T16:29:10+08:00">2026-11-22</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/simulation-%E7%AD%86%E8%A8%98/" itemprop="url" rel="index"><span itemprop="name">simulation 筆記</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>MoveIt Action 控制機械手臂的點到點移動。</p>
+<span id="more"></span>
+
+<h3 id="環境"><a href="#環境" class="headerlink" title="環境"></a>環境</h3><ul>
+<li>作業系統 Ubuntu 24.04</li>
+<li>ROS2 Kilted</li>
+<li>Gazebo Ionic</li>
+<li>Universal Robots 驅動與模擬套件</li>
+</ul>
+<p>雖然有 moveit_py 這個 moveIt 提供的 python 介面，<br>但它會自己建立一個 move_group，<br>與我想要用的 ur_sim_moveit.launch.py 會重複，<br>所以這一篇練習不使用 moveit_py、而是呼叫現有的 <code>/move_action</code> action。</p>
+<h3 id="關於-move-group"><a href="#關於-move-group" class="headerlink" title="關於 move_group"></a>關於 move_group</h3><p><a target="_blank" rel="noopener" href="https://discourse.openrobotics.org/t/moveit-2-journey-first-demonstrator-in-ros-2-planning-to-a-joint-space-goal/9301">參考資料</a><br>有三個層次</p>
+<ul>
+<li>Package(套件)：moveit_ros_move_group 是 ROS2 的套件,可以編譯、安裝的。</li>
+<li>Node(節點)：這個套件裡有一個可執行檔 move_group。執行它(通常用 launch file 啟動)就會產生一個執行中的 ROS2 node，名稱也叫 move_group。</li>
+<li>Action &#x2F; Service：這個 node 運行後,對外提供一組介面,例如:<ul>
+<li>Action：&#x2F;move_action(規劃並執行)、&#x2F;execute_trajectory</li>
+<li>Service：&#x2F;plan_kinematic_path、&#x2F;get_planning_scene、&#x2F;compute_ik、&#x2F;compute_fk 等</li>
+</ul>
+</li>
+</ul>
+<h3 id="建立專案"><a href="#建立專案" class="headerlink" title="建立專案"></a>建立專案</h3><p>我命名這個專案叫 ur5e_ptp</p>
+<p><code>arm_ws/src$ ros2 pkg create --build-type ament_python ur5e_ptp</code></p>
+<p>專案資料夾結構</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">arm_ws/src</span><br><span class="line">└── ur5e_ptp</span><br><span class="line">    ├── package.xml</span><br><span class="line">    ├── resource</span><br><span class="line">    │   └── ur5e_ptp</span><br><span class="line">    ├── setup.cfg</span><br><span class="line">    ├── setup.py</span><br><span class="line">    └── ur5e_ptp</span><br><span class="line">        ├── __init__.py</span><br><span class="line">        └── ptp.py  &lt;&lt; 我們接下來要建立的檔案</span><br></pre></td></tr></table></figure>
+
+<h3 id="開發"><a href="#開發" class="headerlink" title="開發"></a>開發</h3><ul>
+<li><p>建立 <code>ur5e_ptp/ur5e_ptp/ptp.py</code></p>
+  <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line">import sys</span><br><span class="line">import rclpy</span><br><span class="line">from rclpy.node import Node</span><br><span class="line">from rclpy.action import ActionClient</span><br><span class="line">from moveit_msgs.action import MoveGroup</span><br><span class="line">from moveit_msgs.msg import Constraints, JointConstraint</span><br><span class="line"></span><br><span class="line">JOINTS = [</span><br><span class="line">    &quot;shoulder_pan_joint&quot;,</span><br><span class="line">    &quot;shoulder_lift_joint&quot;,</span><br><span class="line">    &quot;elbow_joint&quot;,</span><br><span class="line">    &quot;wrist_1_joint&quot;,</span><br><span class="line">    &quot;wrist_2_joint&quot;,</span><br><span class="line">    &quot;wrist_3_joint&quot;,</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line">POSES = &#123;  # 弧度</span><br><span class="line">    &quot;A&quot;: [0.0, -1.57, 0.0, -1.57, 0.0, 0.0],</span><br><span class="line">    &quot;B&quot;: [0.8, -1.2, 1.0, -1.8, -1.57, 0.0],</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class PtpNode(Node):</span><br><span class="line">    def __init__(self):</span><br><span class="line">        super().__init__(&quot;ur5e_ptp&quot;)</span><br><span class="line">        self.client = ActionClient(self, MoveGroup, &quot;/move_action&quot;)</span><br><span class="line"></span><br><span class="line">    def move_to(self, joints):</span><br><span class="line">        self.client.wait_for_server()</span><br><span class="line">        goal = MoveGroup.Goal()</span><br><span class="line">        req = goal.request</span><br><span class="line">        req.group_name = &quot;ur_manipulator&quot;</span><br><span class="line">        req.num_planning_attempts = 5</span><br><span class="line">        req.allowed_planning_time = 5.0</span><br><span class="line">        req.max_velocity_scaling_factor = 0.3</span><br><span class="line">        req.max_acceleration_scaling_factor = 0.3</span><br><span class="line">        c = Constraints()</span><br><span class="line">        for name, pos in zip(JOINTS, joints):</span><br><span class="line">            c.joint_constraints.append(</span><br><span class="line">                JointConstraint(</span><br><span class="line">                    joint_name=name,</span><br><span class="line">                    position=pos,</span><br><span class="line">                    tolerance_above=0.01,</span><br><span class="line">                    tolerance_below=0.01,</span><br><span class="line">                    weight=1.0,</span><br><span class="line">                )</span><br><span class="line">            )</span><br><span class="line">        req.goal_constraints.append(c)</span><br><span class="line">        goal.planning_options.plan_only = False  # False = 規劃並執行</span><br><span class="line"></span><br><span class="line">        send = self.client.send_goal_async(goal)</span><br><span class="line">        rclpy.spin_until_future_complete(self, send)</span><br><span class="line">        handle = send.result()</span><br><span class="line">        if not handle.accepted:</span><br><span class="line">            self.get_logger().error(&quot;goal rejected&quot;)</span><br><span class="line">            return False</span><br><span class="line">        res = handle.get_result_async()</span><br><span class="line">        rclpy.spin_until_future_complete(self, res)</span><br><span class="line">        code = res.result().result.error_code.val</span><br><span class="line">        self.get_logger().info(f&quot;error_code=&#123;code&#125; (1 = SUCCESS)&quot;)</span><br><span class="line">        return code == 1</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def main():</span><br><span class="line">    rclpy.init(args=sys.argv)</span><br><span class="line">    node = PtpNode()</span><br><span class="line">    for key in (&quot;A&quot;, &quot;B&quot;, &quot;A&quot;):</span><br><span class="line">        if not node.move_to(POSES[key]):</span><br><span class="line">            break</span><br><span class="line">    node.destroy_node()</span><br><span class="line">    rclpy.shutdown()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>POSES 向量的關節順序和 JOINTS 宣告的順序一致</li>
+<li><code>move_group</code> action 控制關節的轉動角度，單位是 rad<ul>
+<li>RViz 的 MotionPlanning 面板 Joints 分頁顯示的是度(degree)</li>
+<li>URDF 的關節 <limit lower upper> 也是 rad</li>
+</ul>
+</li>
+<li>這個程式裡只有一個目標：「6 個關節同時達到這組位置(誤差各 ±0.01 rad)」<ul>
+<li>constraint 不規定哪個關節先動、哪個後動</li>
+<li>只要有一個關節不可達，這個目標就無法滿足，機器人完全不動</li>
+</ul>
+</li>
+<li>補充：<code>/move_action</code> 的 request 不能直接填具名姿態。具名姿態只是 SRDF 裡存的一組關節值,要先讀出來再轉成 <code>JointConstraint</code>。</li>
+</ul>
+</li>
+<li><p>編輯 <code>ur5e_ptp/setup.py</code></p>
+</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">entry_points=&#123;</span><br><span class="line">    &#x27;console_scripts&#x27;: [</span><br><span class="line">        &#x27;ptp = ur5e_ptp.ptp:main&#x27;,</span><br><span class="line">    ],</span><br><span class="line">&#125;,</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>編輯 <code>ur5e_ptp/package.xml</code></li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;exec_depend&gt;rclpy&lt;/exec_depend&gt;</span><br><span class="line">&lt;exec_depend&gt;moveit_msgs&lt;/exec_depend&gt;</span><br><span class="line">&lt;exec_depend&gt;ur_simulation_gz&lt;/exec_depend&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="編譯"><a href="#編譯" class="headerlink" title="編譯"></a>編譯</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">arm_ws$ colcon build --packages-select ur5e_ptp --symlink-install</span><br><span class="line">arm_ws$ source install/setup.bash</span><br></pre></td></tr></table></figure>
+
+<h3 id="測試"><a href="#測試" class="headerlink" title="測試"></a>測試</h3><ul>
+<li>[終端機 A] 前置作業</li>
+</ul>
+<p><code>$ ros2 launch ur_simulation_gz ur_sim_moveit.launch.py ur_type:=ur5e</code></p>
+<ul>
+<li>[終端機 B] 執行點到點的移動</li>
+</ul>
+<p><code>$ ros2 run ur5e_ptp ptp</code></p>
+<p>終端機輸出</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[INFO] [1795189209.443909243] [ur5e_ptp]: error_code=1 (1 = SUCCESS)</span><br><span class="line">[INFO] [1795189213.407994043] [ur5e_ptp]: error_code=1 (1 = SUCCESS)</span><br><span class="line">[INFO] [1795189217.258545969] [ur5e_ptp]: error_code=1 (1 = SUCCESS)</span><br></pre></td></tr></table></figure>
+
+<p>在 UR5e 手臂靜止後，執行 <code>$ ros2 topic echo /joint_states --once</code></p>
+<p>終端機印出目前手臂的姿態</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">---</span><br><span class="line">header:</span><br><span class="line">  stamp:</span><br><span class="line">    sec: 143</span><br><span class="line">    nanosec: 844000000</span><br><span class="line">  frame_id: base_link</span><br><span class="line">name:</span><br><span class="line">- elbow_joint</span><br><span class="line">- shoulder_lift_joint</span><br><span class="line">- shoulder_pan_joint</span><br><span class="line">- wrist_1_joint</span><br><span class="line">- wrist_2_joint</span><br><span class="line">- wrist_3_joint</span><br><span class="line">position:</span><br><span class="line">- 0.0010963213350659064</span><br><span class="line">- -1.5704286788497088</span><br><span class="line">- 0.007048559812828922</span><br><span class="line">- -1.5765197293739979</span><br><span class="line">- -0.0015959506900845829</span><br><span class="line">- -0.004129935903474681</span><br><span class="line">velocity:</span><br><span class="line">- -1.0340578220080499e-16</span><br><span class="line">- -1.0490898107911109e-13</span><br><span class="line">- -3.903737684669839e-16</span><br><span class="line">- 1.0652871813843223e-13</span><br><span class="line">- 9.44069041691753e-17</span><br><span class="line">- -3.9063804274652725e-16</span><br><span class="line">effort:</span><br><span class="line">- -0.020095016791679313</span><br><span class="line">- -0.0352697405346492</span><br><span class="line">- -8.470329472543003e-18</span><br><span class="line">- 0.006871809418104502</span><br><span class="line">- -0.0023865291672471355</span><br><span class="line">- -3.533018229905512e-19</span><br><span class="line">---</span><br></pre></td></tr></table></figure>
+
+<p>差不多是姿態 A 的位置，各關節誤差都在 0.01 rad 內。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Gazebo/" rel="tag"># Gazebo</a>
+              <a href="/tags/MoveIt/" rel="tag"># MoveIt</a>
+              <a href="/tags/RViz/" rel="tag"># RViz</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2026/11/14/MoveIt-Getting-Started/" rel="prev" title="MoveIt Getting Started">
+      <i class="fa fa-chevron-left"></i> MoveIt Getting Started
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%92%B0%E5%A2%83"><span class="nav-number">1.</span> <span class="nav-text">環境</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%9C%E6%96%BC-move-group"><span class="nav-number">2.</span> <span class="nav-text">關於 move_group</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BB%BA%E7%AB%8B%E5%B0%88%E6%A1%88"><span class="nav-number">3.</span> <span class="nav-text">建立專案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%96%8B%E7%99%BC"><span class="nav-number">4.</span> <span class="nav-text">開發</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B7%A8%E8%AD%AF"><span class="nav-number">5.</span> <span class="nav-text">編譯</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B8%AC%E8%A9%A6"><span class="nav-number">6.</span> <span class="nav-text">測試</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Ann</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">43</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ann</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 強力驅動
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
